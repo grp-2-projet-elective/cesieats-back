@@ -1,2 +1,2 @@
 # cesieats-back
-API orders
+API products

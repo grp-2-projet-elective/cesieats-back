@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  orders-api:
+    image: dr.felicien-fouillet.fr/orders-api:latest
+    container_name: orders-api
+    privileged: true
+    restart: unless-stopped
+    networks:
+      - orders-api
+    ports:
+      - 3030:3030
+
+networks:
+  orders-api:
+    external:
+      name: docker_default
