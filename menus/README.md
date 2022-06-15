@@ -1,2 +1,2 @@
 # cesieats-back
-API deliveries
+API menus
