@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  portfolio-api:
+    image: dr.felicien-fouillet.fr/portfolio-api:latest
+    container_name: portfolio-api
+    privileged: true
+    restart: unless-stopped
+    networks:
+      - portfolio-api
+    ports:
+      - 3030:3030
+
+networks:
+  portfolio-api:
+    external:
+      name: docker_default
