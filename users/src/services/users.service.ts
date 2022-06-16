@@ -1,4 +1,4 @@
-import { User, IUser } from 'models/users.model';
+import { IUser } from 'models/users.model';
 import { NotFoundException } from 'utils/exceptions';
 
 export class UsersService {
@@ -7,7 +7,15 @@ export class UsersService {
      */
     async findAll(): Promise<Array<IUser>> {
         try {
-            const users = await User.find();
+            const users = [
+                {
+                    id: '1',
+                    title: 'User 1',
+                    subtitle: 'Subtitle 1',
+                    date: '01/01/2020',
+                    description: 'Description 1'
+                },
+            ];
 
             return users;
         } catch (e) {
@@ -21,7 +29,13 @@ export class UsersService {
      */
     async findOne(id: string): Promise<IUser | null | undefined> {
         try {
-            const user = await User.findById(id);
+            const user = {
+                id: '1',
+                title: 'User 1',
+                subtitle: 'Subtitle 1',
+                date: '01/01/2020',
+                description: 'Description 1'
+            };
 
             return user;
         } catch (e) {
@@ -38,13 +52,19 @@ export class UsersService {
      * @param id - ID unique de l'user
      */
     async update(id: string, userData: Partial<IUser>): Promise<IUser | null | undefined> {
-        const user = await this.findOne(id);
+        const user = {
+            id: '1',
+            title: 'User 1',
+            subtitle: 'Subtitle 1',
+            date: '01/01/2020',
+            description: 'Description 1'
+        };
 
         if (!user) {
             throw new NotFoundException('No user found');
         }
 
-        const updatedUser = await User.findByIdAndUpdate(id, userData, { new: true });
+        const updatedUser = user;
 
         return updatedUser;
     }
@@ -57,7 +77,13 @@ export class UsersService {
      * @param userData - Un objet correspondant à un user. Attention, on ne prend pas l'id avec.
      */
     async create(userData: IUser): Promise<IUser> {
-        const newUser: IUser = await User.create(userData);
+        const newUser = {
+            id: '1',
+            title: 'User 1',
+            subtitle: 'Subtitle 1',
+            date: '01/01/2020',
+            description: 'Description 1'
+        };
 
         return newUser;
     }
@@ -66,12 +92,16 @@ export class UsersService {
      * Suppression d'un user
      */
     async delete(id: string) {
-        const user = await this.findOne(id);
+        const user = {
+            id: '1',
+            title: 'User 1',
+            subtitle: 'Subtitle 1',
+            date: '01/01/2020',
+            description: 'Description 1'
+        };
 
         if (!user) {
             throw new NotFoundException('No user found');
         }
-
-        await User.findByIdAndRemove(id);
     }
 }

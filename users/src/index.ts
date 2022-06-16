@@ -1,24 +1,18 @@
+import { UsersController } from 'controllers/users.controller';
+import { DataTypes, Sequelize } from 'sequelize';
 import cors from 'cors';
 import 'dotenv/config';
+import { environment } from 'environment/environment';
 import express from 'express';
-import sql from 'mssql';
+import { AuthMiddleware } from 'middlewares/auth.middleware';
 import { ExceptionsHandler } from 'middlewares/exceptions.handler';
 import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
-import { environment } from 'environment/environment';
-import { UsersController } from 'controllers/users.controller';
-import { AuthMiddleware } from 'middlewares/auth.middleware';
+import { User } from 'models/users.model';
 
 /**
  * On crée une nouvelle "application" express
  */
 const app = express();
-
-const pool = new sql.ConnectionPool({
-    user: '...',
-    password: '...',
-    server: 'localhost',
-    database: '...'
-})
 
 /**
  * On dit à Express que l'on souhaite parser le body des requêtes en JSON
@@ -59,13 +53,48 @@ app.use(ExceptionsHandler);
  */
 app.listen(environment.API_PORT, () => console.log(`Server listening at: http://localhost:${environment.API_PORT}`));
 
-try {
-    (async () => {
-        let pool = await  sql.connect(config);
-        await connect('mongodb://' + process.env.MONGO_USER + ':' + process.env.MONGO_PWD + environment.MONGO_URI);
-        console.log('Connected to MongoDB');
-    })();
-} catch (error) {
-    console.log('Error connecting to DB: ', error);
-    process.exit(1);
-}
+(async () => {
+    try {
+        const sequelize = new Sequelize(`postgres://${process.env.SQL_USER}:${process.env.SQL_PWD}@${environment.SQL_SERVER}:${environment.SQL_PORT}/${environment.SQL_DATABASE}`);
+        await sequelize.authenticate();
+
+        User.init(
+            {
+                id: {
+                    type: DataTypes.INTEGER.UNSIGNED,
+                    autoIncrement: true,
+                    primaryKey: true
+                },
+                username: {
+                    type: new DataTypes.STRING(128),
+                    allowNull: false
+                },
+                firstname: {
+                    type: new DataTypes.STRING(128),
+                    allowNull: true
+                },
+                lastname: {
+                    type: new DataTypes.STRING(128),
+                    allowNull: true
+                },
+                createdAt: DataTypes.DATE,
+                updatedAt: DataTypes.DATE,
+            },
+            {
+                tableName: 'users',
+                sequelize // passing the `sequelize` instance is required
+            }
+        );
+
+        User.create({
+            username: 'admin',
+            firstname: 'Admin',
+            lastname: 'Admin'
+        });
+        
+        console.log('Connection has been established successfully.');
+    } catch (error) {
+        console.error('Error connecting to DB: ', error);
+        process.exit(1);
+    }
+})();

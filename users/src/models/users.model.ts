@@ -1,17 +1,26 @@
-import { model, Schema, Model, Document } from 'mongoose';
-
-export interface IUser extends Document {
-    title: string,
-    subtitle?: string,
+export interface IUser {
+    id: string,
+    string?: string,
     date: string,
     description?: string
 }
 
-export const UserSchema: Schema = new Schema({
-    title: { type: String, required: true },
-    subtitle: { type: String, required: false },
-    date: { type: String, required: true },
-    description: { type: String, required: false }
-});
+import { Model, InferAttributes, InferCreationAttributes, CreationOptional, HasManyCreateAssociationMixin, NonAttribute, DataTypes } from 'sequelize';
 
-export const User: Model<IUser> = model('User', UserSchema);
+// order of InferAttributes & InferCreationAttributes is important.
+export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+    declare id: CreationOptional<number>;
+
+    declare username: string;
+    declare firstname: string;
+    declare lastname: string;
+
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
+  
+    // getters that are not attributes should be tagged using NonAttribute
+    // to remove them from the model's Attribute Typings.
+    get fullName(): NonAttribute<string> {
+      return this.username;
+    }
+}
