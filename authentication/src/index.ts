@@ -1,24 +1,19 @@
 import cors from 'cors';
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import express from 'express';
-import sql from 'mssql';
 import { ExceptionsHandler } from 'middlewares/exceptions.handler';
 import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
 import { environment } from 'environment/environment';
-import { UsersController } from 'controllers/users.controller';
+import { connect } from 'mongoose';
+import { AuthController } from 'controllers/auth.controller';
 import { AuthMiddleware } from 'middlewares/auth.middleware';
+
+dotenv.config();
 
 /**
  * On crée une nouvelle "application" express
  */
 const app = express();
-
-const pool = new sql.ConnectionPool({
-    user: '...',
-    password: '...',
-    server: 'localhost',
-    database: '...'
-})
 
 /**
  * On dit à Express que l'on souhaite parser le body des requêtes en JSON
@@ -36,7 +31,7 @@ app.use(cors());
 /**
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
-app.use('/api/v1/users', AuthMiddleware.verifyAccessToken, UsersController);
+app.use('/api/v1/users', AuthMiddleware.verifyAccessToken, AuthController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)
@@ -57,11 +52,10 @@ app.use(ExceptionsHandler);
 /**
  * On demande à Express d'écouter les requêtes sur le port défini dans la config
  */
-app.listen(environment.API_PORT, () => console.log(`Server listening at: http://localhost:${environment.API_PORT}`));
+app.listen(environment.API_PORT, () => console.log(`Auth server listening at: http://localhost:${environment.API_PORT}`));
 
 try {
     (async () => {
-        let pool = await  sql.connect(config);
         await connect('mongodb://' + process.env.MONGO_USER + ':' + process.env.MONGO_PWD + environment.MONGO_URI);
         console.log('Connected to MongoDB');
     })();
