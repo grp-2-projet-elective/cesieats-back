@@ -10,7 +10,7 @@ import { ApiException } from 'models/api-exceptions.model';
  *
  * Ici `this.error = error` et `this.status = status`
  */
-class Exception implements ApiException {
+export class Exception implements ApiException {
     constructor(readonly error: any, readonly status: number) { }
 }
 

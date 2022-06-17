@@ -1,25 +1,21 @@
-import { IUser } from 'models/users.model';
-import { NotFoundException } from 'utils/exceptions';
+import { IUser, Role, Roles, User } from 'models/users.model';
+import { Model, ModelStatic } from 'sequelize/types';
+import { Exception, NotFoundException } from 'utils/exceptions';
 
 export class UsersService {
+    public User: ModelStatic<Model<any, any>>;
+    public Role: ModelStatic<Model<any, any>>;
+
     /**
      * Trouve tous les users
      */
-    async findAll(): Promise<Array<IUser>> {
+    async findAll(): Promise<Array<Model<any, any>>> {
         try {
-            const users = [
-                {
-                    id: '1',
-                    title: 'User 1',
-                    subtitle: 'Subtitle 1',
-                    date: '01/01/2020',
-                    description: 'Description 1'
-                },
-            ];
+            const users = await this.User.findAll();
 
             return users;
-        } catch (e) {
-            throw new NotFoundException('No users found');
+        } catch (e: any) {
+            throw new Exception(e.message, e.status);
         }
     }
 
@@ -27,19 +23,17 @@ export class UsersService {
      * Trouve un user en particulier
      * @param id - ID unique de l'user
      */
-    async findOne(id: string): Promise<IUser | null | undefined> {
+    async findOne(id: string): Promise<Model<any, any>> {
         try {
-            const user = {
-                id: '1',
-                title: 'User 1',
-                subtitle: 'Subtitle 1',
-                date: '01/01/2020',
-                description: 'Description 1'
-            };
+            const user = await this.User.findOne({ where: { id } });
+
+            if (!user) {
+                throw new NotFoundException('No user found');
+            }
 
             return user;
-        } catch (e) {
-            throw new NotFoundException('No user found');
+        } catch (e: any) {
+            throw new Exception(e.message, e.status);
         }
     }
 
@@ -51,22 +45,21 @@ export class UsersService {
      * @param userData - Un objet correspondant à un user, il ne contient pas forcément tout un user. Attention, on ne prend pas l'id avec.
      * @param id - ID unique de l'user
      */
-    async update(id: string, userData: Partial<IUser>): Promise<IUser | null | undefined> {
-        const user = {
-            id: '1',
-            title: 'User 1',
-            subtitle: 'Subtitle 1',
-            date: '01/01/2020',
-            description: 'Description 1'
-        };
+    async update(id: string, userData: Partial<User>): Promise<Model<any, any> | null> {
+        try {
+            const user = await this.findOne(id);
 
-        if (!user) {
-            throw new NotFoundException('No user found');
+            const updatedUser = {
+                ...user.toJSON(),
+                ...userData
+            };
+
+            await this.User.update(updatedUser, { where: { id } });
+
+            return updatedUser;
+        } catch (e: any) {
+            throw new Exception(e.message, e.status);
         }
-
-        const updatedUser = user;
-
-        return updatedUser;
     }
 
     /**
@@ -76,32 +69,32 @@ export class UsersService {
      *
      * @param userData - Un objet correspondant à un user. Attention, on ne prend pas l'id avec.
      */
-    async create(userData: IUser): Promise<IUser> {
-        const newUser = {
-            id: '1',
-            title: 'User 1',
-            subtitle: 'Subtitle 1',
-            date: '01/01/2020',
-            description: 'Description 1'
-        };
+    async create(userData: IUser, role: Roles): Promise<Model<any, any>> {
+        const newUser = await this.User.create({
+            ...userData,
+            roleId: (await this.Role.findOne({ where: { type: role } }) as Role).id,
+            createdAt: new Date(Date.now()),
+            updatedAt: new Date(Date.now()),
+        });
 
+        await newUser.save();
         return newUser;
     }
 
     /**
      * Suppression d'un user
      */
-    async delete(id: string) {
-        const user = {
-            id: '1',
-            title: 'User 1',
-            subtitle: 'Subtitle 1',
-            date: '01/01/2020',
-            description: 'Description 1'
-        };
+    async delete(id: string): Promise<any> {
+        try {
+            const userCount = await this.User.destroy({ where: { id } });
 
-        if (!user) {
-            throw new NotFoundException('No user found');
+            if (userCount === 0) {
+                throw new NotFoundException('No user found');
+            }
+
+            return { message: 'User deleted' };
+        } catch (e: any) {
+            throw new Exception(e.message, e.status);
         }
     }
 }

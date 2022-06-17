@@ -8,9 +8,9 @@ import { BadRequestException, NotFoundException } from 'utils/exceptions';
 const UsersController = Router();
 
 /**
- * Instance de notre service
+ * Instance de notre usersService
  */
-const service = new UsersService();
+const usersService = new UsersService();
 
 /**
  * Trouve tous les users
@@ -19,7 +19,7 @@ UsersController.get('/', async (req, res) => {
     try {
         return res
             .status(200)
-            .json(await service.findAll());
+            .json(await usersService.findAll());
     } catch (e: any) {
         return res
             .status(e.status)
@@ -38,7 +38,7 @@ UsersController.get('/:id', async (req, res) => {
             throw new BadRequestException('Invalid id');
         }
 
-        const user = await service.findOne(id);
+        const user = await usersService.findOne(id);
 
         if (!user) {
             throw new NotFoundException('No user found');
@@ -59,7 +59,7 @@ UsersController.get('/:id', async (req, res) => {
  */
 UsersController.post('/', async (req, res) => {
     try {
-        const createdUser = await service.create(req.body);
+        const createdUser = await usersService.create(req.body.userData, req.body.role);
 
         return res
             .status(201)
@@ -82,7 +82,7 @@ UsersController.patch('/:id', async (req, res) => {
             throw new BadRequestException('Invalid id');
         }
 
-        const updatedUser = await service.update(id, req.body);
+        const updatedUser = await usersService.update(id, req.body.userData);
 
         return res
             .status(200)
@@ -105,9 +105,11 @@ UsersController.delete('/:id', async (req, res) => {
             throw new BadRequestException('Invalid id');
         }
 
+        const response = await usersService.delete(id);
+
         return res
             .status(200)
-            .json(await service.delete(id));
+            .json(response);
     } catch (e: any) {
         return res
             .status(e.status)
@@ -118,5 +120,5 @@ UsersController.delete('/:id', async (req, res) => {
 /**
  * On expose notre controller pour l'utiliser dans `src/index.ts`
  */
-export { UsersController };
+export { UsersController, usersService };
 
