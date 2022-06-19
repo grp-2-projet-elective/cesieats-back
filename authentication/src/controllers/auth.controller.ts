@@ -13,35 +13,6 @@ const AuthController = Router();
  */
 const service = new AuthService();
 
-async function initMqttAuthListening(mqttClient: MqttClient): Promise<void> {
-    service.mqttClient = mqttClient;
-
-    mqttClient.on('message', function (topic, message) {
-        // message is Buffer
-        console.log(topic);
-        console.log(message.toString());
-
-        ({
-            'authentication': async (message: string) => {
-                const payload = JSON.parse(message);
-
-                ({
-                    'register': async (message: string) => {
-                        const payload = JSON.parse(message);
-                    },
-                    'login': async (message: string) => {
-                        const payload = JSON.parse(message);
-                    },
-                    'logout': async (message: string) => {
-                        const payload = JSON.parse(message);
-                    }
-                }[payload.action])();
-            }
-        }[topic])();
-    });
-}
-
-
 /**
  * Enregistrer un nouvel user
  */
@@ -73,15 +44,14 @@ AuthController.post('/register', async (req, res) => {
 AuthController.post('/login', async (req, res) => {
     try {
         const user = await service.findOne(req.body.userId);
+        const connectionResponse = {
 
+        }
+        
         //if user does not exist, send a 400 response
-        if (await bcrypt.compare(req.body.password, user.password)) {
-            const accessToken = service.generateAccessToken(req.body.username);
-            const refreshToken = service.generateRefreshToken(req.body.username);
             return res
                 .status(201)
                 .json(service.login());
-        }
 
         return res.status(401).send('Unauthorized');
     } catch (e: any) {

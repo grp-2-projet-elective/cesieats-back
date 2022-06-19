@@ -1,10 +1,14 @@
+import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 import { IUser, Tokens } from 'models/auth.models';
 import { MqttClient } from 'mqtt';
 import { Exception, InternalServerException } from 'utils/exceptions';
+import { EsbService } from './esb.service';
 
 export class AuthService {
     public mqttClient: MqttClient;
+    public esbService: EsbService;
 
     async register(userInformationData: Partial<IUser>): Promise<IUser | void> {
         try {
@@ -24,23 +28,42 @@ export class AuthService {
         }
     }
 
-    async login(id: string, username: string): Promise<Tokens | void> {
+    async login(id: string, username: string, hashedPassword: string): Promise<Tokens | void> {
         try {
-            //if user does not exist, send a 400 response
-            const accessToken = this.generateAccessToken(username);
-            const refreshToken = this.generateRefreshToken(username);
-
-            this.mqttClient.publish('users', JSON.stringify({ action: 'updateToken', data: { accessToken: accessToken, refreshToken: refreshToken } }), (err, packet) => {
-                if (err) {
-                    console.error(err);
-                    throw new InternalServerException(err);
+            this.mqttClient.once("message", (topic, payload) => {
+                this.mqttClient.unsubscribe(responseTopic);
+                try {
+                  const relayResponseMessage: RelayResponseMessage = JSON.parse(
+                    payload.toString()
+                  );
+                  relayResponseMessage.error
+                    ? reject(relayResponseMessage.message)
+                    : resolve(relayResponseMessage.message);
+                } catch (error) {
+                  resolve("JsonConvertError");
                 }
-
-                console.log(packet);
-
-                return { accessToken: accessToken, refreshToken: refreshToken };
+              });
+              this.mqttClient.publish('users', JSON.stringify({ id: uuidv4(), action: 'verifyPassword', body: {userId: id, data: { username: username, hashedPassword: hashedPassword } } }), (err, packet) => {;
             });
+            this.mqttClient.publish('users', JSON.stringify({ id: uuidv4(), action: 'verifyPassword', body: {userId: id, data: { username: username, hashedPassword: hashedPassword } }}), (err, packet) => {});
 
+            if (await bcrypt.compare(hashedPassword, user.password)) {
+                //if user does not exist, send a 400 response
+                const accessToken = this.generateAccessToken(username);
+                const refreshToken = this.generateRefreshToken(username);
+
+                this.mqttClient.publish('users', JSON.stringify({ action: 'updateToken', data: { accessToken: accessToken, refreshToken: refreshToken } }), (err, packet) => {
+                    if (err) {
+                        console.error(err);
+                        throw new InternalServerException(err);
+                    }
+
+                    console.log(packet);
+
+                    return { accessToken: accessToken, refreshToken: refreshToken };
+                });
+
+            }
         } catch (e) {
             throw new Exception(e.message, e.status);
         }

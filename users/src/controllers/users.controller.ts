@@ -40,10 +40,6 @@ UsersController.get('/:id', async (req, res) => {
 
         const user = await usersService.findOne(id);
 
-        if (!user) {
-            throw new NotFoundException('No user found');
-        }
-
         return res
             .status(200)
             .json(user);

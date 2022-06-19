@@ -19,7 +19,9 @@
     "mqtt": "^4.3.7",
     "pg": "^8.7.3",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.20.1"
+    "rxjs": "^7.5.5",
+    "sequelize": "^6.20.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
