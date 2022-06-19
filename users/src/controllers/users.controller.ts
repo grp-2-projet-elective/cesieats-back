@@ -1,4 +1,7 @@
 import { Router } from 'express';
+import { mqttClientOptions } from 'models/esb.model';
+import { connect, MqttClient } from 'mqtt';
+import { EsbService } from 'services/esb.service';
 import { UsersService } from 'services/users.service';
 import { BadRequestException, NotFoundException } from 'utils/exceptions';
 
@@ -10,7 +13,9 @@ const UsersController = Router();
 /**
  * Instance de notre usersService
  */
-const usersService = new UsersService();
+const mqttClient: MqttClient = connect('mqtt://localhost:1883', mqttClientOptions);
+const esbService: EsbService = new EsbService(mqttClient, ['auth']);
+const usersService = new UsersService(mqttClient, esbService);
 
 /**
  * Trouve tous les users

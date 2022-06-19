@@ -1,10 +1,14 @@
 import { IUser, Role, Roles, User } from 'models/users.model';
+import { MqttClient } from 'mqtt';
 import { Model, ModelStatic } from 'sequelize/types';
 import { Exception, NotFoundException } from 'utils/exceptions';
+import { EsbService } from './esb.service';
 
 export class UsersService {
     public User: ModelStatic<Model<any, any>>;
     public Role: ModelStatic<Model<any, any>>;
+
+    constructor(private readonly mqttClient: MqttClient, private readonly publicesbService: EsbService) { }
 
     /**
      * Trouve tous les users

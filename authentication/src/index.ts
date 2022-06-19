@@ -1,39 +1,21 @@
-import { AuthController, initMqttAuthListening } from 'controllers/auth.controller';
+import { AuthController } from 'controllers/auth.controller';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import { environment } from 'environment/environment';
 import express from 'express';
 import { ExceptionsHandler } from 'middlewares/exceptions.handler';
 import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
+import { mqttClientOptions } from 'models/esb.model';
 
-import * as mqtt from "mqtt";
+import { connect, MqttClient } from 'mqtt';
+import { EsbService } from 'services/esb.service';
 
-dotenv.config();
+const mqttClient: MqttClient = connect('mqtt://localhost:1883', mqttClientOptions);
 
 /**
  * On crée une nouvelle "application" express
  */
 const app = express();
-const client: mqtt.MqttClient = mqtt.connect('mqtt://localhost:1883');
-
-client.on('connect', function () {
-    client.subscribe('authentication', function (err: any) {
-        if (!err) {
-            console.log('Authentication topic subscribed');
-            initMqttAuthListening(client);
-            // client.publish('authentication', 'Auth request');
-            return;
-        }
-
-        console.error(err);
-    });
-});
-
-// client.on('message', function (topic, message) {
-//     // message is Buffer
-//     console.log(topic);
-//     console.log(message.toString());
-// });
 
 /**
  * On dit à Express que l'on souhaite parser le body des requêtes en JSON

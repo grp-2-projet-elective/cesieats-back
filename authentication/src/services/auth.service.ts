@@ -1,51 +1,62 @@
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { v4 as uuidv4 } from 'uuid';
 import { IUser, Tokens } from 'models/auth.models';
-import { MqttClient } from 'mqtt';
+import { IClientPublishOptions, MqttClient } from 'mqtt';
 import { Exception, InternalServerException } from 'utils/exceptions';
+import { publishWithResponseBasic } from 'utils/mqtt-async.helper';
 import { EsbService } from './esb.service';
 
 export class AuthService {
-    public mqttClient: MqttClient;
-    public esbService: EsbService;
+    
+    constructor(private readonly mqttClient: MqttClient, private readonly publicesbService: EsbService) { }
 
     async register(userInformationData: Partial<IUser>): Promise<IUser | void> {
         try {
-            this.mqttClient.publish('users', JSON.stringify({ action: 'create', data: userInformationData }), (err, packet) => {
-                if (err) {
-                    console.error(err);
-                    throw new InternalServerException(err);
-                }
+            // this.mqttClient.publish('users', JSON.stringify({ action: 'create', data: userInformationData }), (err, packet) => {
+            //     if (err) {
+            //         console.error(err);
+            //         throw new InternalServerException(err);
+            //     }
 
-                console.log(packet);
-                const updatedUser = userInformationData as IUser;
+            //     console.log(packet);
+            //     const updatedUser = userInformationData as IUser;
 
-                return updatedUser;
-            });
+            //     return updatedUser;
+            // });
         } catch (e) {
             throw new Exception(e.message, e.status);
         }
     }
 
-    async login(id: string, username: string, hashedPassword: string): Promise<Tokens | void> {
+    async login(username: string, hashedPassword: string): Promise<Tokens | void> {
         try {
-            this.mqttClient.once("message", (topic, payload) => {
-                this.mqttClient.unsubscribe(responseTopic);
-                try {
-                  const relayResponseMessage: RelayResponseMessage = JSON.parse(
-                    payload.toString()
-                  );
-                  relayResponseMessage.error
-                    ? reject(relayResponseMessage.message)
-                    : resolve(relayResponseMessage.message);
-                } catch (error) {
-                  resolve("JsonConvertError");
-                }
-              });
-              this.mqttClient.publish('users', JSON.stringify({ id: uuidv4(), action: 'verifyPassword', body: {userId: id, data: { username: username, hashedPassword: hashedPassword } } }), (err, packet) => {;
-            });
-            this.mqttClient.publish('users', JSON.stringify({ id: uuidv4(), action: 'verifyPassword', body: {userId: id, data: { username: username, hashedPassword: hashedPassword } }}), (err, packet) => {});
+            // this.mqttClient.once('message', (topic, payload) => {
+            //     this.mqttClient.unsubscribe(responseTopic);
+            //     try {
+            //         const responseMessage: ResponseMessage = JSON.parse(
+            //             payload.toString()
+            //         );
+            //         responseMessage.error
+            //             ? reject(responseMessage.message)
+            //             : resolve(responseMessage.message);
+            //     } catch (error) {
+            //         resolve('JsonConvertError');
+            //     }
+            // });
+
+            const apiName: string = 'users';
+            const action: string = 'findOne';
+            const responseTopic = `response/${apiName}/${action}`;
+            const requestTopic = `request/${apiName}/${action}`;
+            const publishOptions: IClientPublishOptions = {
+                qos: 1,
+                properties: {
+                    responseTopic,
+                    correlationData: Buffer.from('secret', 'utf-8'),
+                },
+            };
+            const user = JSON.parse(await publishWithResponseBasic(this.mqttClient, '', publishOptions, requestTopic, responseTopic));
+            console.log(user);
 
             if (await bcrypt.compare(hashedPassword, user.password)) {
                 //if user does not exist, send a 400 response
@@ -94,7 +105,7 @@ export class AuthService {
                 }
 
                 console.log(packet);
-                // if (!refreshTokens.includes(req.body.token)) res.status(400).send("Refresh Token Invalid");
+                // if (!refreshTokens.includes(req.body.token)) res.status(400).send('Refresh Token Invalid');
                 // refreshTokens = refreshTokens.filter((c) => c != req.body.token);
                 // const refreshToken = await service.findOne(req.body.tokenId);
 
@@ -117,7 +128,7 @@ export class AuthService {
      * @returns 
      */
     generateAccessToken(mail: string): string {
-        return jwt.sign({ mail: mail }, process.env.ACCESS_TOKEN_SECRET as jwt.Secret, { expiresIn: "15m" });
+        return jwt.sign({ mail: mail }, process.env.ACCESS_TOKEN_SECRET as jwt.Secret, { expiresIn: '15m' });
     }
 
     /**
@@ -126,7 +137,7 @@ export class AuthService {
      * @returns 
      */
     generateRefreshToken(mail: string): string {
-        const refreshToken = jwt.sign({ mail: mail }, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: "20m" });
+        const refreshToken = jwt.sign({ mail: mail }, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: '20m' });
         // refreshTokens.push(refreshToken);
         return refreshToken;
     }

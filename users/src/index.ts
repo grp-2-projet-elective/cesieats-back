@@ -7,35 +7,7 @@ import { AuthMiddleware } from 'middlewares/auth.middleware';
 import { ExceptionsHandler } from 'middlewares/exceptions.handler';
 import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
 import { Roles } from 'models/users.model';
-import { connect, MqttClient } from 'mqtt';
 import { DataTypes, Model, ModelStatic, Sequelize } from 'sequelize';
-
-const mqttClient: MqttClient = connect('mqtt://localhost:1883');
-
-mqttClient.on('connect', function () {
-    mqttClient.subscribe('authentication', function (err: any) {
-        if (!err) {
-            console.log('Authentication topic subscribed');
-            return;
-        }
-
-        console.error(err);
-    });
-});
-
-mqttClient.on('message', function (topic, message) {
-    // message is Buffer
-    console.log(topic);
-    console.log(message.toString());
-
-    ({
-        'authentication': async (message: string) => {
-            const payload = JSON.parse(message);
-
-            // const { id, firstname, lastname, mail, phone, password, roleId, thumbnail, city, cityCode, address, sponsorId, token, refreshToken } = user;
-        }
-    }[topic])();
-});
 
 /**
  * On crée une nouvelle "application" express

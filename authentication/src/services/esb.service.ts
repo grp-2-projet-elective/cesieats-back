@@ -1,20 +1,21 @@
 
-import { IErrorCallback, IPayload } from "models/esb.model";
-import { MqttClient } from "mqtt";
-import { Subject } from "rxjs";
-import { AuthService } from "./auth.service";
+import EventEmitter from 'events';
+import { IErrorCallback } from 'models/esb.model';
+import { MqttClient } from 'mqtt';
+import { ResponseEvent } from 'utils/relay-response-event.helper';
 
 export class EsbService {
     public readonly isMqttClientConnected: boolean = false;
-    public readonly responseSubject: Subject<IPayload> = new Subject<IPayload>();
+    public readonly eventEmitter: EventEmitter = new EventEmitter();
 
-    constructor(private readonly mqttClient: MqttClient, public readonly topics: Array<string>, public readonly service: AuthService) { }
+    constructor(private readonly mqttClient: MqttClient, public readonly topics: Array<string>) { }
 
     public initEsbService() {
         this.mqttClient.on('connect', () => {
             this.mqttClient.connected = true;
+            console.log(`Connected to mqtt ${new Date()}`);
 
-            this.mqttClient.subscribe(['auth', 'users-response'], (err: Error) => {
+            this.mqttClient.subscribe(['response/+/+', 'otherTopics/#'], (err: Error) => {
                 if (!err) {
                     this.initEsbMessagesListening();
                     console.log('ESB topics subscribed');
@@ -25,111 +26,138 @@ export class EsbService {
             });
         });
 
-        this.mqttClient.on("error", (err: IErrorCallback) => {
-            console.log("Error: " + err);
+        this.mqttClient.on('error', (err: IErrorCallback) => {
+            console.error('Error: ' + err);
 
-            if (err.code == "ENOTFOUND") {
-                console.log("Network error, make sure you have an active internet connection");
+            if (err.code == 'ENOTFOUND') {
+                console.error('Network error, make sure you have an active internet connection');
             }
         });
 
-        this.mqttClient.on("close", () => {
-            this.mqttClient.connected = false;
-            console.log("Connection closed by client");
+        this.mqttClient.on('close', () => {
+            console.log('Connection closed by client');
         });
 
-        this.mqttClient.on("reconnect", () => {
-            this.mqttClient.connected = true;
-            console.log("Client trying a reconnection");
+        this.mqttClient.on('reconnect', () => {
+            console.log('Client trying a reconnection');
         });
 
-        this.mqttClient.on("offline", () => {
-            this.mqttClient.connected = false;
-            console.log("Client is currently offline");
+        this.mqttClient.on('offline', () => {
+            console.log('Client is currently offline');
         });
+
+        // this.startSystem();
     }
+
+    // private startSystem(): void {
+    //     this.startResponsePattern('users', 'create', '1');
+    //     this.startResponsePattern('users', 'update', '1');
+    // };
 
     private initEsbMessagesListening(): void {
-        this.mqttClient.on('message', async (topic: string, message: string) => {
-            // message is Buffer
-            console.log(topic);
-            console.log(message.toString());
-
-            await ({
-                'auth': async (message: string) => {
-                    const payload: IPayload = JSON.parse(message);
-
-                    ({
-                        'register': async () => {
-                            await this.service.register(payload.body.userInformationData);
-
-                            const responsePayload = {
-                                id: payload.id,
-                                action: 'findAll-response',
-                                message: 'User registered'
-                            };
-
-                            this.mqttClient.publish('auth-response', JSON.stringify(responsePayload));
-                        },
-                        'login': async () => {
-                            await this.service.login(payload.body.userId, payload.body.username, payload.body.password);
-
-                            const responsePayload = {
-                                id: payload.id,
-                                action: 'findOne-response',
-                                message: 'User logged in'
-                            };
-
-                            this.mqttClient.publish('auth-response', JSON.stringify(responsePayload));
-                        },
-                        'logout': async () => {
-                            const createdUser = await this.service.create(payload.body.userData, payload.body.role);
-
-                            const responsePayload = {
-                                id: payload.id,
-                                action: 'create-response',
-                                createdUser: createdUser
-                            };
-
-                            this.mqttClient.publish('auth-response', JSON.stringify(responsePayload));
-                        },
-                        'refreshToken': async () => {
-                            const updatedUser = await this.service.update(payload.body.userId, payload.body.userData);
-
-                            const responsePayload = {
-                                id: payload.id,
-                                action: 'update-response',
-                                updatedUser: updatedUser
-                            };
-
-                            this.mqttClient.publish('auth-response', JSON.stringify(responsePayload));
-                        }
-                    }[payload.action])();
-                },
-                'users-response': async (message: string) => {
-                    const payload: IPayload = JSON.parse(message);
-
-                    ({
-                        'findAll': async () => {
-                            // const users = await this.service.findAll();
-                        },
-                        'findOne': async () => {
-                            // const user = await this.service.findOne(payload.body.userId);
-                        },
-                        'create': async () => {
-                            // const createdUser = await this.service.create(payload.body.userData, payload.body.role);
-                        },
-                        'update': async () => {
-                            // const updatedUser = await this.service.update(payload.body.userId, payload.body.userData);
-                        },
-                        'delete': async () => {
-                            // await this.service.delete(payload.body.userId);
-                        }
-                    }[payload.action])();
-                }
-            }[topic])();
+        this.mqttClient.on('message', (topic, payload) => {
+            const topicArr = topic.split('/'); //spliting the topic ==> [response,deviceName,relayName]
+            switch (topicArr[0]) {
+                case 'response':
+                    return ResponseEvent(this.eventEmitter, topicArr[1], topicArr[2], payload);
+                case 'otherTopics':
+                    console.log('other topics');
+                    return;
+                default:
+                    return console.log('can not find anything');
+            }
         });
+
+        // this.mqttClient.on('message', async (topic: string, message: string) => {
+        //     // message is Buffer
+        //     console.log(topic);
+        //     console.log(message.toString());
+
+        //     await ({
+        //         'users': async (message: string) => {
+        //             const payload: IPayload = JSON.parse(message);
+
+        //             ({
+        //                 'findAll': async () => {
+        //                     const users = await this.service.findAll();
+
+        //                     const responsePayload = {
+        //                         id: payload.id,
+        //                         action: 'findAll',
+        //                         users: users
+        //                     };
+
+        //                     this.mqttClient.publish('users-response', JSON.stringify(responsePayload));
+        //                 },
+        //                 'findOne': async () => {
+        //                     const user = await this.service.findOne(payload.body.userId);
+
+        //                     const responsePayload = {
+        //                         id: payload.id,
+        //                         action: 'findOne',
+        //                         user: user
+        //                     };
+
+        //                     this.mqttClient.publish('users-response', JSON.stringify(responsePayload));
+        //                 },
+        //                 'create': async () => {
+        //                     const createdUser = await this.service.create(payload.body.userData, payload.body.role);
+
+        //                     const responsePayload = {
+        //                         id: payload.id,
+        //                         action: 'create',
+        //                         createdUser: createdUser
+        //                     };
+
+        //                     this.mqttClient.publish('users-response', JSON.stringify(responsePayload));
+        //                 },
+        //                 'update': async () => {
+        //                     const updatedUser = await this.service.update(payload.body.userId, payload.body.userData);
+
+        //                     const responsePayload = {
+        //                         id: payload.id,
+        //                         action: 'update',
+        //                         updatedUser: updatedUser
+        //                     };
+
+        //                     this.mqttClient.publish('users-response', JSON.stringify(responsePayload));
+        //                 },
+        //                 'delete': async () => {
+        //                     await this.service.delete(payload.body.userId);
+
+        //                     const responsePayload = {
+        //                         id: payload.id,
+        //                         action: 'delete'
+        //                     };
+
+        //                     this.mqttClient.publish('users-response', JSON.stringify(responsePayload));
+        //                 }
+        //             }[payload.action])();
+        //         }
+        //     }[topic])();
+        // });
     }
 
-    public register(userInformationData: any): void {}
+    // private async startResponsePattern(
+    //     apiName: string,
+    //     action: string,
+    //     payload: string,
+    // ) {
+    //     try {
+    //         const responseTopic = `response/${apiName}/${action}`;
+    //         const requestTopic = `request/${apiName}/${action}`;
+    //         const responseEventName = `responseEvent/${apiName}/${action}`;
+    //         const publishOptions: IClientPublishOptions = {
+    //             qos: 1,
+    //             properties: {
+    //                 responseTopic,
+    //                 correlationData: Buffer.from('secret', 'utf-8'),
+    //             },
+    //         };
+    //         const responseMessage = await publishWithResponse(this.mqttClient, payload, publishOptions, requestTopic, responseEventName, this.eventEmitter);
+    //         console.log(`${apiName}/${action} : ${responseMessage.payload}`);
+    //     } catch (error) {
+    //         console.error(`${apiName}/${action} : ${error}`);
+    //     }
+    // };
 }
