@@ -1,12 +1,12 @@
+import { AuthController, initMqttAuthListening } from 'controllers/auth.controller';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { environment } from 'environment/environment';
 import express from 'express';
 import { ExceptionsHandler } from 'middlewares/exceptions.handler';
 import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
-import { environment } from 'environment/environment';
-import { connect } from 'mongoose';
-import { AuthController } from 'controllers/auth.controller';
-import { AuthMiddleware } from 'middlewares/auth.middleware';
+
+import * as mqtt from "mqtt";
 
 dotenv.config();
 
@@ -14,6 +14,26 @@ dotenv.config();
  * On crée une nouvelle "application" express
  */
 const app = express();
+const client: mqtt.MqttClient = mqtt.connect('mqtt://localhost:1883');
+
+client.on('connect', function () {
+    client.subscribe('authentication', function (err: any) {
+        if (!err) {
+            console.log('Authentication topic subscribed');
+            initMqttAuthListening(client);
+            // client.publish('authentication', 'Auth request');
+            return;
+        }
+
+        console.error(err);
+    });
+});
+
+// client.on('message', function (topic, message) {
+//     // message is Buffer
+//     console.log(topic);
+//     console.log(message.toString());
+// });
 
 /**
  * On dit à Express que l'on souhaite parser le body des requêtes en JSON
@@ -31,7 +51,7 @@ app.use(cors());
 /**
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
-app.use('/api/v1/users', AuthMiddleware.verifyAccessToken, AuthController);
+app.use('/api/v1/users', AuthController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)
@@ -54,12 +74,12 @@ app.use(ExceptionsHandler);
  */
 app.listen(environment.API_PORT, () => console.log(`Auth server listening at: http://localhost:${environment.API_PORT}`));
 
-try {
-    (async () => {
-        await connect('mongodb://' + process.env.MONGO_USER + ':' + process.env.MONGO_PWD + environment.MONGO_URI);
-        console.log('Connected to MongoDB');
-    })();
-} catch (error) {
-    console.log('Error connecting to DB: ', error);
-    process.exit(1);
-}
+// try {
+//     (async () => {
+//         await connect('mongodb://' + process.env.MONGO_USER + ':' + process.env.MONGO_PWD + environment.MONGO_URI);
+//         console.log('Connected to MongoDB');
+//     })();
+// } catch (error) {
+//     console.log('Error connecting to DB: ', error);
+//     process.exit(1);
+// }

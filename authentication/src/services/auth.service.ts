@@ -1,77 +1,109 @@
-import { NotFoundException } from 'utils/exceptions';
 import * as jwt from 'jsonwebtoken';
-import { IUserInformation, UserInformation } from 'models/auth.models';
+import { IUser, Tokens } from 'models/auth.models';
+import { MqttClient } from 'mqtt';
+import { Exception, InternalServerException } from 'utils/exceptions';
 
 export class AuthService {
+    public mqttClient: MqttClient;
 
-    /**
-     * Trouve un user en particulier
-     * @param id - ID unique de l'user
-     */
-    async findOne(id: string): Promise<IUserInformation | null | undefined> {
+    async register(userInformationData: Partial<IUser>): Promise<IUser | void> {
         try {
-            const user = await UserInformation.findById(id);
+            this.mqttClient.publish('users', JSON.stringify({ action: 'create', data: userInformationData }), (err, packet) => {
+                if (err) {
+                    console.error(err);
+                    throw new InternalServerException(err);
+                }
 
-            return user;
+                console.log(packet);
+                const updatedUser = userInformationData as IUser;
+
+                return updatedUser;
+            });
         } catch (e) {
-            throw new NotFoundException('No user found');
+            throw new Exception(e.message, e.status);
+        }
+    }
+
+    async login(id: string, username: string): Promise<Tokens | void> {
+        try {
+            //if user does not exist, send a 400 response
+            const accessToken = this.generateAccessToken(username);
+            const refreshToken = this.generateRefreshToken(username);
+
+            this.mqttClient.publish('users', JSON.stringify({ action: 'updateToken', data: { accessToken: accessToken, refreshToken: refreshToken } }), (err, packet) => {
+                if (err) {
+                    console.error(err);
+                    throw new InternalServerException(err);
+                }
+
+                console.log(packet);
+
+                return { accessToken: accessToken, refreshToken: refreshToken };
+            });
+
+        } catch (e) {
+            throw new Exception(e.message, e.status);
+        }
+    }
+
+    async logout(id: string): Promise<void> {
+        try {
+            this.mqttClient.publish('users', JSON.stringify({ action: 'updateToken', userId: id, data: { accessToken: null, refreshToken: null } }), (err, packet) => {
+                if (err) {
+                    console.error(err);
+                    throw new InternalServerException(err);
+                }
+
+                console.log(packet);
+            });
+        } catch (e) {
+            throw new Exception(e.message, e.status);
+        }
+    }
+
+
+    async refreshToken(id: string, mail: string, refreshToken: string): Promise<Tokens | void> {
+        try {
+            this.mqttClient.publish('users', JSON.stringify({ action: 'verifyRefreshToken', userId: id, data: { refreshToken: refreshToken } }), (err, packet) => {
+                if (err) {
+                    console.error(err);
+                    throw new InternalServerException(err);
+                }
+
+                console.log(packet);
+                // if (!refreshTokens.includes(req.body.token)) res.status(400).send("Refresh Token Invalid");
+                // refreshTokens = refreshTokens.filter((c) => c != req.body.token);
+                // const refreshToken = await service.findOne(req.body.tokenId);
+
+
+                //remove the old refreshToken from the refreshTokens list
+                const accessToken = this.generateAccessToken(mail);
+                const refreshToken = this.generateRefreshToken(mail);
+
+                return { accessToken: accessToken, refreshToken: refreshToken };
+            });
+        } catch (e) {
+            throw new Exception(e.message, e.status);
         }
     }
 
     /**
-     * Met à jour un user en particulier
-     *
-     * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
-     *
-     * @param userData - Un objet correspondant à un user, il ne contient pas forcément tout un user. Attention, on ne prend pas l'id avec.
-     * @param id - ID unique de l'user
+     * Génération d'un access token
+     * 
+     * @param mail 
+     * @returns 
      */
-    async login(id: string, userInformationData: Partial<IUserInformation>): Promise<IUserInformation | null | undefined> {
-        const user = await this.findOne(id);
-
-        if (!user) {
-            throw new NotFoundException('No user found');
-        }
-
-        const updatedUser = await UserInformation.findByIdAndUpdate(id, userInformationData, { new: true });
-
-        return updatedUser;
-    }
-    
-    async register(id: string, userInformationData: Partial<IUserInformation>): Promise<IUserInformation | null | undefined> {
-        const user = await this.findOne(id);
-
-        if (!user) {
-            throw new NotFoundException('No user found');
-        }
-
-        const updatedUser = await UserInformation.findByIdAndUpdate(id, userInformationData, { new: true });
-
-        return updatedUser;
+    generateAccessToken(mail: string): string {
+        return jwt.sign({ mail: mail }, process.env.ACCESS_TOKEN_SECRET as jwt.Secret, { expiresIn: "15m" });
     }
 
     /**
-     * Suppression d'un user
+     * Génération d'un refresh token
+     * @param mail 
+     * @returns 
      */
-    async logout(id: string) {
-        const user = await this.findOne(id);
-
-        if (!user) {
-            throw new NotFoundException('No user found');
-        }
-
-        await UserInformation.findByIdAndRemove(id);
-    }
-
-
-    // accessTokens
-    generateAccessToken(username: string): string {
-        return jwt.sign({ username: username }, process.env.ACCESS_TOKEN_SECRET as jwt.Secret, { expiresIn: "15m" });
-    }
-
-    // refreshTokens
-    generateRefreshToken(username: string): string {
-        const refreshToken = jwt.sign({ username: username }, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: "20m" });
+    generateRefreshToken(mail: string): string {
+        const refreshToken = jwt.sign({ mail: mail }, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: "20m" });
         // refreshTokens.push(refreshToken);
         return refreshToken;
     }

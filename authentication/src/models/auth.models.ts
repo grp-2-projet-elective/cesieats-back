@@ -1,13 +1,29 @@
 import { Document, model, Model, Schema } from "mongoose";
 
-export interface IUserInformation extends Document {
-    userId: Number,
-    token: string
+export interface Tokens {
+    accessToken: string;
+    refreshToken: string;
 }
 
-export const UserInformationSchema: Schema = new Schema({
-    userId: { type: Number, required: true },
-    token: { type: String, required: true }
-});
+export interface IUser {
+    id: number;
 
-export const UserInformation: Model<IUserInformation> = model('UserInformation', UserInformationSchema);
+    firstname: string;
+    lastname: string;
+    mail: string;
+    phone: string;
+    password: string;
+    roleId: number;
+
+    thumbnail: string;
+    city: string;
+    cityCode: number;
+    address: string;
+    sponsorId: number;
+
+    token: string;
+    refreshToken: string;
+
+    createdAt: Date;
+    updatedAt: Date;
+}

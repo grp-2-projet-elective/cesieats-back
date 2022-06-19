@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { Router } from 'express';
-import { IUserInformation } from 'models/auth.models';
+import { MqttClient } from 'mqtt';
 import { AuthService } from 'services/auth.service';
 
 /**
@@ -13,19 +13,48 @@ const AuthController = Router();
  */
 const service = new AuthService();
 
+async function initMqttAuthListening(mqttClient: MqttClient): Promise<void> {
+    service.mqttClient = mqttClient;
+
+    mqttClient.on('message', function (topic, message) {
+        // message is Buffer
+        console.log(topic);
+        console.log(message.toString());
+
+        ({
+            'authentication': async (message: string) => {
+                const payload = JSON.parse(message);
+
+                ({
+                    'register': async (message: string) => {
+                        const payload = JSON.parse(message);
+                    },
+                    'login': async (message: string) => {
+                        const payload = JSON.parse(message);
+                    },
+                    'logout': async (message: string) => {
+                        const payload = JSON.parse(message);
+                    }
+                }[payload.action])();
+            }
+        }[topic])();
+    });
+}
+
+
 /**
- * Créé un user
+ * Enregistrer un nouvel user
  */
-AuthController.post('/', async (req, res) => {
+AuthController.post('/register', async (req, res) => {
     try {
-        const username = req.body.username;
+        const mail = req.body.mail;
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
         // users.push({ user: user, password: hashedPassword })
         // res.status(201).send(users)
         // console.log(users)
 
-        const createdUser = await service.create({ username: username, password: hashedPassword });
+        const createdUser = await service.register({ mail: mail, password: hashedPassword });
 
         return res
             .status(201)
@@ -43,7 +72,7 @@ AuthController.post('/', async (req, res) => {
  */
 AuthController.post('/login', async (req, res) => {
     try {
-        const user: IUserInformation = await service.findOne(req.body.userId) as IUserInformation;
+        const user = await service.findOne(req.body.userId);
 
         //if user does not exist, send a 400 response
         if (await bcrypt.compare(req.body.password, user.password)) {
@@ -51,7 +80,7 @@ AuthController.post('/login', async (req, res) => {
             const refreshToken = service.generateRefreshToken(req.body.username);
             return res
                 .status(201)
-                .json({ accessToken: accessToken, refreshToken: refreshToken });
+                .json(service.login());
         }
 
         return res.status(401).send('Unauthorized');
@@ -63,27 +92,32 @@ AuthController.post('/login', async (req, res) => {
 });
 
 AuthController.post("/refreshToken", async (req, res) => {
-    if (!refreshTokens.includes(req.body.token)) res.status(400).send("Refresh Token Invalid");
-    // refreshTokens = refreshTokens.filter((c) => c != req.body.token);
-    const refreshToken = await service.findOne(req.body.tokenId);
+    try {
+        const tokens = await service.refreshToken(req.body.userId, req.body.mail, req.body.refreshToken);
 
-
-    //remove the old refreshToken from the refreshTokens list
-    const accessToken = service.generateAccessToken(req.body.username);
-    const refreshToken = service.generateRefreshToken(req.body.username);
-    //generate new accessToken and refreshTokens
-    res.json({ accessToken: accessToken, refreshToken: refreshToken });
+        return res.status(200).send(tokens);
+    } catch (e: any) {
+        return res
+            .status(e.status)
+            .json(e.message);
+    }
 });
 
 
 AuthController.delete("/logout", async (req, res) => {
-    const refreshToken = await service.delete(req.body.token);
-    //remove the old refreshToken from the refreshTokens list
-    res.status(204).send("Logged out!");
+    try {
+        await service.logout(req.body.id);
+
+        return res.status(204).send("Successfuly logged out");
+    } catch (e: any) {
+        return res
+            .status(e.status)
+            .json(e.message);
+    }
 });
 
 /**
  * On expose notre controller pour l'utiliser dans `src/index.ts`
  */
-export { AuthController };
+export { AuthController, initMqttAuthListening };
 
