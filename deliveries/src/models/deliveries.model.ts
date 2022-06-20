@@ -1,17 +1,35 @@
 import { model, Schema, Model, Document } from 'mongoose';
 
 export interface IDelivery extends Document {
-    title: string,
-    subtitle?: string,
-    date: string,
-    description?: string
+    orderId: number,
+    restaurantId: number,
+    date: Date,
+    deliveryState: string,
+    delivererId: number,
+    customerId: number,
+    location: {
+        city: string,
+        zipCode: number,
+        address: string,
+        latitude: number,
+        longitude: number,
+    },
 }
 
 export const DeliverySchema: Schema = new Schema({
-    title: { type: String, required: true },
-    subtitle: { type: String, required: false },
-    date: { type: String, required: true },
-    description: { type: String, required: false }
+    orderId: { type: Number, required: true },
+    restaurantId: { type: Number, required: true },
+    date: { type: Date, required: true },
+    deliveryState: { type: String, required: true },
+    delivererId: { type: Number, required: true },
+    customerId: { type: Number, required: true },
+    location: {
+        city: { type: String, required: true },
+        zipCode: { type: String, required: true },
+        address: { type: String, required: true },
+        latitude: { type: Number, required: true },
+        longitude: { type: Number, required: true },
+    },
 });
 
 export const Delivery: Model<IDelivery> = model('Delivery', DeliverySchema);
