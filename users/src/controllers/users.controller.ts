@@ -1,9 +1,9 @@
+import { EsbService, initMqttClient } from '@grp-2-projet-elective/mqtt-helper/dist';
 import { Router } from 'express';
-import { mqttClientOptions } from 'models/esb.model';
+import { mqttClientOptions } from 'models/esb.models';
 import { connect, MqttClient } from 'mqtt';
-import { EsbService } from 'services/esb.service';
 import { UsersService } from 'services/users.service';
-import { BadRequestException, NotFoundException } from 'utils/exceptions';
+import { BadRequestException } from 'utils/exceptions';
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`
@@ -13,7 +13,7 @@ const UsersController = Router();
 /**
  * Instance de notre usersService
  */
-const mqttClient: MqttClient = connect('mqtt://localhost:1883', mqttClientOptions);
+const mqttClient: MqttClient = initMqttClient('mqtt://localhost:1883', mqttClientOptions);
 const esbService: EsbService = new EsbService(mqttClient, ['auth']);
 const usersService = new UsersService(mqttClient, esbService);
 
