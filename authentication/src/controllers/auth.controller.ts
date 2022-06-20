@@ -1,7 +1,7 @@
 import { EsbService } from '@grp-2-projet-elective/mqtt-helper';
 import * as bcrypt from 'bcrypt';
 import { Router } from 'express';
-import { mqttClientOptions } from 'models/esb.models';
+import { mqttClientOptions } from 'models/esb.model';
 import { connect, MqttClient } from 'mqtt';
 import { AuthService } from 'services/auth.service';
 

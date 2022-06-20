@@ -2,7 +2,7 @@ import { Tokens } from '@grp-2-projet-elective/auth-helper';
 import { EsbService, publishWithResponseBasic } from '@grp-2-projet-elective/mqtt-helper';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { IUser } from 'models/auth.models';
+import { IUser } from 'models/auth.model';
 import { IClientPublishOptions } from 'mqtt';
 import { Exception } from 'utils/exceptions';
 

@@ -1,6 +1,6 @@
 import { EsbService, initMqttClient } from '@grp-2-projet-elective/mqtt-helper';
 import { Router } from 'express';
-import { mqttClientOptions } from 'models/esb.models';
+import { mqttClientOptions } from 'models/esb.model';
 import { MqttClient } from 'mqtt';
 import { UsersService } from 'services/users.service';
 import { BadRequestException } from 'utils/exceptions';
