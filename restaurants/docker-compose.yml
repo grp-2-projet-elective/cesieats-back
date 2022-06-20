@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  restaurants-api:
+    image: dr.felicien-fouillet.fr/restaurants-api:latest
+    container_name: restaurants-api
+    privileged: true
+    restart: unless-stopped
+    networks:
+      - restaurants-api
+    ports:
+      - 3030:3030
+
+networks:
+  restaurants-api:
+    external:
+      name: docker_default
