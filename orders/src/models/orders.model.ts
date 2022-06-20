@@ -1,17 +1,43 @@
 import { model, Schema, Model, Document } from 'mongoose';
 
 export interface IOrder extends Document {
-    title: string,
-    subtitle?: string,
-    date: string,
-    description?: string
+    menus?: Array<number>,
+    products?: Array<number>,
+    restaurantId: number,
+    prices: {
+        orderPrice: number,
+        deliveryPrice: number,
+        totalPrice: number,
+    },
+    date: Date,
+    customerId: number,
+    location: {
+        city: string,
+        zipCode: number,
+        address: string,
+        latitude: number,
+        longitude: number,
+    },
 }
 
 export const OrderSchema: Schema = new Schema({
-    title: { type: String, required: true },
-    subtitle: { type: String, required: false },
-    date: { type: String, required: true },
-    description: { type: String, required: false }
+    menus: { type: Array, required: false },
+    products: { type: Array, required: false },
+    restaurantId: { type: Number, required: true },
+    prices: {
+        orderPrice: { type: Number, required: true },
+        deliveryPrice: { type: Number, required: true },
+        totalPrice: { type: Number, required: true },
+    },
+    date: { type: Date, required: true },
+    customerId: { type: Number, required: true },
+    location: {
+        city: { type: String, required: true },
+        zipCode: { type: String, required: true },
+        address: { type: String, required: true },
+        latitude: { type: Number, required: true },
+        longitude: { type: Number, required: true },
+    },
 });
 
 export const Order: Model<IOrder> = model('Order', OrderSchema);
