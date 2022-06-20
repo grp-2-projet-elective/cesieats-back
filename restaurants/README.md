@@ -1,2 +1,0 @@
-# cesieats-back
-API restaurants

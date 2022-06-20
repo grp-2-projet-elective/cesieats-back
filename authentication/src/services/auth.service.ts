@@ -1,122 +1,81 @@
+import { Tokens } from '@grp-2-projet-elective/auth-helper';
+import { EsbService, publishWithResponseBasic } from '@grp-2-projet-elective/mqtt-helper';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { IUser, Tokens } from 'models/auth.models';
-import { IClientPublishOptions, MqttClient } from 'mqtt';
-import { Exception, InternalServerException } from 'utils/exceptions';
-import { publishWithResponseBasic } from 'utils/mqtt-async.helper';
-import { EsbService } from './esb.service';
+import { IUser } from 'models/auth.models';
+import { IClientPublishOptions } from 'mqtt';
+import { Exception } from 'utils/exceptions';
 
 export class AuthService {
-    
-    constructor(private readonly mqttClient: MqttClient, private readonly publicesbService: EsbService) { }
+    // private readonly mqttClient: MqttClient,
+    constructor(public readonly esbService: EsbService) {
+        console.log(this.esbService.isMqttClientConnected);
+        // this.esbService.eventEmitter.on('responseEvent/users/findOneByMail', (data: any) => {
+        //     console.log('responseEvent/users/findOneByMail');
+        //     console.log(data);
+        // });
+
+        // this.esbService.eventEmitter.on('responseEvent/users/findOne', (data: any) => {
+        //     console.log('responseEvent/users/findOne');
+        //     console.log(data);
+        // });
+
+        // this.esbService.eventEmitter.on('responseEvent/users/createOne', (data: any) => {
+        //     console.log('responseEvent/users/createOne');
+        //     const parsedMessage = JSON.parse(data.message);
+        //     console.log(parsedMessage.payload);
+        // });
+    }
 
     async register(userInformationData: Partial<IUser>): Promise<IUser | void> {
         try {
-            // this.mqttClient.publish('users', JSON.stringify({ action: 'create', data: userInformationData }), (err, packet) => {
-            //     if (err) {
-            //         console.error(err);
-            //         throw new InternalServerException(err);
-            //     }
+            const user = await this.createUser(userInformationData);
 
-            //     console.log(packet);
-            //     const updatedUser = userInformationData as IUser;
-
-            //     return updatedUser;
-            // });
-        } catch (e) {
+            return user;
+        } catch (e: any) {
             throw new Exception(e.message, e.status);
         }
     }
 
-    async login(username: string, hashedPassword: string): Promise<Tokens | void> {
+    async login(id: string, username: string, hashedPassword: string): Promise<Tokens | void> {
         try {
-            // this.mqttClient.once('message', (topic, payload) => {
-            //     this.mqttClient.unsubscribe(responseTopic);
-            //     try {
-            //         const responseMessage: ResponseMessage = JSON.parse(
-            //             payload.toString()
-            //         );
-            //         responseMessage.error
-            //             ? reject(responseMessage.message)
-            //             : resolve(responseMessage.message);
-            //     } catch (error) {
-            //         resolve('JsonConvertError');
-            //     }
-            // });
-
-            const apiName: string = 'users';
-            const action: string = 'findOne';
-            const responseTopic = `response/${apiName}/${action}`;
-            const requestTopic = `request/${apiName}/${action}`;
-            const publishOptions: IClientPublishOptions = {
-                qos: 1,
-                properties: {
-                    responseTopic,
-                    correlationData: Buffer.from('secret', 'utf-8'),
-                },
-            };
-            const user = JSON.parse(await publishWithResponseBasic(this.mqttClient, '', publishOptions, requestTopic, responseTopic));
-            console.log(user);
+            const user = await this.getUser(id);
 
             if (await bcrypt.compare(hashedPassword, user.password)) {
                 //if user does not exist, send a 400 response
                 const accessToken = this.generateAccessToken(username);
                 const refreshToken = this.generateRefreshToken(username);
 
-                this.mqttClient.publish('users', JSON.stringify({ action: 'updateToken', data: { accessToken: accessToken, refreshToken: refreshToken } }), (err, packet) => {
-                    if (err) {
-                        console.error(err);
-                        throw new InternalServerException(err);
-                    }
-
-                    console.log(packet);
-
-                    return { accessToken: accessToken, refreshToken: refreshToken };
-                });
-
+                return { accessToken: accessToken, refreshToken: refreshToken };
             }
-        } catch (e) {
+        } catch (e: any) {
             throw new Exception(e.message, e.status);
         }
     }
 
     async logout(id: string): Promise<void> {
         try {
-            this.mqttClient.publish('users', JSON.stringify({ action: 'updateToken', userId: id, data: { accessToken: null, refreshToken: null } }), (err, packet) => {
-                if (err) {
-                    console.error(err);
-                    throw new InternalServerException(err);
-                }
 
-                console.log(packet);
-            });
-        } catch (e) {
+        } catch (e: any) {
             throw new Exception(e.message, e.status);
         }
     }
 
 
-    async refreshToken(id: string, mail: string, refreshToken: string): Promise<Tokens | void> {
+    async refreshToken(mail: string, refreshToken: string): Promise<Tokens | void> {
         try {
-            this.mqttClient.publish('users', JSON.stringify({ action: 'verifyRefreshToken', userId: id, data: { refreshToken: refreshToken } }), (err, packet) => {
-                if (err) {
-                    console.error(err);
-                    throw new InternalServerException(err);
-                }
+            const user = await this.getUserByMail(mail);
 
-                console.log(packet);
-                // if (!refreshTokens.includes(req.body.token)) res.status(400).send('Refresh Token Invalid');
-                // refreshTokens = refreshTokens.filter((c) => c != req.body.token);
-                // const refreshToken = await service.findOne(req.body.tokenId);
+            if (user.refreshToken != refreshToken) throw new Exception('Refresh Token Invalid', 400);
+            // refreshTokens = refreshTokens.filter((c) => c != req.body.token);
 
 
-                //remove the old refreshToken from the refreshTokens list
-                const accessToken = this.generateAccessToken(mail);
-                const refreshToken = this.generateRefreshToken(mail);
+            //remove the old refreshToken from the refreshTokens list
+            const newAccessToken = this.generateAccessToken(mail);
+            const newRefreshToken = this.generateRefreshToken(mail);
 
-                return { accessToken: accessToken, refreshToken: refreshToken };
-            });
-        } catch (e) {
+            return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+        } catch (e: any) {
             throw new Exception(e.message, e.status);
         }
     }
@@ -140,5 +99,56 @@ export class AuthService {
         const refreshToken = jwt.sign({ mail: mail }, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: '20m' });
         // refreshTokens.push(refreshToken);
         return refreshToken;
+    }
+
+    private async getUser(id: string): Promise<IUser> {
+        const apiName: string = 'users';
+        const action: string = 'findOne';
+        const responseTopic = `response/${apiName}/${action}`;
+        const requestTopic = `request/${apiName}/${action}`;
+        const publishOptions: IClientPublishOptions = {
+            qos: 1,
+            properties: {
+                responseTopic,
+                correlationData: Buffer.from('secret', 'utf-8'),
+            },
+        };
+
+        const payload = JSON.stringify({
+            userId: id,
+        });
+
+        const user = JSON.parse(await publishWithResponseBasic(this.esbService.mqttClient, payload, publishOptions, requestTopic, responseTopic));
+        console.log(user);
+
+        return user;
+    }
+
+    private async getUserByMail(mail: string): Promise<IUser> {        
+        const apiName: string = 'users';
+        const action: string = 'findOneByMail';
+
+        const payload = JSON.stringify({
+            mail
+        });
+
+        const user = (await this.esbService.call(apiName, action, payload));
+        console.log(user);
+
+        return user as any;
+    }
+
+    private async createUser(userInformationData: Partial<IUser>): Promise<IUser> {
+        const apiName: string = 'users';
+        const action: string = 'createOne';
+
+        const payload = JSON.stringify({
+            userInformationData
+        });
+
+        const user = (await this.esbService.call(apiName, action, payload));
+        console.log(user);
+
+        return user as any;
     }
 }

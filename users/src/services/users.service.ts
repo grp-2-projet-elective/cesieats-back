@@ -1,6 +1,5 @@
-import { EsbService } from '@grp-2-projet-elective/mqtt-helper/dist';
+import { EsbService, RequestMessage } from '@grp-2-projet-elective/mqtt-helper';
 import { IUser, Role, Roles, User } from 'models/users.model';
-import { MqttClient } from 'mqtt';
 import { Model, ModelStatic } from 'sequelize/types';
 import { Exception, NotFoundException } from 'utils/exceptions';
 
@@ -8,7 +7,24 @@ export class UsersService {
     public User: ModelStatic<Model<any, any>>;
     public Role: ModelStatic<Model<any, any>>;
 
-    constructor(private readonly mqttClient: MqttClient, private readonly esbService: EsbService) { }
+    constructor(private readonly esbService: EsbService) {
+        console.log(this.esbService.isMqttClientConnected);
+        this.esbService.eventEmitter.on('requestEvent/users/findOneByMail', (data: RequestMessage) => {
+            console.log('requestEvent/users/findOneByMail');
+            console.log(data);
+        });
+
+        this.esbService.eventEmitter.on('requestEvent/users/findOne', (data: RequestMessage) => {
+            console.log('requestEvent/users/findOne');
+            console.log(data);
+        });
+
+        this.esbService.eventEmitter.on('requestEvent/users/createOne', (data: RequestMessage) => {
+            console.log('requestEvent/users/createOne');
+            const parsedPayload = JSON.parse(data.payload.toString());
+            this.create(parsedPayload.userInformationData, Roles.CUSTOMER);
+        });
+    }
 
     /**
      * Trouve tous les users
@@ -30,6 +46,24 @@ export class UsersService {
     async findOne(id: string): Promise<Model<any, any>> {
         try {
             const user = await this.User.findOne({ where: { id } });
+
+            if (!user) {
+                throw new NotFoundException('No user found');
+            }
+
+            return user;
+        } catch (e: any) {
+            throw new Exception(e.message, e.status);
+        }
+    }
+
+    /**
+     * Trouve un user en particulier
+     * @param id - ID unique de l'user
+     */
+    async findOneByMail(mail: string): Promise<Model<any, any>> {
+        try {
+            const user = await this.User.findOne({ where: { mail } });
 
             if (!user) {
                 throw new NotFoundException('No user found');

@@ -5,12 +5,6 @@ import { environment } from 'environment/environment';
 import express from 'express';
 import { ExceptionsHandler } from 'middlewares/exceptions.handler';
 import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
-import { mqttClientOptions } from 'models/esb.model';
-
-import { connect, MqttClient } from 'mqtt';
-import { EsbService } from 'services/esb.service';
-
-const mqttClient: MqttClient = connect('mqtt://localhost:1883', mqttClientOptions);
 
 /**
  * On crée une nouvelle "application" express
@@ -33,7 +27,7 @@ app.use(cors());
 /**
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
-app.use('/api/v1/users', AuthController);
+app.use('/api/v1/auth', AuthController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)

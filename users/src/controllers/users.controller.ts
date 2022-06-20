@@ -1,7 +1,7 @@
-import { EsbService, initMqttClient } from '@grp-2-projet-elective/mqtt-helper/dist';
+import { EsbService, initMqttClient } from '@grp-2-projet-elective/mqtt-helper';
 import { Router } from 'express';
 import { mqttClientOptions } from 'models/esb.models';
-import { connect, MqttClient } from 'mqtt';
+import { MqttClient } from 'mqtt';
 import { UsersService } from 'services/users.service';
 import { BadRequestException } from 'utils/exceptions';
 
@@ -14,8 +14,8 @@ const UsersController = Router();
  * Instance de notre usersService
  */
 const mqttClient: MqttClient = initMqttClient('mqtt://localhost:1883', mqttClientOptions);
-const esbService: EsbService = new EsbService(mqttClient, ['auth']);
-const usersService = new UsersService(mqttClient, esbService);
+const esbService: EsbService = new EsbService(mqttClient, ['users']);
+const usersService = new UsersService(esbService);
 
 /**
  * Trouve tous les users
@@ -26,9 +26,10 @@ UsersController.get('/', async (req, res) => {
             .status(200)
             .json(await usersService.findAll());
     } catch (e: any) {
+        console.error(e);
         return res
-            .status(e.status)
-            .json(e.message);
+            .status(e.status ? e.status : 500)
+            .json(e);
     }
 });
 
@@ -49,9 +50,10 @@ UsersController.get('/:id', async (req, res) => {
             .status(200)
             .json(user);
     } catch (e: any) {
+        console.error(e);
         return res
-            .status(e.status)
-            .json(e.message);
+            .status(e.status ? e.status : 500)
+            .json(e);
     }
 });
 
@@ -66,9 +68,10 @@ UsersController.post('/', async (req, res) => {
             .status(201)
             .json(createdUser);
     } catch (e: any) {
+        console.error(e);
         return res
-            .status(e.status)
-            .json(e.message);
+            .status(e.status ? e.status : 500)
+            .json(e);
     }
 });
 
@@ -89,9 +92,10 @@ UsersController.patch('/:id', async (req, res) => {
             .status(200)
             .json(updatedUser);
     } catch (e: any) {
+        console.error(e);
         return res
-            .status(e.status)
-            .json(e.message);
+            .status(e.status ? e.status : 500)
+            .json(e);
     }
 });
 
@@ -112,9 +116,10 @@ UsersController.delete('/:id', async (req, res) => {
             .status(200)
             .json(response);
     } catch (e: any) {
+        console.error(e);
         return res
-            .status(e.status)
-            .json(e.message);
+            .status(e.status ? e.status : 500)
+            .json(e);
     }
 });
 

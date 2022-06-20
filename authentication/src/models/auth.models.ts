@@ -1,10 +1,3 @@
-import { Document, model, Model, Schema } from "mongoose";
-
-export interface Tokens {
-    accessToken: string;
-    refreshToken: string;
-}
-
 export interface IUser {
     id: number;
 
