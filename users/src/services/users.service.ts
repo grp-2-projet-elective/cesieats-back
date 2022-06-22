@@ -1,17 +1,23 @@
-import { User, IUser } from 'models/users.model';
-import { NotFoundException } from 'utils/exceptions';
+import { IUser, Roles, User } from 'models/users.model';
+import { Model, ModelStatic } from 'sequelize/types';
+import { Exception, NotFoundException } from 'utils/exceptions';
 
 export class UsersService {
+    public User: ModelStatic<Model<any, any>>;
+    public Role: ModelStatic<Model<any, any>>;
+
+    constructor() { }
+
     /**
      * Trouve tous les users
      */
-    async findAll(): Promise<Array<IUser>> {
+    async findAll(): Promise<Array<Model<any, any>>> {
         try {
-            const users = await User.find();
+            const users = await this.User.findAll();
 
             return users;
-        } catch (e) {
-            throw new NotFoundException('No users found');
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
         }
     }
 
@@ -19,13 +25,45 @@ export class UsersService {
      * Trouve un user en particulier
      * @param id - ID unique de l'user
      */
-    async findOne(id: string): Promise<IUser | null | undefined> {
+    async findOne(mail: string): Promise<Model<any, any> | null> {
         try {
-            const user = await User.findById(id);
+            const user = await this.User.findOne({ where: { mail } });
 
             return user;
-        } catch (e) {
-            throw new NotFoundException('No user found');
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
+        }
+    }
+
+    /**
+     * Trouve un user en particulier par son email
+     * @param mail - mail unique de l'user
+     */
+    async findOneById(id: string): Promise<Model<any, any> | null> {
+        try {
+            const user = await this.User.findOne({ where: { id } });
+
+            return user;
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
+        }
+    }
+
+    /**
+     * Trouve un user en particulier par son email
+     * @param mail - mail unique de l'user
+     */
+    async asRole(mail: string, role: Roles): Promise<boolean> {
+        try {
+            const user: User = await this.User.findOne({ where: { mail } }) as User;
+
+            if (!user) {
+                throw new NotFoundException('No user found');
+            }
+
+            return user.roleId === role ? true : false;
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
         }
     }
 
@@ -37,16 +75,23 @@ export class UsersService {
      * @param userData - Un objet correspondant à un user, il ne contient pas forcément tout un user. Attention, on ne prend pas l'id avec.
      * @param id - ID unique de l'user
      */
-    async update(id: string, userData: Partial<IUser>): Promise<IUser | null | undefined> {
-        const user = await this.findOne(id);
+    async update(mail: string, userData: Partial<User>): Promise<Model<any, any> | null> {
+        try {
+            const user = await this.findOne(mail);
 
-        if (!user) {
-            throw new NotFoundException('No user found');
+            if(!user) return null;
+
+            const updatedUser = {
+                ...user.toJSON(),
+                ...userData
+            };
+
+            await this.User.update(updatedUser, { where: { mail } });
+
+            return updatedUser;
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
         }
-
-        const updatedUser = await User.findByIdAndUpdate(id, userData, { new: true });
-
-        return updatedUser;
     }
 
     /**
@@ -56,22 +101,35 @@ export class UsersService {
      *
      * @param userData - Un objet correspondant à un user. Attention, on ne prend pas l'id avec.
      */
-    async create(userData: IUser): Promise<IUser> {
-        const newUser: IUser = await User.create(userData);
+    async create(userData: IUser): Promise<Model<any, any>> {
+        try {
+            const newUser = await this.User.create({
+                ...userData,
+                createdAt: new Date(Date.now()),
+                updatedAt: new Date(Date.now()),
+            });
 
-        return newUser;
+            await newUser.save();
+            return newUser;
+        } catch (e: any) {
+            throw new Exception(e, e.status);
+        }
     }
 
     /**
      * Suppression d'un user
      */
-    async delete(id: string) {
-        const user = await this.findOne(id);
+    async delete(id: string): Promise<any> {
+        try {
+            const userCount = await this.User.destroy({ where: { id } });
 
-        if (!user) {
-            throw new NotFoundException('No user found');
+            if (userCount === 0) {
+                throw new NotFoundException('No user found');
+            }
+
+            return { message: 'User deleted' };
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
         }
-
-        await User.findByIdAndRemove(id);
     }
 }

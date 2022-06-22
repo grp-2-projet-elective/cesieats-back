@@ -37,3 +37,16 @@ export class BadRequestException extends Exception {
         super(error, 400);
     }
 }
+
+
+/**
+ * Création d'une 500
+ */
+ export class InternalServerException extends Exception {
+    /**
+     * On appelle le `constructor` de la classe parente `Exception`
+     */
+    constructor(error: any) {
+        super(error, 500);
+    }
+}

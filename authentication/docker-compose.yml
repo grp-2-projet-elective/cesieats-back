@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  authentication-api:
+    image: dr.felicien-fouillet.fr/authentication-api:latest
+    container_name: authentication-api
+    privileged: true
+    restart: unless-stopped
+    networks:
+      - authentication-api
+    ports:
+      - 3030:3030
+
+networks:
+  authentication-api:
+    external:
+      name: docker_default
