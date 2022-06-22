@@ -1,24 +1,27 @@
+
+import { CreationOptional, InferAttributes, InferCreationAttributes, Model, NonAttribute } from 'sequelize';
+
 export interface IUser {
-    id: number;
+  id: number;
 
-    firstname: string;
-    lastname: string;
-    mail: string;
-    phone: string;
-    password: string;
-    roleId: number;
+  firstname: string;
+  lastname: string;
+  mail: string;
+  phone: string;
+  password: string;
+  roleId: number;
 
-    thumbnail: string;
-    city: string;
-    cityCode: number;
-    address: string;
-    sponsorId: number;
+  thumbnail: string;
+  city: string;
+  zipCode: number;
+  address: string;
+  sponsorId: number;
 
-    token: string;
-    refreshToken: string;
+  accessToken: string;
+  refreshToken: string;
 
-    createdAt: Date;
-    updatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IRole {
@@ -32,44 +35,43 @@ export interface IRole {
 }
 
 export enum Roles {
-  CUSTOMER = 'CUSTOMER',
-  RESTAURANT_OWNER = 'RESTAURANT_OWNER',
-  DELIVERY_MAN = 'DELIVERY_MAN',
-  TECHNICAL_DEPARTMENT = 'TECHNICAL_DEPARTMENT',
-  COMERCIAL_DEPARTMENT = 'COMERCIAL_DEPARTMENT',
-  EXTERNAL = 'EXTERNAL'
+  CUSTOMER = 1,
+  RESTAURANT_OWNER = 2,
+  DELIVERY_MAN = 3,
+  TECHNICAL_DEPARTMENT = 4,
+  COMERCIAL_DEPARTMENT = 5,
+  EXTERNAL = 6
 }
 
-import { Model, InferAttributes, InferCreationAttributes, CreationOptional, HasManyCreateAssociationMixin, NonAttribute, DataTypes, Optional } from 'sequelize';
 
 // order of InferAttributes & InferCreationAttributes is important.
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-    declare id: CreationOptional<number>;
+  declare id: CreationOptional<number>;
 
-    declare firstname: string;
-    declare lastname: string;
-    declare mail: string;
-    declare phone: string;
-    declare password: string;
-    declare roleId: Role['id'];
+  declare firstname: string;
+  declare lastname: string;
+  declare mail: string;
+  declare phone: string;
+  declare password: string;
+  declare roleId: number;
 
-    declare thumbnail: CreationOptional<string>;
-    declare city: string;
-    declare cityCode: number;
-    declare address: string;
-    declare sponsorId: CreationOptional<number>;
+  declare thumbnail: CreationOptional<string>;
+  declare city: string;
+  declare zipCode: number;
+  declare address: string;
+  declare sponsorId: CreationOptional<number>;
 
-    declare token: CreationOptional<string>;
-    declare refreshToken: CreationOptional<string>;
+  declare accessToken: CreationOptional<string>;
+  declare refreshToken: CreationOptional<string>;
 
-    declare createdAt: CreationOptional<Date>;
-    declare updatedAt: CreationOptional<Date>;
-  
-    // getters that are not attributes should be tagged using NonAttribute
-    // to remove them from the model's Attribute Typings.
-    get fullName(): NonAttribute<string> {
-      return `${this.firstname} ${this.lastname}`;
-    }
+  declare createdAt: CreationOptional<Date>;
+  declare updatedAt: CreationOptional<Date>;
+
+  // getters that are not attributes should be tagged using NonAttribute
+  // to remove them from the model's Attribute Typings.
+  get fullName(): NonAttribute<string> {
+    return `${this.firstname} ${this.lastname}`;
+  }
 }
 
 // order of InferAttributes & InferCreationAttributes is important.

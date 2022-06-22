@@ -1,7 +1,4 @@
-import { EsbService, initMqttClient } from '@grp-2-projet-elective/mqtt-helper';
 import { Router } from 'express';
-import { mqttClientOptions } from 'models/esb.model';
-import { MqttClient } from 'mqtt';
 import { UsersService } from 'services/users.service';
 import { BadRequestException } from 'utils/exceptions';
 
@@ -13,9 +10,33 @@ const UsersController = Router();
 /**
  * Instance de notre usersService
  */
-const mqttClient: MqttClient = initMqttClient('mqtt://localhost:1883', mqttClientOptions);
-const esbService: EsbService = new EsbService(mqttClient, ['users']);
-const usersService = new UsersService(esbService);
+// const mqttClient: MqttClient = initMqttClient('mqtt://localhost:1883', mqttClientOptions);
+// const esbService: EsbService = new EsbService(mqttClient, 'users', []);
+const usersService = new UsersService();
+
+/**
+ * Trouve un user en particulier par son email
+ */
+ UsersController.get('/:mail', async (req, res) => {
+    try {
+        const mail = req.params.mail;
+
+        if (!mail) {
+            throw new BadRequestException('Invalid mail');
+        }
+
+        const user = await usersService.findOne(mail);
+        
+        return res
+            .status(200)
+            .json(user);
+    } catch (e: any) {
+        console.error(e);
+        return res
+            .status(e.status ? e.status : 500)
+            .json(e);
+    }
+});
 
 /**
  * Trouve tous les users
@@ -36,19 +57,23 @@ UsersController.get('/', async (req, res) => {
 /**
  * Trouve un user en particulier
  */
-UsersController.get('/:id', async (req, res) => {
+UsersController.get('/asRole', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const mail = req.body.mail;
+        const role = req.body.role;
 
-        if (!id) {
-            throw new BadRequestException('Invalid id');
+        if (!mail) {
+            throw new BadRequestException('Invalid mail');
+        }
+        if (!role) {
+            throw new BadRequestException('Invalid role');
         }
 
-        const user = await usersService.findOne(id);
+        const asRole = await usersService.asRole(mail, role);
 
         return res
             .status(200)
-            .json(user);
+            .json(asRole);
     } catch (e: any) {
         console.error(e);
         return res
@@ -57,12 +82,36 @@ UsersController.get('/:id', async (req, res) => {
     }
 });
 
+// /**
+//  * Trouve un user en particulier
+//  */
+// UsersController.get('/id/:id', async (req, res) => {
+//     try {
+//         const id = String(req.params.id);
+
+//         if (!id) {
+//             throw new BadRequestException('Invalid id');
+//         }
+
+//         const user = await usersService.findOneById(id);
+
+//         return res
+//             .status(200)
+//             .json(user);
+//     } catch (e: any) {
+//         console.error(e);
+//         return res
+//             .status(e.status ? e.status : 500)
+//             .json(e);
+//     }
+// });
+
 /**
  * Créé un user
  */
 UsersController.post('/', async (req, res) => {
     try {
-        const createdUser = await usersService.create(req.body.userData, req.body.role);
+        const createdUser = await usersService.create(req.body);
 
         return res
             .status(201)
@@ -78,15 +127,15 @@ UsersController.post('/', async (req, res) => {
 /**
  * Mise à jour d'un user
  */
-UsersController.patch('/:id', async (req, res) => {
+UsersController.patch('/:mail', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const mail = String(req.params.mail);
 
-        if (!id) {
-            throw new BadRequestException('Invalid id');
+        if (!mail) {
+            throw new BadRequestException('Invalid mail');
         }
 
-        const updatedUser = await usersService.update(id, req.body.userData);
+        const updatedUser = await usersService.update(mail, req.body);
 
         return res
             .status(200)

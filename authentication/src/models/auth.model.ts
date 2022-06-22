@@ -20,3 +20,8 @@ export interface IUser {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface Tokens {
+    accessToken: string;
+    refreshToken: string;
+}

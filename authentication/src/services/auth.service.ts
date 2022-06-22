@@ -1,30 +1,15 @@
-import { Tokens } from '@grp-2-projet-elective/auth-helper';
-import { EsbService, publishWithResponseBasic } from '@grp-2-projet-elective/mqtt-helper';
+import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { IUser } from 'models/auth.model';
-import { IClientPublishOptions } from 'mqtt';
+import { IUser, Tokens } from 'models/auth.model';
+import { Roles } from 'models/user.model';
 import { Exception } from 'utils/exceptions';
 
 export class AuthService {
-    // private readonly mqttClient: MqttClient,
-    constructor(public readonly esbService: EsbService) {
-        console.log(this.esbService.isMqttClientConnected);
-        // this.esbService.eventEmitter.on('responseEvent/users/findOneByMail', (data: any) => {
-        //     console.log('responseEvent/users/findOneByMail');
-        //     console.log(data);
-        // });
+    private static instance: AuthService;
 
-        // this.esbService.eventEmitter.on('responseEvent/users/findOne', (data: any) => {
-        //     console.log('responseEvent/users/findOne');
-        //     console.log(data);
-        // });
-
-        // this.esbService.eventEmitter.on('responseEvent/users/createOne', (data: any) => {
-        //     console.log('responseEvent/users/createOne');
-        //     const parsedMessage = JSON.parse(data.message);
-        //     console.log(parsedMessage.payload);
-        // });
+    constructor() {
+        AuthService.instance = this;
     }
 
     async register(userInformationData: Partial<IUser>): Promise<IUser | void> {
@@ -33,23 +18,35 @@ export class AuthService {
 
             return user;
         } catch (e: any) {
-            throw new Exception(e.message, e.status);
+            throw new Exception(e.error, e.status);
         }
     }
 
-    async login(id: string, username: string, hashedPassword: string): Promise<Tokens | void> {
+    async login(mail: string, password: string): Promise<Tokens | { status: number, message: string, [key: string]: any }> {
         try {
-            const user = await this.getUser(id);
+            const user = await this.getUserByMail(mail);
 
-            if (await bcrypt.compare(hashedPassword, user.password)) {
-                //if user does not exist, send a 400 response
-                const accessToken = this.generateAccessToken(username);
-                const refreshToken = this.generateRefreshToken(username);
+            if (!user) return { status: 404, message: 'No user found' };
+            const hashComparaison = await bcrypt.compare(password, user.password);
+
+            if (hashComparaison) {
+                const accessToken = this.generateAccessToken(mail);
+                const refreshToken = this.generateRefreshToken(mail);
+
+                const updatedUser = {
+                    ...user,
+                    accessToken,
+                    refreshToken
+                };
+
+                await this.updateUser(updatedUser);
 
                 return { accessToken: accessToken, refreshToken: refreshToken };
             }
+
+            return { status: 403, message: 'Unauthorized' };
         } catch (e: any) {
-            throw new Exception(e.message, e.status);
+            throw new Exception(e.error, e.status);
         }
     }
 
@@ -57,7 +54,7 @@ export class AuthService {
         try {
 
         } catch (e: any) {
-            throw new Exception(e.message, e.status);
+            throw new Exception(e.error, e.status);
         }
     }
 
@@ -67,8 +64,6 @@ export class AuthService {
             const user = await this.getUserByMail(mail);
 
             if (user.refreshToken != refreshToken) throw new Exception('Refresh Token Invalid', 400);
-            // refreshTokens = refreshTokens.filter((c) => c != req.body.token);
-
 
             //remove the old refreshToken from the refreshTokens list
             const newAccessToken = this.generateAccessToken(mail);
@@ -76,7 +71,8 @@ export class AuthService {
 
             return { accessToken: newAccessToken, refreshToken: newRefreshToken };
         } catch (e: any) {
-            throw new Exception(e.message, e.status);
+            console.error(e)
+            throw new Exception(e.error, e.status);
         }
     }
 
@@ -101,54 +97,75 @@ export class AuthService {
         return refreshToken;
     }
 
-    private async getUser(id: string): Promise<IUser> {
-        const apiName: string = 'users';
-        const action: string = 'findOne';
-        const responseTopic = `response/${apiName}/${action}`;
-        const requestTopic = `request/${apiName}/${action}`;
-        const publishOptions: IClientPublishOptions = {
-            qos: 1,
-            properties: {
-                responseTopic,
-                correlationData: Buffer.from('secret', 'utf-8'),
-            },
-        };
+    public async getUserByMail(mail: string): Promise<any> {
+        try {
+            const apiUrl: string = `http://localhost:3030/api/v1/users/${mail}`;
 
-        const payload = JSON.stringify({
-            userId: id,
-        });
-
-        const user = JSON.parse(await publishWithResponseBasic(this.esbService.mqttClient, payload, publishOptions, requestTopic, responseTopic));
-        console.log(user);
-
-        return user;
+            const user = (await axios.get(apiUrl)).data;
+            return user;
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
+        }
     }
 
-    private async getUserByMail(mail: string): Promise<IUser> {        
-        const apiName: string = 'users';
-        const action: string = 'findOneByMail';
+    public async asRole(mail: string, role: Roles): Promise<boolean> {
+        try {
+            const apiUrl: string = 'http://localhost:3030/api/v1/users/asRole';
+            const body: any = {
+                mail,
+                role
+            }
 
-        const payload = JSON.stringify({
-            mail
-        });
+            const asRole = ((await axios.get(apiUrl, body))).data as boolean;
+            return asRole;
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
+        }
+    }
 
-        const user = (await this.esbService.call(apiName, action, payload));
-        console.log(user);
+    public async createUser(userInformationData: Partial<IUser>): Promise<IUser> {
+        const apiUrl: string = 'http://localhost:3030/api/v1/users';
+        const body = {
+            ...userInformationData
+        }
+
+        const user = (await axios.post(apiUrl, body)).data;
 
         return user as any;
     }
 
-    private async createUser(userInformationData: Partial<IUser>): Promise<IUser> {
-        const apiName: string = 'users';
-        const action: string = 'createOne';
+    public async updateUser(userInformationData: Partial<IUser>): Promise<IUser> {
+        try {
+            const apiUrl: string = `http://localhost:3030/api/v1/users/${userInformationData.mail}`;
+            const body = {
+                ...userInformationData
+            }
 
-        const payload = JSON.stringify({
-            userInformationData
-        });
+            const user = (await axios.patch(apiUrl, body)).data;
 
-        const user = (await this.esbService.call(apiName, action, payload));
-        console.log(user);
+            return user as any;
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
+        }
+    }
 
-        return user as any;
+    public static async asRole(mail: string, role: Roles): Promise<boolean> {
+        try {
+            const user = await this.instance.asRole(mail, role);
+            if (user === null) return false;
+            return true;
+        } catch (e: any) {
+            throw new Exception(e, e.status ? e.status : 500);
+        }
+    }
+
+    public static async isUserDuplicated(mail: string): Promise<boolean> {
+        try {
+            const user = await this.instance.getUserByMail(mail);
+            if (user === null) return false;
+            return true;
+        } catch (e: any) {
+            throw new Exception(e, e.status ? e.status : 500);
+        }
     }
 }

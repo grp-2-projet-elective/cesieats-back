@@ -49,13 +49,3 @@ app.use(ExceptionsHandler);
  * On demande à Express d'écouter les requêtes sur le port défini dans la config
  */
 app.listen(environment.API_PORT, () => console.log(`Auth server listening at: http://localhost:${environment.API_PORT}`));
-
-// try {
-//     (async () => {
-//         await connect('mongodb://' + process.env.MONGO_USER + ':' + process.env.MONGO_PWD + environment.MONGO_URI);
-//         console.log('Connected to MongoDB');
-//     })();
-// } catch (error) {
-//     console.log('Error connecting to DB: ', error);
-//     process.exit(1);
-// }

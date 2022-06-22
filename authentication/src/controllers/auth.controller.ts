@@ -1,8 +1,6 @@
-import { EsbService } from '@grp-2-projet-elective/mqtt-helper';
 import * as bcrypt from 'bcrypt';
 import { Router } from 'express';
-import { mqttClientOptions } from 'models/esb.model';
-import { connect, MqttClient } from 'mqtt';
+import { AuthMiddleware } from 'middlewares/auth.middleware';
 import { AuthService } from 'services/auth.service';
 
 /**
@@ -13,25 +11,21 @@ const AuthController = Router();
 /**
  * Instance de notre service
  */
-const mqttClient: MqttClient = connect('mqtt://localhost:1883', mqttClientOptions);
-const esbService: EsbService = new EsbService(mqttClient, []);
-const authService = new AuthService(esbService);
+// const mqttClient: MqttClient = connect('mqtt://localhost:1883', mqttClientOptions);
+// const esbService: EsbService = new EsbService(mqttClient, 'auth', []);
+const authService = new AuthService();
 
 /**
  * Enregistrer un nouvel user
  */
-AuthController.post('/register', async (req, res) => {
+AuthController.post('/register', AuthMiddleware.verifyUserDucplication, async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-        const userInformationData = {
+        const userInformationData: any = {
             ...req.body,
             password: hashedPassword
         }
-
-        // users.push({ user: user, password: hashedPassword })
-        // res.status(201).send(users)
-        // console.log(users)
 
         const createdUser = await authService.register(userInformationData);
 
@@ -52,14 +46,9 @@ AuthController.post('/register', async (req, res) => {
  */
 AuthController.post('/login', async (req, res) => {
     try {
-        // const user = await service.findOne(req.body.userId);
-
-        //if user does not exist, send a 400 response
-        return res
-            .status(201)
-            .json(authService.login(req.body.username, req.body.username, req.body.password));
-
-        // return res.status(401).send('Unauthorized');
+        const loginInformations = await authService.login(req.body.mail, req.body.password);
+        if((loginInformations as any).status === 404) return res.status((loginInformations as any).status).json(loginInformations);
+        return res.status(201).json(loginInformations);
     } catch (e: any) {
         console.error(e);
         return res
@@ -68,7 +57,7 @@ AuthController.post('/login', async (req, res) => {
     }
 });
 
-AuthController.post("/refreshToken", async (req, res) => {
+AuthController.post("/refreshToken", AuthMiddleware.verifyAccessToken, async (req, res) => {
     try {
         const tokens = await authService.refreshToken(req.body.mail, req.body.refreshToken);
 
@@ -82,7 +71,7 @@ AuthController.post("/refreshToken", async (req, res) => {
 });
 
 
-AuthController.delete("/logout", async (req, res) => {
+AuthController.post("/logout", async (req, res) => {
     try {
         await authService.logout(req.body.id);
 

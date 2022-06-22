@@ -5,7 +5,6 @@ import { environment } from 'environment/environment';
 import express from 'express';
 import { ExceptionsHandler } from 'middlewares/exceptions.handler';
 import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
-import { Roles } from 'models/users.model';
 import { DataTypes, Model, ModelStatic, Sequelize } from 'sequelize';
 
 /**
@@ -90,6 +89,7 @@ async function syncUser(sequelize: Sequelize): Promise<ModelStatic<Model<any, an
         },
         mail: {
             type: DataTypes.STRING,
+            primaryKey: true,
             allowNull: false
         },
         phone: {
@@ -112,7 +112,7 @@ async function syncUser(sequelize: Sequelize): Promise<ModelStatic<Model<any, an
             type: DataTypes.STRING,
             allowNull: false
         },
-        cityCode: {
+        zipCode: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
@@ -124,7 +124,7 @@ async function syncUser(sequelize: Sequelize): Promise<ModelStatic<Model<any, an
             type: DataTypes.INTEGER,
             allowNull: true
         },
-        token: {
+        accessToken: {
             type: DataTypes.STRING,
             allowNull: true
         },
@@ -174,31 +174,31 @@ async function populateRoles(role: ModelStatic<Model<any, any>>): Promise<void> 
         console.log('No roles found, creating default roles...');
 
         const CUSTOMER = await role.create({
-            type: Roles.CUSTOMER,
+            type: 'CUSTOMER',
             createdAt: new Date(Date.now()),
             updatedAt: new Date(Date.now()),
         });
 
         const RESTAURANT_OWNER = await role.create({
-            type: Roles.RESTAURANT_OWNER,
+            type: 'RESTAURANT_OWNER',
             createdAt: new Date(Date.now()),
             updatedAt: new Date(Date.now()),
         });
 
         const DELIVERY_MAN = await role.create({
-            type: Roles.DELIVERY_MAN,
+            type: 'DELIVERY_MAN',
             createdAt: new Date(Date.now()),
             updatedAt: new Date(Date.now()),
         });
 
         const TECHNICAL_DEPARTMENT = await role.create({
-            type: Roles.TECHNICAL_DEPARTMENT,
+            type: 'TECHNICAL_DEPARTMENT',
             createdAt: new Date(Date.now()),
             updatedAt: new Date(Date.now()),
         });
 
         const COMERCIAL_DEPARTMENT = await role.create({
-            type: Roles.COMERCIAL_DEPARTMENT,
+            type: 'COMERCIAL_DEPARTMENT',
             createdAt: new Date(Date.now()),
             updatedAt: new Date(Date.now()),
         });
