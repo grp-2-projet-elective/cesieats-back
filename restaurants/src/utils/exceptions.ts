@@ -10,7 +10,7 @@ import { ApiException } from 'models/api-exceptions.model';
  *
  * Ici `this.error = error` et `this.status = status`
  */
-class Exception implements ApiException {
+export class Exception implements ApiException {
     constructor(readonly error: any, readonly status: number) { }
 }
 
@@ -35,5 +35,18 @@ export class BadRequestException extends Exception {
      */
     constructor(error: any) {
         super(error, 400);
+    }
+}
+
+
+/**
+ * Création d'une 500
+ */
+ export class InternalServerException extends Exception {
+    /**
+     * On appelle le `constructor` de la classe parente `Exception`
+     */
+    constructor(error: any) {
+        super(error, 500);
     }
 }

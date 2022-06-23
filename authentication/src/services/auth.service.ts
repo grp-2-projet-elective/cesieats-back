@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
+import { environment } from 'environment/environment';
 import * as jwt from 'jsonwebtoken';
 import { IUser, Tokens } from 'models/auth.model';
 import { Roles } from 'models/users.model';
@@ -92,7 +93,7 @@ export class AuthService {
 
     public async getUserByMail(mail: string): Promise<any> {
         try {
-            const apiUrl: string = `http://localhost:3030/api/v1/users/${mail}`;
+            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${mail}`;
 
             const user = (await axios.get(apiUrl)).data;
             return user;
@@ -103,13 +104,9 @@ export class AuthService {
 
     public async asRole(mail: string, role: Roles): Promise<boolean> {
         try {
-            const apiUrl: string = 'http://localhost:3030/api/v1/users/asRole';
-            const body: any = {
-                mail,
-                role
-            }
+            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/asRole/${mail}/${role}`;
 
-            const asRole = ((await axios.get(apiUrl, body))).data as boolean;
+            const asRole = ((await axios.get(apiUrl))).data as boolean;
             return asRole;
         } catch (e: any) {
             throw new Exception(e.error, e.status);
@@ -117,7 +114,7 @@ export class AuthService {
     }
 
     public async createUser(userInformationData: Partial<IUser>): Promise<IUser> {
-        const apiUrl: string = 'http://localhost:3030/api/v1/users';
+        const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users`;
         const body = {
             ...userInformationData
         }
@@ -129,7 +126,7 @@ export class AuthService {
 
     public async updateUser(userInformationData: Partial<IUser>): Promise<IUser> {
         try {
-            const apiUrl: string = `http://localhost:3030/api/v1/users/${userInformationData.mail}`;
+            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${userInformationData.mail}`;
             const body = {
                 ...userInformationData
             }
