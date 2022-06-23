@@ -16,8 +16,8 @@ export interface IUser {
   zipCode: number;
   address: string;
   sponsorId: number;
+  referalCode: string;
 
-  accessToken: string;
   refreshToken: string;
 
   createdAt: Date;
@@ -60,8 +60,8 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare zipCode: number;
   declare address: string;
   declare sponsorId: CreationOptional<number>;
+  declare referalCode: CreationOptional<string>;
 
-  declare accessToken: CreationOptional<string>;
   declare refreshToken: CreationOptional<string>;
 
   declare createdAt: CreationOptional<Date>;

@@ -1,6 +1,7 @@
 import { IUser, Roles, User } from 'models/users.model';
 import { Model, ModelStatic } from 'sequelize/types';
 import { Exception, NotFoundException } from 'utils/exceptions';
+import * as referralCodes from 'referral-codes';
 
 export class UsersService {
     public User: ModelStatic<Model<any, any>>;
@@ -83,7 +84,7 @@ export class UsersService {
         try {
             const user = await this.findOne(mail);
 
-            if(!user) return null;
+            if (!user) return null;
 
             const updatedUser = {
                 ...user.toJSON(),
@@ -109,6 +110,11 @@ export class UsersService {
         try {
             const newUser = await this.User.create({
                 ...userData,
+                referalCode: referralCodes.generate({
+                    length: 8,
+                    count: 1,
+                    charset: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+                })[0],
                 createdAt: new Date(Date.now()),
                 updatedAt: new Date(Date.now()),
             });
@@ -136,7 +142,7 @@ export class UsersService {
             throw new Exception(e.error, e.status);
         }
     }
-    
+
     public static async asRole(mail: string, role: Roles): Promise<boolean> {
         try {
             const user = await this.instance.asRole(mail, role);
