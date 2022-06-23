@@ -16,7 +16,7 @@ const authService = new AuthService();
 /**
  * Enregistrer un nouvel user
  */
-AuthController.post('/register', AuthMiddleware.verifyUserDucplication, async (req, res) => {
+AuthController.post('/register', async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
@@ -34,7 +34,7 @@ AuthController.post('/register', AuthMiddleware.verifyUserDucplication, async (r
         console.error(e);
         return res
             .status(e.status ? e.status : 500)
-            .json(e);
+            .json(e.response.data ? e.response.data : e);
     }
 });
 

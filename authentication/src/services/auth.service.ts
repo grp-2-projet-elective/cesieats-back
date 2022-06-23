@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { IUser, Tokens } from 'models/auth.model';
-import { Roles } from 'models/user.model';
+import { Roles } from 'models/users.model';
 import { Exception } from 'utils/exceptions';
 
 export class AuthService {
@@ -12,17 +12,13 @@ export class AuthService {
         AuthService.instance = this;
     }
 
-    async register(userInformationData: Partial<IUser>): Promise<IUser | void> {
-        try {
-            const user = await this.createUser(userInformationData);
+    public async register(userInformationData: Partial<IUser>): Promise<IUser | void> {
+        const user = await this.createUser(userInformationData);
 
-            return user;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
+        return user;
     }
 
-    async login(mail: string, password: string): Promise<Tokens | { status: number, message: string, [key: string]: any }> {
+    public async login(mail: string, password: string): Promise<Tokens | { status: number, message: string, [key: string]: any }> {
         try {
             const user = await this.getUserByMail(mail);
 
@@ -50,7 +46,7 @@ export class AuthService {
         }
     }
 
-    async logout(id: string): Promise<void> {
+    public async logout(id: string): Promise<void> {
         try {
 
         } catch (e: any) {
@@ -59,7 +55,7 @@ export class AuthService {
     }
 
 
-    async refreshToken(mail: string, refreshToken: string): Promise<Tokens | void> {
+    public async refreshToken(mail: string, refreshToken: string): Promise<Tokens | void> {
         try {
             const user = await this.getUserByMail(mail);
 
@@ -91,9 +87,7 @@ export class AuthService {
      * @returns 
      */
     generateRefreshToken(mail: string): string {
-        const refreshToken = jwt.sign({ mail: mail }, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: '20m' });
-        // refreshTokens.push(refreshToken);
-        return refreshToken;
+        return jwt.sign({ mail: mail }, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: '20m' });
     }
 
     public async getUserByMail(mail: string): Promise<any> {
@@ -151,16 +145,6 @@ export class AuthService {
     public static async asRole(mail: string, role: Roles): Promise<boolean> {
         try {
             const user = await this.instance.asRole(mail, role);
-            if (user === null) return false;
-            return true;
-        } catch (e: any) {
-            throw new Exception(e, e.status ? e.status : 500);
-        }
-    }
-
-    public static async isUserDuplicated(mail: string): Promise<boolean> {
-        try {
-            const user = await this.instance.getUserByMail(mail);
             if (user === null) return false;
             return true;
         } catch (e: any) {
