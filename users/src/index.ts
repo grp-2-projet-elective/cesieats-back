@@ -29,7 +29,6 @@ app.use(cors());
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
 app.use('/api/v1/users', UsersController);
-// app.use('/api/v1/users', AuthMiddleware.verifyAccessToken, UsersController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)
@@ -208,6 +207,9 @@ async function populateRoles(role: ModelStatic<Model<any, any>>): Promise<void> 
         await DELIVERY_MAN.save();
         await TECHNICAL_DEPARTMENT.save();
         await COMERCIAL_DEPARTMENT.save();
+
+        console.log('Roles succesfully created');
+        return;
     }
 
     console.log('Roles already created');

@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { UsersService } from 'services/users.service';
 import { BadRequestException } from 'utils/exceptions';
-import { Roles } from 'models/users.model';
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`
@@ -11,14 +10,12 @@ const UsersController = Router();
 /**
  * Instance de notre usersService
  */
-// const mqttClient: MqttClient = initMqttClient('mqtt://localhost:1883', mqttClientOptions);
-// const esbService: EsbService = new EsbService(mqttClient, 'users', []);
 const usersService = new UsersService();
 
 /**
  * Trouve un user en particulier par son email
  */
- UsersController.get('/:mail', async (req, res) => {
+UsersController.get('/:mail', async (req, res) => {
     try {
         const mail = req.params.mail;
 
@@ -27,7 +24,7 @@ const usersService = new UsersService();
         }
 
         const user = await usersService.findOne(mail);
-        
+
         return res
             .status(200)
             .json(user);
