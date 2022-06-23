@@ -14,9 +14,25 @@ const UsersController = Router();
 const usersService = new UsersService();
 
 /**
+ * Trouve tous les users
+ */
+UsersController.get('/', AuthMiddleware.isCommercialDepartment, AuthMiddleware.isTechnicalDepartment, async (req, res) => {
+    try {
+        return res
+            .status(200)
+            .json(await usersService.findAll());
+    } catch (e: any) {
+        console.error(e);
+        return res
+            .status(e.status ? e.status : 500)
+            .json(e);
+    }
+});
+
+/**
  * Trouve un user en particulier par son email
  */
-UsersController.get('/:mail', async (req, res) => {
+ UsersController.get('/:mail', async (req, res) => {
     try {
         const mail = req.params.mail;
 
@@ -29,22 +45,6 @@ UsersController.get('/:mail', async (req, res) => {
         return res
             .status(200)
             .json(user);
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
-    }
-});
-
-/**
- * Trouve tous les users
- */
-UsersController.get('/', async (req, res) => {
-    try {
-        return res
-            .status(200)
-            .json(await usersService.findAll());
     } catch (e: any) {
         console.error(e);
         return res

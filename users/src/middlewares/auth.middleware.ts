@@ -4,7 +4,13 @@ import { Roles } from 'models/users.model';
 import { UsersService } from 'services/users.service';
 
 export abstract class AuthMiddleware {
+    public static authorizedHosts: Array<string>;
+
     public static async verifyAccessToken(req: Request, res: Response, next: NextFunction) {
+        if ((req as any).skipMiddlewares) {
+            return next();
+        }
+
         try {
             const accessToken: string = req.headers['x-access-token'] as string;
 
@@ -26,8 +32,11 @@ export abstract class AuthMiddleware {
     }
 
     public static async verifyUserDucplication(req: Request, res: Response, next: NextFunction) {
-        try {
+        if ((req as any).skipMiddlewares) {
+            return next();
+        }
 
+        try {
             const mail: string = req.body.mail;
 
             if (!mail) {
@@ -49,8 +58,22 @@ export abstract class AuthMiddleware {
         }
     }
 
+    public static async isApiCall(req: Request, res: Response, next: NextFunction) {
+        const hostname = req.hostname;
+        console.log('API call from: ', hostname);
+
+        if (AuthMiddleware.authorizedHosts.includes(hostname)) {
+            (req as any).skipMiddlewares = true;
+        }
+
+        return next();
+    }
 
     public static async isCustomer(req: Request, res: Response, next: NextFunction) {
+        if ((req as any).skipMiddlewares) {
+            return next();
+        }
+
         const mail: string = req.body.mail;
         const excpectedRole = Roles.CUSTOMER;
 
@@ -68,6 +91,10 @@ export abstract class AuthMiddleware {
     }
 
     public static async isRestaurantOwner(req: Request, res: Response, next: NextFunction) {
+        if ((req as any).skipMiddlewares) {
+            return next();
+        }
+
         const mail: string = req.body.mail;
         const excpectedRole = Roles.RESTAURANT_OWNER;
 
@@ -85,6 +112,10 @@ export abstract class AuthMiddleware {
     }
 
     public static async isDeliveryMan(req: Request, res: Response, next: NextFunction) {
+        if ((req as any).skipMiddlewares) {
+            return next();
+        }
+
         const mail: string = req.body.mail;
         const excpectedRole = Roles.DELIVERY_MAN;
 
@@ -102,6 +133,10 @@ export abstract class AuthMiddleware {
     }
 
     public static async isTechnicalDepartment(req: Request, res: Response, next: NextFunction) {
+        if ((req as any).skipMiddlewares) {
+            return next();
+        }
+
         const mail: string = req.body.mail;
         const excpectedRole = Roles.TECHNICAL_DEPARTMENT;
 
@@ -119,6 +154,10 @@ export abstract class AuthMiddleware {
     }
 
     public static async isCommercialDepartment(req: Request, res: Response, next: NextFunction) {
+        if ((req as any).skipMiddlewares) {
+            return next();
+        }
+
         const mail: string = req.body.mail;
         const excpectedRole = Roles.TECHNICAL_DEPARTMENT;
 

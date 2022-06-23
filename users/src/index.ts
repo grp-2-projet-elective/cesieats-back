@@ -3,10 +3,12 @@ import cors from 'cors';
 import 'dotenv/config';
 import { environment } from 'environment/environment';
 import express from 'express';
+import { AuthMiddleware } from 'middlewares/auth.middleware';
 import { ExceptionsHandler } from 'middlewares/exceptions.handler';
 import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
 import { DataTypes, Model, ModelStatic, Sequelize } from 'sequelize';
 
+AuthMiddleware.authorizedHosts = environment.authorizedHosts;
 /**
  * On crée une nouvelle "application" express
  */
@@ -28,7 +30,7 @@ app.use(cors());
 /**
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
-app.use('/api/v1/users', UsersController);
+app.use('/api/v1/users', AuthMiddleware.isApiCall, AuthMiddleware.verifyAccessToken, UsersController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)

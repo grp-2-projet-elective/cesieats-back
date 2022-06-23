@@ -1,6 +1,5 @@
 import * as bcrypt from 'bcrypt';
 import { Router } from 'express';
-import { AuthMiddleware } from 'middlewares/auth.middleware';
 import { AuthService } from 'services/auth.service';
 
 /**
@@ -45,7 +44,7 @@ AuthController.post('/register', async (req, res) => {
 AuthController.post('/login', async (req, res) => {
     try {
         const loginInformations = await authService.login(req.body.mail, req.body.password);
-        if((loginInformations as any).status === 404) return res.status((loginInformations as any).status).json(loginInformations);
+        if ((loginInformations as any).status === 404) return res.status((loginInformations as any).status).json(loginInformations);
         return res.status(201).json(loginInformations);
     } catch (e: any) {
         console.error(e);
@@ -55,7 +54,7 @@ AuthController.post('/login', async (req, res) => {
     }
 });
 
-AuthController.post("/refreshToken", AuthMiddleware.verifyAccessToken, async (req, res) => {
+AuthController.post("/refreshToken", async (req, res) => {
     try {
         const tokens = await authService.refreshToken(req.body.mail, req.body.refreshToken);
 
