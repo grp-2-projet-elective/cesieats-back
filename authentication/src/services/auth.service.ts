@@ -65,7 +65,6 @@ export class AuthService {
 
             if (user.refreshToken != refreshToken) throw new Exception('Refresh Token Invalid', 400);
 
-            //remove the old refreshToken from the refreshTokens list
             const newAccessToken = this.generateAccessToken(mail);
             const newRefreshToken = this.generateRefreshToken(mail);
 

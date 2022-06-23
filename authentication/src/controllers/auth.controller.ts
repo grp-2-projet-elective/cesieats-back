@@ -11,8 +11,6 @@ const AuthController = Router();
 /**
  * Instance de notre service
  */
-// const mqttClient: MqttClient = connect('mqtt://localhost:1883', mqttClientOptions);
-// const esbService: EsbService = new EsbService(mqttClient, 'auth', []);
 const authService = new AuthService();
 
 /**

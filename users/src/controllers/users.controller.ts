@@ -10,14 +10,12 @@ const UsersController = Router();
 /**
  * Instance de notre usersService
  */
-// const mqttClient: MqttClient = initMqttClient('mqtt://localhost:1883', mqttClientOptions);
-// const esbService: EsbService = new EsbService(mqttClient, 'users', []);
 const usersService = new UsersService();
 
 /**
  * Trouve un user en particulier par son email
  */
- UsersController.get('/:mail', async (req, res) => {
+UsersController.get('/:mail', async (req, res) => {
     try {
         const mail = req.params.mail;
 
@@ -26,7 +24,7 @@ const usersService = new UsersService();
         }
 
         const user = await usersService.findOne(mail);
-        
+
         return res
             .status(200)
             .json(user);
@@ -57,10 +55,10 @@ UsersController.get('/', async (req, res) => {
 /**
  * Trouve un user en particulier
  */
-UsersController.get('/asRole', async (req, res) => {
+UsersController.get('/asRole/:mail/:role', async (req, res) => {
     try {
-        const mail = req.body.mail;
-        const role = req.body.role;
+        const mail = req.params.mail;
+        const role = Number(req.params.role);
 
         if (!mail) {
             throw new BadRequestException('Invalid mail');
@@ -81,30 +79,6 @@ UsersController.get('/asRole', async (req, res) => {
             .json(e);
     }
 });
-
-// /**
-//  * Trouve un user en particulier
-//  */
-// UsersController.get('/id/:id', async (req, res) => {
-//     try {
-//         const id = String(req.params.id);
-
-//         if (!id) {
-//             throw new BadRequestException('Invalid id');
-//         }
-
-//         const user = await usersService.findOneById(id);
-
-//         return res
-//             .status(200)
-//             .json(user);
-//     } catch (e: any) {
-//         console.error(e);
-//         return res
-//             .status(e.status ? e.status : 500)
-//             .json(e);
-//     }
-// });
 
 /**
  * Créé un user
@@ -129,7 +103,7 @@ UsersController.post('/', async (req, res) => {
  */
 UsersController.patch('/:mail', async (req, res) => {
     try {
-        const mail = String(req.params.mail);
+        const mail = req.params.mail;
 
         if (!mail) {
             throw new BadRequestException('Invalid mail');
@@ -151,15 +125,15 @@ UsersController.patch('/:mail', async (req, res) => {
 /**
  * Suppression d'un user
  */
-UsersController.delete('/:id', async (req, res) => {
+UsersController.delete('/:mail', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const mail = req.params.mail;
 
-        if (!id) {
+        if (!mail) {
             throw new BadRequestException('Invalid id');
         }
 
-        const response = await usersService.delete(id);
+        const response = await usersService.delete(mail);
 
         return res
             .status(200)
