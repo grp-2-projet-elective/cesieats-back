@@ -125,9 +125,9 @@ async function syncUser(sequelize: Sequelize): Promise<ModelStatic<Model<any, an
             type: DataTypes.INTEGER,
             allowNull: true
         },
-        accessToken: {
+        referalCode: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: false
         },
         refreshToken: {
             type: DataTypes.STRING,
