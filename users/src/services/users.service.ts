@@ -119,9 +119,9 @@ export class UsersService {
     /**
      * Suppression d'un user
      */
-    async delete(id: string): Promise<any> {
+    async delete(mail: string): Promise<any> {
         try {
-            const userCount = await this.User.destroy({ where: { id } });
+            const userCount = await this.User.destroy({ where: { mail } });
 
             if (userCount === 0) {
                 throw new NotFoundException('No user found');
