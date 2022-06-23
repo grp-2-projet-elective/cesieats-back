@@ -5,5 +5,4 @@ export enum Roles {
     TECHNICAL_DEPARTMENT = 4,
     COMERCIAL_DEPARTMENT = 5,
     EXTERNAL = 6
-  }
-  
+}

@@ -10,7 +10,7 @@ export abstract class AuthMiddleware {
         if ((req as any).skipMiddlewares) {
             return next();
         }
-
+      
         try {
             const accessToken: string = req.headers['x-access-token'] as string;
 
