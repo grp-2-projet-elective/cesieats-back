@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { Roles } from 'models/users.model';
-import { AuthService } from 'services/auth.service';
+import { UsersService } from 'services/users.service';
 
 export abstract class AuthMiddleware {
     public static async verifyAccessToken(req: Request, res: Response, next: NextFunction) {
@@ -25,6 +25,31 @@ export abstract class AuthMiddleware {
         }
     }
 
+    public static async verifyUserDucplication(req: Request, res: Response, next: NextFunction) {
+        try {
+
+            const mail: string = req.body.mail;
+
+            if (!mail) {
+                return res.status(400).send({ message: 'User mail not provided' });
+            }
+
+            const isUserDuplicated: boolean = await UsersService.isUserDuplicated(mail);
+
+            if (isUserDuplicated) {
+                return res.status(400).send({ message: 'User already exists' });
+            }
+
+            return next();
+        } catch (e: any) {
+            console.error(e);
+            return res
+                .status(e.status ? e.status : 500)
+                .json(e);
+        }
+    }
+
+
     public static async isCustomer(req: Request, res: Response, next: NextFunction) {
         const mail: string = req.body.mail;
         const excpectedRole = Roles.CUSTOMER;
@@ -33,7 +58,7 @@ export abstract class AuthMiddleware {
             return res.status(400).send({ message: 'User mail not provided' });
         }
 
-        const isCustomer: boolean = await AuthService.asRole(mail, excpectedRole);
+        const isCustomer: boolean = await UsersService.asRole(mail, excpectedRole);
 
         if (!isCustomer) {
             return res.status(403).send({ message: 'Invalid role' });
@@ -50,7 +75,7 @@ export abstract class AuthMiddleware {
             return res.status(400).send({ message: 'User mail not provided' });
         }
 
-        const isRestaurantOwner: boolean = await AuthService.asRole(mail, excpectedRole);
+        const isRestaurantOwner: boolean = await UsersService.asRole(mail, excpectedRole);
 
         if (!isRestaurantOwner) {
             return res.status(403).send({ message: 'Invalid role' });
@@ -67,7 +92,7 @@ export abstract class AuthMiddleware {
             return res.status(400).send({ message: 'User mail not provided' });
         }
 
-        const isDeliveryMan: boolean = await AuthService.asRole(mail, excpectedRole);
+        const isDeliveryMan: boolean = await UsersService.asRole(mail, excpectedRole);
 
         if (!isDeliveryMan) {
             return res.status(403).send({ message: 'Invalid role' });
@@ -84,7 +109,7 @@ export abstract class AuthMiddleware {
             return res.status(400).send({ message: 'User mail not provided' });
         }
 
-        const isTechnicalDepartment: boolean = await AuthService.asRole(mail, excpectedRole);
+        const isTechnicalDepartment: boolean = await UsersService.asRole(mail, excpectedRole);
 
         if (!isTechnicalDepartment) {
             return res.status(403).send({ message: 'Invalid role' });
@@ -101,7 +126,7 @@ export abstract class AuthMiddleware {
             return res.status(400).send({ message: 'User mail not provided' });
         }
 
-        const isCommercialDepartment: boolean = await AuthService.asRole(mail, excpectedRole);
+        const isCommercialDepartment: boolean = await UsersService.asRole(mail, excpectedRole);
 
         if (!isCommercialDepartment) {
             return res.status(403).send({ message: 'Invalid role' });

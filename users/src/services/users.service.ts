@@ -6,7 +6,11 @@ export class UsersService {
     public User: ModelStatic<Model<any, any>>;
     public Role: ModelStatic<Model<any, any>>;
 
-    constructor() { }
+    private static instance: UsersService;
+
+    constructor() {
+        UsersService.instance = this;
+    }
 
     /**
      * Trouve tous les users
@@ -130,6 +134,26 @@ export class UsersService {
             return { message: 'User deleted' };
         } catch (e: any) {
             throw new Exception(e.error, e.status);
+        }
+    }
+    
+    public static async asRole(mail: string, role: Roles): Promise<boolean> {
+        try {
+            const user = await this.instance.asRole(mail, role);
+            if (user === null) return false;
+            return true;
+        } catch (e: any) {
+            throw new Exception(e, e.status ? e.status : 500);
+        }
+    }
+
+    public static async isUserDuplicated(mail: string): Promise<boolean> {
+        try {
+            const user = await this.instance.findOne(mail);
+            if (user === null) return false;
+            return true;
+        } catch (e: any) {
+            throw new Exception(e, e.status ? e.status : 500);
         }
     }
 }

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { AuthMiddleware } from 'middlewares/auth.middleware';
 import { UsersService } from 'services/users.service';
 import { BadRequestException } from 'utils/exceptions';
 
@@ -83,7 +84,7 @@ UsersController.get('/asRole/:mail/:role', async (req, res) => {
 /**
  * Créé un user
  */
-UsersController.post('/', async (req, res) => {
+UsersController.post('/', AuthMiddleware.verifyUserDucplication, async (req, res) => {
     try {
         const createdUser = await usersService.create(req.body);
 
