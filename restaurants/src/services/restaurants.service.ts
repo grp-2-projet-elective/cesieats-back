@@ -1,7 +1,16 @@
-import { Restaurant, IRestaurant } from 'models/restaurants.model';
-import { NotFoundException } from 'utils/exceptions';
+import axios from 'axios';
+import { environment } from 'environment/environment';
+import { IRestaurant, Restaurant } from 'models/restaurants.model';
+import { Roles } from 'models/users.model';
+import { Exception, NotFoundException } from 'utils/exceptions';
 
 export class RestaurantsService {
+    private static instance: RestaurantsService;
+
+    constructor() {
+        RestaurantsService.instance = this;
+    }
+
     /**
      * Trouve tous les restaurants
      */
@@ -73,5 +82,26 @@ export class RestaurantsService {
         }
 
         await Restaurant.findByIdAndRemove(id);
+    }
+
+    public async asRole(mail: string, role: Roles): Promise<boolean> {
+        try {
+            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/asRole/${mail}/${role}`;
+
+            const asRole = ((await axios.get(apiUrl))).data as boolean;
+            return asRole;
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
+        }
+    }
+
+    public static async asRole(mail: string, role: Roles): Promise<boolean> {
+        try {
+            const user = await this.instance.asRole(mail, role);
+            if (user === null) return false;
+            return true;
+        } catch (e: any) {
+            throw new Exception(e, e.status ? e.status : 500);
+        }
     }
 }

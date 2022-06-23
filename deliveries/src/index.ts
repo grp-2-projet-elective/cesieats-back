@@ -29,7 +29,7 @@ app.use(cors());
 /**
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
-app.use('/api/v1/deliveries', AuthMiddleware.verifyAccessToken, DeliveriesController);
+app.use('/api/v1/deliveries', AuthMiddleware.isApiCall, AuthMiddleware.verifyAccessToken, DeliveriesController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)
