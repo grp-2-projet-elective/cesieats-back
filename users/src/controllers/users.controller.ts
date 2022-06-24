@@ -32,7 +32,32 @@ UsersController.get('/', AuthMiddleware.isCommercialDepartment, AuthMiddleware.i
 /**
  * Trouve un user en particulier par son email
  */
- UsersController.get('/:mail', async (req, res) => {
+ UsersController.get('/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const user = await usersService.findOne(id);
+
+        return res
+            .status(200)
+            .json(user);
+    } catch (e: any) {
+        console.error(e);
+        return res
+            .status(e.status ? e.status : 500)
+            .json(e);
+    }
+});
+
+
+/**
+ * Trouve un user en particulier par son email
+ */
+ UsersController.get('/mail/:mail', async (req, res) => {
     try {
         const mail = req.params.mail;
 
@@ -40,7 +65,7 @@ UsersController.get('/', AuthMiddleware.isCommercialDepartment, AuthMiddleware.i
             throw new BadRequestException('Invalid mail');
         }
 
-        const user = await usersService.findOne(mail);
+        const user = await usersService.findOneByMail(mail);
 
         return res
             .status(200)
@@ -56,19 +81,19 @@ UsersController.get('/', AuthMiddleware.isCommercialDepartment, AuthMiddleware.i
 /**
  * Trouve un user en particulier
  */
-UsersController.get('/asRole/:mail/:role', async (req, res) => {
+UsersController.get('/asRole/:id/:role', async (req, res) => {
     try {
-        const mail = req.params.mail;
+        const id = req.params.id;
         const role = Number(req.params.role);
 
-        if (!mail) {
-            throw new BadRequestException('Invalid mail');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
         }
         if (!role) {
             throw new BadRequestException('Invalid role');
         }
 
-        const asRole = await usersService.asRole(mail, role);
+        const asRole = await usersService.asRole(id, role);
 
         return res
             .status(200)
@@ -102,15 +127,15 @@ UsersController.post('/', AuthMiddleware.verifyUserDucplication, async (req, res
 /**
  * Mise à jour d'un user
  */
-UsersController.patch('/:mail', async (req, res) => {
+UsersController.patch('/:id', async (req, res) => {
     try {
-        const mail = req.params.mail;
+        const id = req.params.id;
 
-        if (!mail) {
-            throw new BadRequestException('Invalid mail');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
         }
 
-        const updatedUser = await usersService.update(mail, req.body);
+        const updatedUser = await usersService.update(id, req.body);
 
         return res
             .status(200)
@@ -126,15 +151,15 @@ UsersController.patch('/:mail', async (req, res) => {
 /**
  * Suppression d'un user
  */
-UsersController.delete('/:mail', async (req, res) => {
+UsersController.delete('/:id', async (req, res) => {
     try {
-        const mail = req.params.mail;
+        const id = req.params.id;
 
-        if (!mail) {
+        if (!id) {
             throw new BadRequestException('Invalid id');
         }
 
-        const response = await usersService.delete(mail);
+        const response = await usersService.delete(id);
 
         return res
             .status(200)

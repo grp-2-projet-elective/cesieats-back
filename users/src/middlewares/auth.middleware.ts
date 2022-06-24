@@ -182,14 +182,14 @@ export abstract class AuthMiddleware {
             return next();
         }
 
-        const mail: string = req.body.mail;
+        const id: string = req.body.id;
         const excpectedRole = Roles.TECHNICAL_DEPARTMENT;
-
-        if (!mail) {
-            return res.status(400).send({ message: 'User mail not provided' });
+        
+        if (!id) {
+            return res.status(400).send({ message: 'User id not provided' });
         }
 
-        const isCommercialDepartment: boolean = await UsersService.asRole(mail, excpectedRole);
+        const isCommercialDepartment: boolean = await UsersService.asRole(id, excpectedRole);
 
         if (!isCommercialDepartment) {
             return res.status(403).send({ message: 'Invalid role' });

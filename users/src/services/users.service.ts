@@ -31,21 +31,7 @@ export class UsersService {
      * Trouve un user en particulier
      * @param id - ID unique de l'user
      */
-    async findOne(mail: string): Promise<Model<any, any> | null> {
-        try {
-            const user = await this.User.findOne({ where: { mail } });
-
-            return user;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
-    }
-
-    /**
-     * Trouve un user en particulier par son email
-     * @param mail - mail unique de l'user
-     */
-    async findOneById(id: string): Promise<Model<any, any> | null> {
+    async findOne(id: string): Promise<Model<any, any> | null> {
         try {
             const user = await this.User.findOne({ where: { id } });
 
@@ -59,9 +45,23 @@ export class UsersService {
      * Trouve un user en particulier par son email
      * @param mail - mail unique de l'user
      */
-    async asRole(mail: string, role: Roles): Promise<boolean> {
+    async findOneByMail(mail: string): Promise<Model<any, any> | null> {
         try {
-            const user: User = await this.User.findOne({ where: { mail } }) as User;
+            const user = await this.User.findOne({ where: { mail } });
+
+            return user;
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
+        }
+    }
+
+    /**
+     * Trouve un user en particulier par son email
+     * @param id - id unique de l'user
+     */
+    async asRole(id: string, role: Roles): Promise<boolean> {
+        try {
+            const user: User = await this.User.findOne({ where: { id } }) as User;
 
             if (!user) {
                 throw new NotFoundException('No user found');
@@ -81,9 +81,9 @@ export class UsersService {
      * @param userData - Un objet correspondant à un user, il ne contient pas forcément tout un user. Attention, on ne prend pas l'id avec.
      * @param id - ID unique de l'user
      */
-    async update(mail: string, userData: Partial<User>): Promise<Model<any, any> | null> {
+    async update(id: string, userData: Partial<User>): Promise<Model<any, any> | null> {
         try {
-            const user = await this.findOne(mail);
+            const user = await this.findOne(id);
 
             if (!user) return null;
 
@@ -92,7 +92,7 @@ export class UsersService {
                 ...userData
             };
 
-            await this.User.update(updatedUser, { where: { mail } });
+            await this.User.update(updatedUser, { where: { id } });
 
             return updatedUser;
         } catch (e: any) {
@@ -112,7 +112,9 @@ export class UsersService {
             const newUser = await this.User.create({
                 ...userData,
                 referalCode: referralCodes.generate({
-                    length: 8,
+                    prefix: `${userData.roleId}-`,
+                    pattern: '###-###',
+                    length: 6,
                     count: 1,
                     charset: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
                 })[0],
@@ -144,9 +146,9 @@ export class UsersService {
         }
     }
 
-    public static async asRole(mail: string, role: Roles): Promise<boolean> {
+    public static async asRole(id: string, role: Roles): Promise<boolean> {
         try {
-            const user = await this.instance.asRole(mail, role);
+            const user = await this.instance.asRole(id, role);
             if (user === null) return false;
             return true;
         } catch (e: any) {
@@ -154,14 +156,14 @@ export class UsersService {
         }
     }
 
-    public static async isProfileOwner(mail: string, token: string): Promise<boolean> {
+    public static async isProfileOwner(id: string, token: string): Promise<boolean> {
         try {
             const decodedToken = jwt.decode(token, {
                 complete: true
             });
             const tokenData = JSON.parse(decodedToken);
             
-            if (mail !== tokenData.mail) return false;
+            if (id !== tokenData.id) return false;
             return true;
         } catch (e: any) {
             throw new Exception(e, e.status ? e.status : 500);
