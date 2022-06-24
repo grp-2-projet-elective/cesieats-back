@@ -1,5 +1,6 @@
 import { IUser, Roles, User } from 'models/users.model';
 import { Model, ModelStatic } from 'sequelize/types';
+import * as jwt from 'jsonwebtoken';
 import { Exception, NotFoundException } from 'utils/exceptions';
 import * as referralCodes from 'referral-codes';
 
@@ -147,6 +148,20 @@ export class UsersService {
         try {
             const user = await this.instance.asRole(mail, role);
             if (user === null) return false;
+            return true;
+        } catch (e: any) {
+            throw new Exception(e, e.status ? e.status : 500);
+        }
+    }
+
+    public static async isProfileOwner(mail: string, token: string): Promise<boolean> {
+        try {
+            const decodedToken = jwt.decode(token, {
+                complete: true
+            });
+            const tokenData = JSON.parse(decodedToken);
+            
+            if (mail !== tokenData.mail) return false;
             return true;
         } catch (e: any) {
             throw new Exception(e, e.status ? e.status : 500);

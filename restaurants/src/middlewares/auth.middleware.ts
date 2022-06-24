@@ -30,6 +30,85 @@ export abstract class AuthMiddleware {
             return res.status(e.status ? e.status : 500).send(e);
         }
     }
+    
+    public static async isRestaurantDuplicated(req: Request, res: Response, next: NextFunction) {
+        if ((req as any).skipMiddlewares) {
+            return next();
+        }
+
+        try {
+            const name: string = req.body.name;
+
+            if (!name) {
+                return res.status(400).send({ message: 'Restaurant name not provided' });
+            }
+
+            const isUserDuplicated: boolean = await RestaurantsService.isRestaurantDuplicated(name);
+
+            if (isUserDuplicated) {
+                return res.status(400).send({ message: 'User already exists' });
+            }
+
+            return next();
+        } catch (e: any) {
+            console.error(e);
+            return res
+                .status(e.status ? e.status : 500)
+                .json(e);
+        }
+    }
+    
+    public static async verifyProfileOwnership(req: Request, res: Response, next: NextFunction) {
+        try {
+            const accessToken: string = req.headers['x-access-token'] as string;
+            const mail: string = req.body.mail;
+
+            if (!mail) {
+                return res.status(400).send({ message: 'User mail not provided' });
+            }
+
+            const isProfileOwner: boolean = await RestaurantsService.isProfileOwner(mail, accessToken);
+
+            if (!isProfileOwner) {
+                return res.status(400).send({ message: 'Unauthorized' });
+            }
+
+            return next();
+        } catch (e: any) {
+            console.error(e);
+            return res
+                .status(e.status ? e.status : 500)
+                .json(e);
+        }
+    }
+
+    public static async verifyRestaurantOwnership(req: Request, res: Response, next: NextFunction) {
+        if ((req as any).skipMiddlewares) {
+            return next();
+        }
+
+        try {
+            const mail: string = req.body.mail;
+            const restaurantId: number = Number(req.body.restaurantId);
+
+            if (!mail) {
+                return res.status(400).send({ message: 'User mail not provided' });
+            }
+
+            const isProfileOwner: boolean = await RestaurantsService.haveRestaurantOwnership(mail, restaurantId);
+
+            if (!isProfileOwner) {
+                return res.status(400).send({ message: 'Unauthorized' });
+            }
+
+            return next();
+        } catch (e: any) {
+            console.error(e);
+            return res
+                .status(e.status ? e.status : 500)
+                .json(e);
+        }
+    }
 
     public static async isApiCall(req: Request, res: Response, next: NextFunction) {
         const hostname = req.hostname;

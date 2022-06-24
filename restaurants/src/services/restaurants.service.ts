@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { environment } from 'environment/environment';
+import * as jwt from 'jsonwebtoken';
 import { IRestaurant, Restaurant } from 'models/restaurants.model';
 import { Roles } from 'models/users.model';
 import { Exception, NotFoundException } from 'utils/exceptions';
@@ -28,7 +29,7 @@ export class RestaurantsService {
      * Trouve un restaurant en particulier
      * @param id - ID unique de l'restaurant
      */
-    async findOne(id: string): Promise<IRestaurant | null | undefined> {
+    async findOne(id: number): Promise<IRestaurant | null | undefined> {
         try {
             const restaurant = await Restaurant.findById(id);
 
@@ -46,7 +47,7 @@ export class RestaurantsService {
      * @param restaurantData - Un objet correspondant à un restaurant, il ne contient pas forcément tout un restaurant. Attention, on ne prend pas l'id avec.
      * @param id - ID unique de l'restaurant
      */
-    async update(id: string, restaurantData: Partial<IRestaurant>): Promise<IRestaurant | null | undefined> {
+    async update(id: number, restaurantData: Partial<IRestaurant>): Promise<IRestaurant | null | undefined> {
         const restaurant = await this.findOne(id);
 
         if (!restaurant) {
@@ -74,7 +75,7 @@ export class RestaurantsService {
     /**
      * Suppression d'un restaurant
      */
-    async delete(id: string) {
+    async delete(id: number) {
         const restaurant = await this.findOne(id);
 
         if (!restaurant) {
@@ -82,6 +83,18 @@ export class RestaurantsService {
         }
 
         await Restaurant.findByIdAndRemove(id);
+    }
+
+    
+    public async getUserByMail(mail: string): Promise<any> {
+        try {
+            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${mail}`;
+
+            const user = (await axios.get(apiUrl)).data;
+            return user;
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
+        }
     }
 
     public async asRole(mail: string, role: Roles): Promise<boolean> {
@@ -95,11 +108,45 @@ export class RestaurantsService {
         }
     }
 
+    public async haveRestaurantOwnership(mail: string, restaurantId: number): Promise<boolean> {
+        try {
+            const user = await this.getUserByMail(mail);
+            const restaurant: IRestaurant = await this.findOne(restaurantId) as IRestaurant;
+
+            if(restaurant?.restaurantOwnersId.includes(user.id)) return true;
+            return false;
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
+        }
+    }
+
     public static async asRole(mail: string, role: Roles): Promise<boolean> {
         try {
-            const user = await this.instance.asRole(mail, role);
-            if (user === null) return false;
+            const asRole = await this.instance.asRole(mail, role);
+            return asRole;
+        } catch (e: any) {
+            throw new Exception(e, e.status ? e.status : 500);
+        }
+    }
+
+    public static async isProfileOwner(mail: string, token: string): Promise<boolean> {
+        try {
+            const decodedToken = jwt.decode(token, {
+                complete: true
+            });
+            const tokenData = JSON.parse(decodedToken);
+
+            if (mail !== tokenData.mail) return false;
             return true;
+        } catch (e: any) {
+            throw new Exception(e, e.status ? e.status : 500);
+        }
+    }
+
+    public static async haveRestaurantOwnership(mail: string, restaurantId: number): Promise<boolean> {
+        try {
+            const asRole = await this.instance.haveRestaurantOwnership(mail, restaurantId);
+            return asRole;
         } catch (e: any) {
             throw new Exception(e, e.status ? e.status : 500);
         }
