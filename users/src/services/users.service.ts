@@ -1,8 +1,8 @@
 import { IUser, Roles, User } from 'models/users.model';
 import { Model, ModelStatic } from 'sequelize/types';
-import * as jwt from 'jsonwebtoken';
 import { Exception, NotFoundException } from 'utils/exceptions';
 import * as referralCodes from 'referral-codes';
+import { AuthMiddlewares } from '@grp-2-projet-elective/auth-helper';
 
 export class UsersService {
     public User: ModelStatic<Model<any, any>>;
@@ -31,7 +31,7 @@ export class UsersService {
      * Trouve un user en particulier
      * @param id - ID unique de l'user
      */
-    async findOne(id: string): Promise<Model<any, any> | null> {
+    async findOne(id: number): Promise<Model<any, any> | null> {
         try {
             const user = await this.User.findOne({ where: { id } });
 
@@ -56,24 +56,6 @@ export class UsersService {
     }
 
     /**
-     * Trouve un user en particulier par son email
-     * @param id - id unique de l'user
-     */
-    async asRole(id: string, role: Roles): Promise<boolean> {
-        try {
-            const user: User = await this.User.findOne({ where: { id } }) as User;
-
-            if (!user) {
-                throw new NotFoundException('No user found');
-            }
-
-            return user.roleId === role ? true : false;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
-    }
-
-    /**
      * Met à jour un user en particulier
      *
      * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
@@ -81,7 +63,7 @@ export class UsersService {
      * @param userData - Un objet correspondant à un user, il ne contient pas forcément tout un user. Attention, on ne prend pas l'id avec.
      * @param id - ID unique de l'user
      */
-    async update(id: string, userData: Partial<User>): Promise<Model<any, any> | null> {
+    async update(id: number, userData: Partial<User>): Promise<Model<any, any> | null> {
         try {
             const user = await this.findOne(id);
 
@@ -132,9 +114,9 @@ export class UsersService {
     /**
      * Suppression d'un user
      */
-    async delete(mail: string): Promise<any> {
+    async delete(id: number): Promise<any> {
         try {
-            const userCount = await this.User.destroy({ where: { mail } });
+            const userCount = await this.User.destroy({ where: { id } });
 
             if (userCount === 0) {
                 throw new NotFoundException('No user found');
@@ -146,24 +128,11 @@ export class UsersService {
         }
     }
 
-    public static async asRole(id: string, role: Roles): Promise<boolean> {
+    public static async isProfileOwner(id: number, accessToken: string): Promise<boolean> {
         try {
-            const user = await this.instance.asRole(id, role);
-            if (user === null) return false;
-            return true;
-        } catch (e: any) {
-            throw new Exception(e, e.status ? e.status : 500);
-        }
-    }
+            const decodedToken = await AuthMiddlewares.getTokenPayload(accessToken);
 
-    public static async isProfileOwner(id: string, token: string): Promise<boolean> {
-        try {
-            const decodedToken = jwt.decode(token, {
-                complete: true
-            });
-            const tokenData = JSON.parse(decodedToken);
-            
-            if (id !== tokenData.id) return false;
+            if (id !== decodedToken.id) return false;
             return true;
         } catch (e: any) {
             throw new Exception(e, e.status ? e.status : 500);
@@ -172,7 +141,7 @@ export class UsersService {
 
     public static async isUserDuplicated(mail: string): Promise<boolean> {
         try {
-            const user = await this.instance.findOne(mail);
+            const user = await this.instance.findOneByMail(mail);
             if (user === null) return false;
             return true;
         } catch (e: any) {

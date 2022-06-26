@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { AuthMiddleware } from 'middlewares/auth.middleware';
+import { UsersAuthMiddleware } from 'middlewares/users-auth.middleware';
 import { UsersService } from 'services/users.service';
 import { BadRequestException } from 'utils/exceptions';
+import { AuthMiddlewares } from '@grp-2-projet-elective/auth-helper';
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`
@@ -16,7 +17,7 @@ const usersService = new UsersService();
 /**
  * Trouve tous les users
  */
-UsersController.get('/', AuthMiddleware.isCommercialDepartment, AuthMiddleware.isTechnicalDepartment, async (req, res) => {
+UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req, res) => {
     try {
         return res
             .status(200)
@@ -34,7 +35,7 @@ UsersController.get('/', AuthMiddleware.isCommercialDepartment, AuthMiddleware.i
  */
  UsersController.get('/:id', async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = Number(req.params.id);
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -79,37 +80,9 @@ UsersController.get('/', AuthMiddleware.isCommercialDepartment, AuthMiddleware.i
 });
 
 /**
- * Trouve un user en particulier
- */
-UsersController.get('/asRole/:id/:role', async (req, res) => {
-    try {
-        const id = req.params.id;
-        const role = Number(req.params.role);
-
-        if (!id) {
-            throw new BadRequestException('Invalid id');
-        }
-        if (!role) {
-            throw new BadRequestException('Invalid role');
-        }
-
-        const asRole = await usersService.asRole(id, role);
-
-        return res
-            .status(200)
-            .json(asRole);
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
-    }
-});
-
-/**
  * Créé un user
  */
-UsersController.post('/', AuthMiddleware.verifyUserDucplication, async (req, res) => {
+UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req, res) => {
     try {
         const createdUser = await usersService.create(req.body);
 
@@ -129,7 +102,7 @@ UsersController.post('/', AuthMiddleware.verifyUserDucplication, async (req, res
  */
 UsersController.patch('/:id', async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = Number(req.params.id);
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -153,7 +126,7 @@ UsersController.patch('/:id', async (req, res) => {
  */
 UsersController.delete('/:id', async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = Number(req.params.id);
 
         if (!id) {
             throw new BadRequestException('Invalid id');
