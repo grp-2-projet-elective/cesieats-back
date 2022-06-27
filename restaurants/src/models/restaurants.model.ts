@@ -6,6 +6,7 @@ export interface IRestaurant extends Document {
     image: string,
     categories?: Array<string>,
     restaurantOwnersId: Array<number>,
+    openingHours: string,
     location: {
         city: string,
         zipCode: number,
