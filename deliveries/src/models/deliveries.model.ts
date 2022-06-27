@@ -1,12 +1,12 @@
-import { model, Schema, Model, Document } from 'mongoose';
+import { Document, model, Model, Schema } from 'mongoose';
 
 export interface IDelivery extends Document {
     orderId: number,
-    restaurantId: number,
+    restaurantId: string,
     date: Date,
     deliveryState: string,
-    deliveryManId: number,
-    customerId: number,
+    deliveryManId: string,
+    customerId: string,
     location: {
         city: string,
         zipCode: number,
@@ -18,11 +18,11 @@ export interface IDelivery extends Document {
 
 export const DeliverySchema: Schema = new Schema({
     orderId: { type: Number, required: true },
-    restaurantId: { type: Number, required: true },
+    restaurantId: { type: String, required: true },
     date: { type: Date, required: true },
     deliveryState: { type: String, required: true },
-    deliveryManId: { type: Number, required: true },
-    customerId: { type: Number, required: true },
+    deliveryManId: { type: String, required: true },
+    customerId: { type: String, required: true },
     location: {
         city: { type: String, required: true },
         zipCode: { type: String, required: true },

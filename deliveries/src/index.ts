@@ -1,11 +1,11 @@
+import { AuthMiddlewares, ExceptionsHandler, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
+import { DeliveriesController } from 'controllers/deliveries.controller';
 import cors from 'cors';
 import 'dotenv/config';
-import express from 'express';
 import { environment } from 'environment/environment';
-import { connect } from 'mongoose';
-import { DeliveriesController } from 'controllers/deliveries.controller';
+import express from 'express';
 import { DeliveriesAuthMiddleware } from 'middlewares/deliveries-auth.middleware';
-import { AuthMiddlewares, ExceptionsHandler, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
+import { connect } from 'mongoose';
 /**
  * On crée une nouvelle "application" express
  */

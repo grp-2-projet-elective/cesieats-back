@@ -32,7 +32,7 @@ DeliveriesController.get('/', async (req, res) => {
  */
 DeliveriesController.get('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -76,7 +76,7 @@ DeliveriesController.post('/', async (req, res) => {
  */
 DeliveriesController.patch('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -99,7 +99,7 @@ DeliveriesController.patch('/:id', async (req, res) => {
  */
 DeliveriesController.delete('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
