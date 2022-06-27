@@ -1,48 +1,6 @@
 
+import { RoleTypes } from '@grp-2-projet-elective/cesieats-helpers';
 import { CreationOptional, InferAttributes, InferCreationAttributes, Model, NonAttribute } from 'sequelize';
-
-export interface IUser {
-  id: number;
-
-  firstname: string;
-  lastname: string;
-  mail: string;
-  phone: string;
-  password: string;
-  roleId: number;
-
-  thumbnail: string;
-  city: string;
-  zipCode: number;
-  address: string;
-  sponsorId: number;
-  referalCode: string;
-
-  refreshToken: string;
-
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface IRole {
-  id: number;
-
-  description: string;
-  comment: string;
-
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export enum Roles {
-  CUSTOMER = 1,
-  RESTAURANT_OWNER = 2,
-  DELIVERY_MAN = 3,
-  TECHNICAL_DEPARTMENT = 4,
-  COMERCIAL_DEPARTMENT = 5,
-  EXTERNAL = 6
-}
-
 
 // order of InferAttributes & InferCreationAttributes is important.
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
@@ -78,7 +36,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
 export class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
   declare id: CreationOptional<number>;
 
-  declare type: Roles;
+  declare type: RoleTypes;
   declare description: CreationOptional<string>;
   declare comment: CreationOptional<string>;
 

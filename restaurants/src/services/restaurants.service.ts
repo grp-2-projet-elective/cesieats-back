@@ -1,9 +1,8 @@
+import { Exception, NotFoundException, Roles } from '@grp-2-projet-elective/cesieats-helpers';
 import axios from 'axios';
 import { environment } from 'environment/environment';
 import * as jwt from 'jsonwebtoken';
 import { IRestaurant, Restaurant } from 'models/restaurants.model';
-import { Roles } from 'models/users.model';
-import { Exception, NotFoundException } from 'utils/exceptions';
 
 export class RestaurantsService {
     private static instance: RestaurantsService;
@@ -36,6 +35,16 @@ export class RestaurantsService {
             return restaurant;
         } catch (e) {
             throw new NotFoundException('No restaurant found');
+        }
+    }
+
+    async findOneByName(restaurantName: string): Promise<IRestaurant | null | undefined> {
+        try {
+            const restaurant = await Restaurant.findOne({ where: { name: restaurantName } });
+
+            return restaurant;
+        } catch (e: any) {
+            throw new Exception(e.error, e.status);
         }
     }
 
@@ -85,7 +94,7 @@ export class RestaurantsService {
         await Restaurant.findByIdAndRemove(id);
     }
 
-    
+
     public async getUserByMail(mail: string): Promise<any> {
         try {
             const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${mail}`;
@@ -113,7 +122,7 @@ export class RestaurantsService {
             const user = await this.getUserByMail(mail);
             const restaurant: IRestaurant = await this.findOne(restaurantId) as IRestaurant;
 
-            if(restaurant?.restaurantOwnersId.includes(user.id)) return true;
+            if (restaurant?.restaurantOwnersId.includes(user.id)) return true;
             return false;
         } catch (e: any) {
             throw new Exception(e.error, e.status);
@@ -147,6 +156,16 @@ export class RestaurantsService {
         try {
             const asRole = await this.instance.haveRestaurantOwnership(mail, restaurantId);
             return asRole;
+        } catch (e: any) {
+            throw new Exception(e, e.status ? e.status : 500);
+        }
+    }
+
+    public static async isRestaurantDuplicated(restaurantName: string): Promise<boolean> {
+        try {
+            const user = await this.instance.findOneByName(restaurantName);
+            if (user === null) return false;
+            return true;
         } catch (e: any) {
             throw new Exception(e, e.status ? e.status : 500);
         }

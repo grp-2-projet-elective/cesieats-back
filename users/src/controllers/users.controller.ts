@@ -1,8 +1,7 @@
+import { AuthMiddlewares, BadRequestException } from '@grp-2-projet-elective/cesieats-helpers';
 import { Router } from 'express';
 import { UsersAuthMiddleware } from 'middlewares/users-auth.middleware';
 import { UsersService } from 'services/users.service';
-import { BadRequestException } from 'utils/exceptions';
-import { AuthMiddlewares } from '@grp-2-projet-elective/auth-helper';
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`
@@ -33,7 +32,7 @@ UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req
 /**
  * Trouve un user en particulier par son email
  */
- UsersController.get('/:id', async (req, res) => {
+UsersController.get('/:id', async (req, res) => {
     try {
         const id = Number(req.params.id);
 
@@ -58,7 +57,7 @@ UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req
 /**
  * Trouve un user en particulier par son email
  */
- UsersController.get('/mail/:mail', async (req, res) => {
+UsersController.get('/mail/:mail', async (req, res) => {
     try {
         const mail = req.params.mail;
 

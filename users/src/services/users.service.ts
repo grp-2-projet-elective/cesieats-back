@@ -1,8 +1,7 @@
-import { IUser, Roles, User } from 'models/users.model';
-import { Model, ModelStatic } from 'sequelize/types';
-import { Exception, NotFoundException } from 'utils/exceptions';
+import { AuthMiddlewares, Exception, IUser, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { User } from 'models/users.model';
 import * as referralCodes from 'referral-codes';
-import { AuthMiddlewares } from '@grp-2-projet-elective/auth-helper';
+import { Model, ModelStatic } from 'sequelize/types';
 
 export class UsersService {
     public User: ModelStatic<Model<any, any>>;

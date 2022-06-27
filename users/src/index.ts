@@ -1,11 +1,9 @@
-import { AuthMiddlewares } from '@grp-2-projet-elective/auth-helper';
+import { AuthMiddlewares, ExceptionsHandler, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
 import { UsersController, usersService } from 'controllers/users.controller';
 import cors from 'cors';
 import 'dotenv/config';
 import { environment } from 'environment/environment';
 import express from 'express';
-import { ExceptionsHandler } from 'middlewares/exceptions.handler';
-import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
 import { UsersAuthMiddleware } from 'middlewares/users-auth.middleware';
 import { DataTypes, Model, ModelStatic, Sequelize } from 'sequelize';
 
