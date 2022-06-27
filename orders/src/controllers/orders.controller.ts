@@ -1,6 +1,6 @@
+import { BadRequestException, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { Router } from 'express';
 import { OrdersService } from 'services/orders.service';
-import { BadRequestException, NotFoundException } from 'utils/exceptions';
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`

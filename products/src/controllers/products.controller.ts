@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { ProductsService } from 'services/products.service';
-import { BadRequestException, NotFoundException } from 'utils/exceptions';
+import { BadRequestException, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`

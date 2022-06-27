@@ -1,8 +1,7 @@
+import { Exception, NotFoundException, Roles } from '@grp-2-projet-elective/cesieats-helpers';
 import axios from 'axios';
 import { environment } from 'environment/environment';
 import { Delivery, IDelivery } from 'models/deliveries.model';
-import { Roles } from 'models/users.model';
-import { Exception, NotFoundException } from 'utils/exceptions';
 
 export class DeliveriesService {
     private static instance: DeliveriesService;

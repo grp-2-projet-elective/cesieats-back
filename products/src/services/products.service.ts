@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { environment } from 'environment/environment';
 import { Product, IProduct } from 'models/products.model';
-import { Roles } from 'models/users.model';
-import { Exception, NotFoundException } from 'utils/exceptions';
+import { NotFoundException, Exception, Roles } from '@grp-2-projet-elective/cesieats-helpers';
 
 export class ProductsService {
     private static instance: ProductsService;

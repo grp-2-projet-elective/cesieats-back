@@ -1,10 +1,9 @@
+import { ExceptionsHandler, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
 import { AuthController } from 'controllers/auth.controller';
 import cors from 'cors';
 import 'dotenv/config';
 import { environment } from 'environment/environment';
 import express from 'express';
-import { ExceptionsHandler } from 'middlewares/exceptions.handler';
-import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
 
 /**
  * On crée une nouvelle "application" express
