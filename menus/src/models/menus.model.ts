@@ -4,7 +4,7 @@ export interface IMenu extends Document {
     name: string,
     description?: string,
     products: Array<number>,
-    restaurantId: number,
+    restaurantId: string,
     price: number,
     image: string,
 }

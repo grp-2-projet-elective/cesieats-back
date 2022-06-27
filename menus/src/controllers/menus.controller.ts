@@ -32,7 +32,7 @@ MenusController.get('/', async (req, res) => {
  */
 MenusController.get('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -76,7 +76,7 @@ MenusController.post('/', async (req, res) => {
  */
 MenusController.patch('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -99,7 +99,7 @@ MenusController.patch('/:id', async (req, res) => {
  */
 MenusController.delete('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
