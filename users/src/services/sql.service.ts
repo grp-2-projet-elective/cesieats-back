@@ -1,30 +1,24 @@
 import { environment } from "environment/environment";
 import { DataTypes, Model, ModelStatic, Sequelize } from "sequelize/types";
 import { UsersService } from "./users.service";
-import { Application } from 'express';
 
 export class SqlService {
-    constructor(private readonly app: Application, private readonly usersService: UsersService) { }
+    constructor(private readonly usersService: UsersService) { }
 
     public async initService(): Promise<void> {
         try {
             const sequelize = new Sequelize(`postgres://${process.env.SQL_USER}:${process.env.SQL_PWD}@${environment.SQL_SERVER}:${environment.SQL_PORT}/${environment.SQL_DATABASE}`);
             await sequelize.authenticate();
-    
+
             const user = await this.syncUser(sequelize);
             const role = await this.syncRole(sequelize);
-    
+
             this.usersService.User = user;
             this.usersService.Role = role;
-    
+
             await this.populateRoles(role);
-    
+
             console.log('Connection has been established successfully.');
-    
-            /**
-             * On demande à Express d'écouter les requêtes sur le port défini dans la config
-             */
-            this.app.listen(environment.API_PORT, () => console.log(`Server listening at: http://localhost:${environment.API_PORT}`));
         } catch (error) {
             console.error('Error connecting to DB: ', error);
             process.exit(1);
@@ -94,7 +88,7 @@ export class SqlService {
             createdAt: DataTypes.DATE,
             updatedAt: DataTypes.DATE,
         });
-    
+
         await user.sync();
         return user;
     }
@@ -121,57 +115,57 @@ export class SqlService {
             createdAt: DataTypes.DATE,
             updatedAt: DataTypes.DATE,
         });
-    
+
         await role.sync();
         return role;
     }
-    
+
     private async populateRoles(role: ModelStatic<Model<any, any>>): Promise<void> {
         const roleCount = await role.count();
-    
+
         if (roleCount === 0) {
             console.log('No roles found, creating default roles...');
-    
+
             const CUSTOMER = await role.create({
                 type: 'CUSTOMER',
                 createdAt: new Date(Date.now()),
                 updatedAt: new Date(Date.now()),
             });
-    
+
             const RESTAURANT_OWNER = await role.create({
                 type: 'RESTAURANT_OWNER',
                 createdAt: new Date(Date.now()),
                 updatedAt: new Date(Date.now()),
             });
-    
+
             const DELIVERY_MAN = await role.create({
                 type: 'DELIVERY_MAN',
                 createdAt: new Date(Date.now()),
                 updatedAt: new Date(Date.now()),
             });
-    
+
             const TECHNICAL_DEPARTMENT = await role.create({
                 type: 'TECHNICAL_DEPARTMENT',
                 createdAt: new Date(Date.now()),
                 updatedAt: new Date(Date.now()),
             });
-    
+
             const COMERCIAL_DEPARTMENT = await role.create({
                 type: 'COMERCIAL_DEPARTMENT',
                 createdAt: new Date(Date.now()),
                 updatedAt: new Date(Date.now()),
             });
-    
+
             await CUSTOMER.save();
             await RESTAURANT_OWNER.save();
             await DELIVERY_MAN.save();
             await TECHNICAL_DEPARTMENT.save();
             await COMERCIAL_DEPARTMENT.save();
-    
+
             console.log('Roles succesfully created');
             return;
         }
-    
+
         console.log('Roles already created');
     }
 }

@@ -48,6 +48,11 @@ app.all('*', UnknownRoutesHandler);
 app.use(ExceptionsHandler);
 
 (async () => {
-    const sqlService = new SqlService(app, usersService);
+    const sqlService = new SqlService(usersService);
     await sqlService.initService();
+
+    /**
+     * On demande à Express d'écouter les requêtes sur le port défini dans la config
+     */
+    app.listen(environment.API_PORT, () => console.log(`Server listening at: http://localhost:${environment.API_PORT}`));
 })();
