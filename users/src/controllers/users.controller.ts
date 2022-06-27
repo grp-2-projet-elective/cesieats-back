@@ -33,99 +33,71 @@ UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req
  * Trouve un user en particulier par son email
  */
 UsersController.get('/:id?/:mail?', async (req, res) => {
-    try {
-        const id = Number(req.params.id);
-        const mail = req.params.mail;
+    const id = Number(req.params.id);
+    const mail = req.params.mail;
 
-        if (!id && !mail) {
-            throw new BadRequestException('Invalid parameters');
-        }
+    if (!id && !mail) {
+        throw new BadRequestException('Invalid parameters');
+    }
 
-        if (mail) {
-            const user = await usersService.findOneByMail(mail);
-
-            return res
-                .status(200)
-                .json(user);
-        }
-
-        const user = await usersService.findOne(id);
+    if (mail) {
+        const user = await usersService.findOneByMail(mail);
 
         return res
             .status(200)
             .json(user);
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
     }
+
+    const user = await usersService.findOne(id);
+
+    return res
+        .status(200)
+        .json(user);
 });
 
 /**
  * Créé un user
  */
 UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req, res) => {
-    try {
-        const createdUser = await usersService.create(req.body);
+    const createdUser = await usersService.create(req.body);
 
-        return res
-            .status(201)
-            .json(createdUser);
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
-    }
+    return res
+        .status(201)
+        .json(createdUser);
 });
 
 /**
  * Mise à jour d'un user
  */
 UsersController.patch('/:id', async (req, res) => {
-    try {
-        const id = Number(req.params.id);
+    const id = Number(req.params.id);
 
-        if (!id) {
-            throw new BadRequestException('Invalid id');
-        }
-
-        const updatedUser = await usersService.update(id, req.body);
-
-        return res
-            .status(200)
-            .json(updatedUser);
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
+    if (!id) {
+        throw new BadRequestException('Invalid id');
     }
+
+    const updatedUser = await usersService.update(id, req.body);
+
+    return res
+        .status(200)
+        .json(updatedUser);
 });
 
 /**
  * Suppression d'un user
  */
 UsersController.delete('/:id', async (req, res) => {
-    try {
-        const id = Number(req.params.id);
+    const id = Number(req.params.id);
 
-        if (!id) {
-            throw new BadRequestException('Invalid id');
-        }
-
-        const response = await usersService.delete(id);
-
-        return res
-            .status(200)
-            .json(response);
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
+    if (!id) {
+        throw new BadRequestException('Invalid id');
     }
+
+    const response = await usersService.delete(id);
+
+    return res
+        .status(200)
+        .json(response);
 });
 
 /**
