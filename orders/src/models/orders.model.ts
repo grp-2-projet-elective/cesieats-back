@@ -1,8 +1,8 @@
 import { model, Schema, Model, Document } from 'mongoose';
 
 export interface IOrder extends Document {
-    menus?: Array<number>,
-    products?: Array<number>,
+    menus?: Array<object>,
+    products?: Array<object>,
     restaurantId: number,
     prices: {
         orderPrice: number,
@@ -10,6 +10,7 @@ export interface IOrder extends Document {
         totalPrice: number,
     },
     date: Date,
+    orderState: string,
     customerId: number,
     location: {
         city: string,
