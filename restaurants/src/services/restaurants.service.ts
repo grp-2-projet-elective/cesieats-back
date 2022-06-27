@@ -28,7 +28,7 @@ export class RestaurantsService {
      * Trouve un restaurant en particulier
      * @param id - ID unique de l'restaurant
      */
-    async findOne(id: number): Promise<IRestaurant | null | undefined> {
+    async findOne(id: string): Promise<IRestaurant | null | undefined> {
         try {
             const restaurant = await Restaurant.findById(id);
 
@@ -56,7 +56,7 @@ export class RestaurantsService {
      * @param restaurantData - Un objet correspondant à un restaurant, il ne contient pas forcément tout un restaurant. Attention, on ne prend pas l'id avec.
      * @param id - ID unique de l'restaurant
      */
-    async update(id: number, restaurantData: Partial<IRestaurant>): Promise<IRestaurant | null | undefined> {
+    async update(id: string, restaurantData: Partial<IRestaurant>): Promise<IRestaurant | null | undefined> {
         const restaurant = await this.findOne(id);
 
         if (!restaurant) {
@@ -84,7 +84,7 @@ export class RestaurantsService {
     /**
      * Suppression d'un restaurant
      */
-    async delete(id: number) {
+    async delete(id: string) {
         const restaurant = await this.findOne(id);
 
         if (!restaurant) {
@@ -117,12 +117,12 @@ export class RestaurantsService {
         }
     }
 
-    public async haveRestaurantOwnership(mail: string, restaurantId: number): Promise<boolean> {
+    public async haveRestaurantOwnership(mail: string, restaurantId: string): Promise<boolean> {
         try {
             const user = await this.getUserByMail(mail);
             const restaurant: IRestaurant = await this.findOne(restaurantId) as IRestaurant;
 
-            if (restaurant?.restaurantOwnersId.includes(user.id)) return true;
+            if (restaurant?.restaurantOwnerId === user.id) return true;
             return false;
         } catch (e: any) {
             throw new Exception(e.error, e.status);
@@ -152,7 +152,7 @@ export class RestaurantsService {
         }
     }
 
-    public static async haveRestaurantOwnership(mail: string, restaurantId: number): Promise<boolean> {
+    public static async haveRestaurantOwnership(mail: string, restaurantId: string): Promise<boolean> {
         try {
             const asRole = await this.instance.haveRestaurantOwnership(mail, restaurantId);
             return asRole;

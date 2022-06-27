@@ -32,7 +32,7 @@ ProductsController.get('/', async (req, res) => {
  */
 ProductsController.get('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -76,7 +76,7 @@ ProductsController.post('/', async (req, res) => {
  */
 ProductsController.patch('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -99,7 +99,7 @@ ProductsController.patch('/:id', async (req, res) => {
  */
 ProductsController.delete('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');

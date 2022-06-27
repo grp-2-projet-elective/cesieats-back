@@ -1,7 +1,8 @@
+import { environment } from 'environment/environment';
 import { NextFunction, Request, Response } from 'express';
 
 export abstract class ProductsAuthMiddleware {
-    public static authorizedHosts: Array<string>;
+    public static authorizedHosts: Array<string> = environment.authorizedHosts;
 
     public static async isApiCall(req: Request, res: Response, next: NextFunction) {
         const hostname = req.hostname;

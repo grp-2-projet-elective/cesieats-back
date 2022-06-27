@@ -1,8 +1,9 @@
+import { environment } from 'environment/environment';
 import { NextFunction, Request, Response } from 'express';
 import { RestaurantsService } from 'services/restaurants.service';
 
 export abstract class RestaurantAuthMiddleware {
-    public static authorizedHosts: Array<string>;
+    public static authorizedHosts: Array<string> = environment.authorizedHosts;
 
     public static async isRestaurantDuplicated(req: Request, res: Response, next: NextFunction) {
         if ((req as any).skipMiddlewares) {
@@ -38,7 +39,7 @@ export abstract class RestaurantAuthMiddleware {
 
         try {
             const mail: string = req.body.mail;
-            const restaurantId: number = Number(req.body.restaurantId);
+            const restaurantId: string = req.body.restaurantId;
 
             if (!mail) {
                 return res.status(400).send({ message: 'User mail not provided' });

@@ -1,8 +1,8 @@
-import { model, Schema, Model, Document } from 'mongoose';
+import { Document, model, Model, Schema } from 'mongoose';
 
 export interface IDelivery extends Document {
     orderId: number,
-    restaurantId: number,
+    restaurantId: string,
     date: Date,
     deliveryState: string,
     deliveryManId: number,
@@ -18,7 +18,7 @@ export interface IDelivery extends Document {
 
 export const DeliverySchema: Schema = new Schema({
     orderId: { type: Number, required: true },
-    restaurantId: { type: Number, required: true },
+    restaurantId: { type: String, required: true },
     date: { type: Date, required: true },
     deliveryState: { type: String, required: true },
     deliveryManId: { type: Number, required: true },

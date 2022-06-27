@@ -119,17 +119,6 @@ export class AuthService {
         }
     }
 
-    public async asRole(mail: string, role: Roles): Promise<boolean> {
-        try {
-            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/asRole/${mail}/${role}`;
-
-            const asRole = ((await axios.get(apiUrl))).data as boolean;
-            return asRole;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
-    }
-
     public async createUser(userInformationData: Partial<IUser>): Promise<IUser> {
         const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users`;
         const body = {
@@ -153,16 +142,6 @@ export class AuthService {
             return user as any;
         } catch (e: any) {
             throw new Exception(e.error, e.status);
-        }
-    }
-
-    public static async asRole(mail: string, role: Roles): Promise<boolean> {
-        try {
-            const user = await this.instance.asRole(mail, role);
-            if (user === null) return false;
-            return true;
-        } catch (e: any) {
-            throw new Exception(e, e.status ? e.status : 500);
         }
     }
 }
