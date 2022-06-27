@@ -1,13 +1,11 @@
 import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
-import { ExceptionsHandler } from 'middlewares/exceptions.handler';
-import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
 import { environment } from 'environment/environment';
 import { connect } from 'mongoose';
 import { DeliveriesController } from 'controllers/deliveries.controller';
-import { AuthMiddleware } from 'middlewares/auth.middleware';
-
+import { DeliveriesAuthMiddleware } from 'middlewares/deliveries-auth.middleware';
+import { AuthMiddlewares, ExceptionsHandler, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
 /**
  * On crée une nouvelle "application" express
  */
@@ -29,7 +27,7 @@ app.use(cors());
 /**
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
-app.use('/api/v1/deliveries', AuthMiddleware.isApiCall, AuthMiddleware.verifyAccessToken, DeliveriesController);
+app.use('/api/v1/deliveries', DeliveriesAuthMiddleware.isApiCall, AuthMiddlewares.verifyAccessToken, DeliveriesController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)

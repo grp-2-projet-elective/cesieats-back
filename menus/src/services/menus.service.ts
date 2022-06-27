@@ -1,8 +1,7 @@
+import { Exception, NotFoundException, Roles } from '@grp-2-projet-elective/cesieats-helpers';
 import axios from 'axios';
 import { environment } from 'environment/environment';
 import { IMenu, Menu } from 'models/menus.model';
-import { Roles } from 'models/users.model';
-import { Exception, NotFoundException } from 'utils/exceptions';
 
 export class MenusService {
     private static instance: MenusService;

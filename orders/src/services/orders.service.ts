@@ -1,8 +1,7 @@
+import { Exception, NotFoundException, Roles } from '@grp-2-projet-elective/cesieats-helpers';
 import axios from 'axios';
 import { environment } from 'environment/environment';
 import { IOrder, Order } from 'models/orders.model';
-import { Roles } from 'models/users.model';
-import { Exception, NotFoundException } from 'utils/exceptions';
 
 export class OrdersService {
     private static instance: OrdersService;

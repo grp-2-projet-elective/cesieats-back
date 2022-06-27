@@ -1,10 +1,9 @@
+import { Exception, IUser, Roles } from '@grp-2-projet-elective/cesieats-helpers';
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import { environment } from 'environment/environment';
 import * as jwt from 'jsonwebtoken';
-import { IUser, TokenData, Tokens } from 'models/auth.model';
-import { Roles } from 'models/users.model';
-import { Exception } from 'utils/exceptions';
+import { TokenData, Tokens } from 'models/auth.model';
 
 export class AuthService {
     private static instance: AuthService;

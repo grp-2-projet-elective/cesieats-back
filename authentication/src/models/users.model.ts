@@ -1,8 +1,0 @@
-export enum Roles {
-    CUSTOMER = 1,
-    RESTAURANT_OWNER = 2,
-    DELIVERY_MAN = 3,
-    TECHNICAL_DEPARTMENT = 4,
-    COMERCIAL_DEPARTMENT = 5,
-    EXTERNAL = 6
-}

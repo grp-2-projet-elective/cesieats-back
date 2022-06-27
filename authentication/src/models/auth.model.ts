@@ -1,27 +1,4 @@
-import { Roles } from "./users.model";
-
-export interface IUser {
-    id: number;
-
-    firstname: string;
-    lastname: string;
-    mail: string;
-    phone: string;
-    password: string;
-    roleId: number;
-
-    thumbnail: string;
-    city: string;
-    cityCode: number;
-    address: string;
-    sponsorId: number;
-
-    token: string;
-    refreshToken: string;
-
-    createdAt: Date;
-    updatedAt: Date;
-}
+import { Roles } from "@grp-2-projet-elective/cesieats-helpers";
 
 export interface Tokens {
     accessToken: string;
