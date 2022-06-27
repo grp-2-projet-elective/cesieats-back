@@ -1,3 +1,5 @@
+import { Roles } from "./users.model";
+
 export interface IUser {
     id: number;
 
@@ -24,4 +26,12 @@ export interface IUser {
 export interface Tokens {
     accessToken: string;
     refreshToken: string;
+}
+
+export interface TokenData {
+    id: number;
+    mail: string;
+    role: Roles;
+
+    restaurantId?: number;
 }

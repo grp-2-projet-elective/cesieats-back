@@ -1,7 +1,7 @@
+import { AuthMiddlewares, BadRequestException } from '@grp-2-projet-elective/cesieats-helpers';
 import { Router } from 'express';
-import { AuthMiddleware } from 'middlewares/auth.middleware';
+import { UsersAuthMiddleware } from 'middlewares/users-auth.middleware';
 import { UsersService } from 'services/users.service';
-import { BadRequestException } from 'utils/exceptions';
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`
@@ -16,7 +16,7 @@ const usersService = new UsersService();
 /**
  * Trouve tous les users
  */
-UsersController.get('/', AuthMiddleware.isCommercialDepartment, AuthMiddleware.isTechnicalDepartment, async (req, res) => {
+UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req, res) => {
     try {
         return res
             .status(200)
@@ -32,7 +32,32 @@ UsersController.get('/', AuthMiddleware.isCommercialDepartment, AuthMiddleware.i
 /**
  * Trouve un user en particulier par son email
  */
- UsersController.get('/:mail', async (req, res) => {
+UsersController.get('/:id', async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const user = await usersService.findOne(id);
+
+        return res
+            .status(200)
+            .json(user);
+    } catch (e: any) {
+        console.error(e);
+        return res
+            .status(e.status ? e.status : 500)
+            .json(e);
+    }
+});
+
+
+/**
+ * Trouve un user en particulier par son email
+ */
+UsersController.get('/mail/:mail', async (req, res) => {
     try {
         const mail = req.params.mail;
 
@@ -40,7 +65,7 @@ UsersController.get('/', AuthMiddleware.isCommercialDepartment, AuthMiddleware.i
             throw new BadRequestException('Invalid mail');
         }
 
-        const user = await usersService.findOne(mail);
+        const user = await usersService.findOneByMail(mail);
 
         return res
             .status(200)
@@ -54,37 +79,9 @@ UsersController.get('/', AuthMiddleware.isCommercialDepartment, AuthMiddleware.i
 });
 
 /**
- * Trouve un user en particulier
- */
-UsersController.get('/asRole/:mail/:role', async (req, res) => {
-    try {
-        const mail = req.params.mail;
-        const role = Number(req.params.role);
-
-        if (!mail) {
-            throw new BadRequestException('Invalid mail');
-        }
-        if (!role) {
-            throw new BadRequestException('Invalid role');
-        }
-
-        const asRole = await usersService.asRole(mail, role);
-
-        return res
-            .status(200)
-            .json(asRole);
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
-    }
-});
-
-/**
  * Créé un user
  */
-UsersController.post('/', AuthMiddleware.verifyUserDucplication, async (req, res) => {
+UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req, res) => {
     try {
         const createdUser = await usersService.create(req.body);
 
@@ -102,15 +99,15 @@ UsersController.post('/', AuthMiddleware.verifyUserDucplication, async (req, res
 /**
  * Mise à jour d'un user
  */
-UsersController.patch('/:mail', async (req, res) => {
+UsersController.patch('/:id', async (req, res) => {
     try {
-        const mail = req.params.mail;
+        const id = Number(req.params.id);
 
-        if (!mail) {
-            throw new BadRequestException('Invalid mail');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
         }
 
-        const updatedUser = await usersService.update(mail, req.body);
+        const updatedUser = await usersService.update(id, req.body);
 
         return res
             .status(200)
@@ -126,15 +123,15 @@ UsersController.patch('/:mail', async (req, res) => {
 /**
  * Suppression d'un user
  */
-UsersController.delete('/:mail', async (req, res) => {
+UsersController.delete('/:id', async (req, res) => {
     try {
-        const mail = req.params.mail;
+        const id = Number(req.params.id);
 
-        if (!mail) {
+        if (!id) {
             throw new BadRequestException('Invalid id');
         }
 
-        const response = await usersService.delete(mail);
+        const response = await usersService.delete(id);
 
         return res
             .status(200)

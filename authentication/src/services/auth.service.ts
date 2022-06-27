@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import { environment } from 'environment/environment';
 import * as jwt from 'jsonwebtoken';
-import { IUser, Tokens } from 'models/auth.model';
+import { IUser, TokenData, Tokens } from 'models/auth.model';
 import { Roles } from 'models/users.model';
 import { Exception } from 'utils/exceptions';
 
@@ -27,8 +27,15 @@ export class AuthService {
             const hashComparaison = await bcrypt.compare(password, user.password);
 
             if (hashComparaison) {
-                const accessToken = this.generateAccessToken(mail);
-                const refreshToken = this.generateRefreshToken(mail);
+                const tokenData: TokenData = {
+                    id: user.id,
+                    mail: user.mail,
+                    role: user.role,
+                    restaurantId: user.role === Roles.RESTAURANT_OWNER ? 0 : undefined
+                };
+
+                const accessToken = this.generateAccessToken(tokenData);
+                const refreshToken = this.generateRefreshToken(tokenData);
 
                 const updatedUser = {
                     ...user,
@@ -47,14 +54,18 @@ export class AuthService {
         }
     }
 
-    public async logout(id: string): Promise<void> {
+    public async logout(mail: string): Promise<any> {
         try {
+            const user = await this.getUserByMail(mail);
+            user.refreshToken = undefined;
 
+            await this.updateUser(user);
+
+            return { status: 200, message: 'disconnected' };
         } catch (e: any) {
             throw new Exception(e.error, e.status);
         }
     }
-
 
     public async refreshToken(mail: string, refreshToken: string): Promise<Tokens | void> {
         try {
@@ -62,8 +73,15 @@ export class AuthService {
 
             if (user.refreshToken != refreshToken) throw new Exception('Refresh Token Invalid', 400);
 
-            const newAccessToken = this.generateAccessToken(mail);
-            const newRefreshToken = this.generateRefreshToken(mail);
+            const tokenData: TokenData = {
+                id: user.id,
+                mail: user.mail,
+                role: user.role,
+                restaurantId: user.role === Roles.RESTAURANT_OWNER ? 0 : undefined
+            };
+
+            const newAccessToken = this.generateAccessToken(tokenData);
+            const newRefreshToken = this.generateRefreshToken(tokenData);
 
             return { accessToken: newAccessToken, refreshToken: newRefreshToken };
         } catch (e: any) {
@@ -75,20 +93,20 @@ export class AuthService {
     /**
      * Génération d'un access token
      * 
-     * @param mail 
+     * @param tokenData 
      * @returns 
      */
-    generateAccessToken(mail: string): string {
-        return jwt.sign({ mail: mail }, process.env.ACCESS_TOKEN_SECRET as jwt.Secret, { expiresIn: '15m' });
+    generateAccessToken(tokenData: TokenData): string {
+        return jwt.sign(tokenData, process.env.ACCESS_TOKEN_SECRET as jwt.Secret, { expiresIn: '15m' });
     }
 
     /**
      * Génération d'un refresh token
-     * @param mail 
+     * @param tokenData 
      * @returns 
      */
-    generateRefreshToken(mail: string): string {
-        return jwt.sign({ mail: mail }, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: '20m' });
+    generateRefreshToken(tokenData: TokenData): string {
+        return jwt.sign(tokenData, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: '20m' });
     }
 
     public async getUserByMail(mail: string): Promise<any> {

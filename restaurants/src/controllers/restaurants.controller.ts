@@ -1,6 +1,6 @@
+import { BadRequestException, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { Router } from 'express';
 import { RestaurantsService } from 'services/restaurants.service';
-import { BadRequestException, NotFoundException } from 'utils/exceptions';
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`
@@ -32,7 +32,7 @@ RestaurantsController.get('/', async (req, res) => {
  */
 RestaurantsController.get('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = Number(req.params.id);
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -76,7 +76,7 @@ RestaurantsController.post('/', async (req, res) => {
  */
 RestaurantsController.patch('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = Number(req.params.id);
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -99,7 +99,7 @@ RestaurantsController.patch('/:id', async (req, res) => {
  */
 RestaurantsController.delete('/:id', async (req, res) => {
     try {
-        const id = String(req.params.id);
+        const id = Number(req.params.id);
 
         if (!id) {
             throw new BadRequestException('Invalid id');

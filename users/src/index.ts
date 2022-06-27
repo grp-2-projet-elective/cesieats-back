@@ -1,14 +1,13 @@
+import { AuthMiddlewares, ExceptionsHandler, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
 import { UsersController, usersService } from 'controllers/users.controller';
 import cors from 'cors';
 import 'dotenv/config';
 import { environment } from 'environment/environment';
 import express from 'express';
-import { AuthMiddleware } from 'middlewares/auth.middleware';
-import { ExceptionsHandler } from 'middlewares/exceptions.handler';
-import { UnknownRoutesHandler } from 'middlewares/unknown-routes.handler';
+import { UsersAuthMiddleware } from 'middlewares/users-auth.middleware';
 import { DataTypes, Model, ModelStatic, Sequelize } from 'sequelize';
 
-AuthMiddleware.authorizedHosts = environment.authorizedHosts;
+UsersAuthMiddleware.authorizedHosts = environment.authorizedHosts;
 /**
  * On crée une nouvelle "application" express
  */
@@ -30,7 +29,7 @@ app.use(cors());
 /**
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
-app.use('/api/v1/users', AuthMiddleware.isApiCall, AuthMiddleware.verifyAccessToken, UsersController);
+app.use('/api/v1/users', UsersAuthMiddleware.isApiCall, AuthMiddlewares.verifyAccessToken, UsersController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)
