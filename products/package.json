@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@grp-2-projet-elective/cesieats-helpers": "^1.1.3",
+    "@grp-2-projet-elective/cesieats-helpers": "^1.1.5",
     "axios": "^0.27.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
