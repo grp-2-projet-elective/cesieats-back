@@ -1,4 +1,4 @@
-import { Exception, NotFoundException, Roles } from '@grp-2-projet-elective/cesieats-helpers';
+import { Exception, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import axios from 'axios';
 import { environment } from 'environment/environment';
 import * as jwt from 'jsonwebtoken';
@@ -94,7 +94,6 @@ export class RestaurantsService {
         await Restaurant.findByIdAndRemove(id);
     }
 
-
     public async getUserByMail(mail: string): Promise<any> {
         try {
             const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${mail}`;
@@ -103,61 +102,6 @@ export class RestaurantsService {
             return user;
         } catch (e: any) {
             throw new Exception(e.error, e.status);
-        }
-    }
-
-    public async asRole(mail: string, role: Roles): Promise<boolean> {
-        try {
-            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/asRole/${mail}/${role}`;
-
-            const asRole = ((await axios.get(apiUrl))).data as boolean;
-            return asRole;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
-    }
-
-    public async haveRestaurantOwnership(mail: string, restaurantId: string): Promise<boolean> {
-        try {
-            const user = await this.getUserByMail(mail);
-            const restaurant: IRestaurant = await this.findOne(restaurantId) as IRestaurant;
-
-            if (restaurant?.restaurantOwnerId === user.id) return true;
-            return false;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
-    }
-
-    public static async asRole(mail: string, role: Roles): Promise<boolean> {
-        try {
-            const asRole = await this.instance.asRole(mail, role);
-            return asRole;
-        } catch (e: any) {
-            throw new Exception(e, e.status ? e.status : 500);
-        }
-    }
-
-    public static async isProfileOwner(mail: string, token: string): Promise<boolean> {
-        try {
-            const decodedToken = jwt.decode(token, {
-                complete: true
-            });
-            const tokenData = JSON.parse(decodedToken);
-
-            if (mail !== tokenData.mail) return false;
-            return true;
-        } catch (e: any) {
-            throw new Exception(e, e.status ? e.status : 500);
-        }
-    }
-
-    public static async haveRestaurantOwnership(mail: string, restaurantId: string): Promise<boolean> {
-        try {
-            const asRole = await this.instance.haveRestaurantOwnership(mail, restaurantId);
-            return asRole;
-        } catch (e: any) {
-            throw new Exception(e, e.status ? e.status : 500);
         }
     }
 

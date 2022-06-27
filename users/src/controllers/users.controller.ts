@@ -32,40 +32,24 @@ UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req
 /**
  * Trouve un user en particulier par son email
  */
-UsersController.get('/:id', async (req, res) => {
+UsersController.get('/:id?/:mail?', async (req, res) => {
     try {
         const id = Number(req.params.id);
+        const mail = req.params.mail;
 
-        if (!id) {
-            throw new BadRequestException('Invalid id');
+        if (!id && !mail) {
+            throw new BadRequestException('Invalid parameters');
+        }
+
+        if (mail) {
+            const user = await usersService.findOneByMail(mail);
+
+            return res
+                .status(200)
+                .json(user);
         }
 
         const user = await usersService.findOne(id);
-
-        return res
-            .status(200)
-            .json(user);
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
-    }
-});
-
-
-/**
- * Trouve un user en particulier par son email
- */
-UsersController.get('/mail/:mail', async (req, res) => {
-    try {
-        const mail = req.params.mail;
-
-        if (!mail) {
-            throw new BadRequestException('Invalid mail');
-        }
-
-        const user = await usersService.findOneByMail(mail);
 
         return res
             .status(200)
