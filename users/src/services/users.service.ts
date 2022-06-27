@@ -1,4 +1,4 @@
-import { AuthMiddlewares, IUser, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { IUser, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { User } from 'models/users.model';
 import * as referralCodes from 'referral-codes';
 import { Model, ModelStatic } from 'sequelize/types';
@@ -53,7 +53,7 @@ export class UsersService {
     async update(id: number, userData: Partial<User>): Promise<Model<any, any> | null> {
         const user = await this.findOne(id);
 
-        if (!user) return null;
+        if (!user) throw new NotFoundException('No user found');;
 
         const updatedUser = {
             ...user.toJSON(),

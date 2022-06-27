@@ -16,25 +16,18 @@ const authService = new AuthService();
  * Enregistrer un nouvel user
  */
 AuthController.post('/register', async (req, res) => {
-    try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-        const userInformationData: any = {
-            ...req.body,
-            password: hashedPassword
-        }
-
-        const createdUser = await authService.register(userInformationData);
-
-        return res
-            .status(201)
-            .json(createdUser);
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e.response.data ? e.response.data : e);
+    const userInformationData: any = {
+        ...req.body,
+        password: hashedPassword
     }
+
+    const createdUser = await authService.register(userInformationData);
+
+    return res
+        .status(201)
+        .json(createdUser);
 });
 
 
@@ -42,43 +35,21 @@ AuthController.post('/register', async (req, res) => {
  * Connecter un user
  */
 AuthController.post('/login', async (req, res) => {
-    try {
-        const loginInformations = await authService.login(req.body.mail, req.body.password);
-        if ((loginInformations as any).status === 404) return res.status((loginInformations as any).status).json(loginInformations);
-        return res.status(201).json(loginInformations);
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
-    }
+    const loginInformations = await authService.login(req.body.mail, req.body.password);
+    return res.status(201).json(loginInformations);
 });
 
 AuthController.post("/refreshToken", async (req, res) => {
-    try {
-        const tokens = await authService.refreshToken(req.body.mail, req.body.refreshToken);
+    const tokens = await authService.refreshToken(req.body.mail, req.body.refreshToken);
 
-        return res.status(200).send(tokens);
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
-    }
+    return res.status(200).send(tokens);
 });
 
 
 AuthController.post("/logout", async (req, res) => {
-    try {
-        await authService.logout(req.body.id);
+    const logoutResponse = await authService.logout(req.body.id);
 
-        return res.status(204).send("Successfuly logged out");
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
-    }
+    return res.status(logoutResponse.status).send(logoutResponse.message);
 });
 
 /**

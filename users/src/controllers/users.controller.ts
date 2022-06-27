@@ -17,16 +17,9 @@ const usersService = new UsersService();
  * Trouve tous les users
  */
 UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req, res) => {
-    try {
-        return res
-            .status(200)
-            .json(await usersService.findAll());
-    } catch (e: any) {
-        console.error(e);
-        return res
-            .status(e.status ? e.status : 500)
-            .json(e);
-    }
+    return res
+        .status(200)
+        .json(await usersService.findAll());
 });
 
 /**
