@@ -5,8 +5,8 @@ export interface IDelivery extends Document {
     restaurantId: string,
     date: Date,
     deliveryState: string,
-    deliveryManId: string,
-    customerId: string,
+    deliveryManId: number,
+    customerId: number,
     location: {
         city: string,
         zipCode: number,
@@ -21,8 +21,8 @@ export const DeliverySchema: Schema = new Schema({
     restaurantId: { type: String, required: true },
     date: { type: Date, required: true },
     deliveryState: { type: String, required: true },
-    deliveryManId: { type: String, required: true },
-    customerId: { type: String, required: true },
+    deliveryManId: { type: Number, required: true },
+    customerId: { type: Number, required: true },
     location: {
         city: { type: String, required: true },
         zipCode: { type: String, required: true },
