@@ -32,7 +32,7 @@ RestaurantsController.get('/', async (req, res) => {
  */
 RestaurantsController.get('/:id', async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -76,7 +76,7 @@ RestaurantsController.post('/', async (req, res) => {
  */
 RestaurantsController.patch('/:id', async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -99,7 +99,7 @@ RestaurantsController.patch('/:id', async (req, res) => {
  */
 RestaurantsController.delete('/:id', async (req, res) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
