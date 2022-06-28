@@ -1,4 +1,4 @@
-import { BadRequestException, IUser, NotFoundException, Roles, UnauthorizedException } from '@grp-2-projet-elective/cesieats-helpers';
+import { BadRequestException, IUser, LoggerService, NotFoundException, Roles, UnauthorizedException } from '@grp-2-projet-elective/cesieats-helpers';
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import { environment } from 'environment/environment';
@@ -7,11 +7,14 @@ import { TokenData, Tokens } from 'models/auth.model';
 
 export class AuthService {
 
+    private readonly Logger: LoggerService = LoggerService.Instance('Auth API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/auth');
+
     constructor() { }
 
     public async register(userInformationData: Partial<IUser>): Promise<IUser | void> {
         const user = await this.createUser(userInformationData);
-
+        
+        this.Logger.info('New account registered');
         return user;
     }
 
@@ -40,6 +43,7 @@ export class AuthService {
 
             await this.updateUser(updatedUser);
 
+            this.Logger.info('Account logged in');
             return { accessToken: accessToken, refreshToken: refreshToken };
         }
 
@@ -52,6 +56,7 @@ export class AuthService {
 
         await this.updateUser(user);
 
+        this.Logger.info('Account logged out');
         return { status: 204, message: 'Disconnected' };
     }
 
@@ -70,6 +75,7 @@ export class AuthService {
         const newAccessToken = this.generateAccessToken(tokenData);
         const newRefreshToken = this.generateRefreshToken(tokenData);
 
+        this.Logger.info('Account token refreshed');
         return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     }
 
@@ -93,6 +99,7 @@ export class AuthService {
     }
 
     public async getUserByMail(mail: string): Promise<any> {
+        this.Logger.info('Users api request: requesting user by mail');
         const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${mail}`;
 
         const user = (await axios.get(apiUrl)).data;
@@ -100,6 +107,7 @@ export class AuthService {
     }
 
     public async createUser(userInformationData: Partial<IUser>): Promise<IUser> {
+        this.Logger.info('Users api request: requesting user creation');
         const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users`;
         const body = {
             ...userInformationData
@@ -111,6 +119,7 @@ export class AuthService {
     }
 
     public async updateUser(userInformationData: Partial<IUser>): Promise<IUser> {
+        this.Logger.info('Users api request: requesting user update');
         const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${userInformationData.mail}`;
         const body = {
             ...userInformationData

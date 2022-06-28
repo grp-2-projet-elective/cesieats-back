@@ -6,9 +6,10 @@
     "lib": [
       "esnext"
     ],
+    "sourceMap": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "strict": false,
+    "strict": true,
     "strictNullChecks": true,
     "resolveJsonModule": true,
     "skipDefaultLibCheck": true,

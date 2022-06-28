@@ -1,11 +1,16 @@
+import { LoggerService } from "@grp-2-projet-elective/cesieats-helpers";
 import { environment } from "environment/environment";
-import { DataTypes, Model, ModelStatic, Sequelize } from "sequelize/types";
+import { DataTypes, Model, ModelStatic, Sequelize } from "sequelize";
 import { UsersService } from "./users.service";
 
 export class SqlService {
+    
+    private readonly Logger = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
+
     constructor(private readonly usersService: UsersService) { }
 
     public async initService(): Promise<void> {
+        this.Logger.info('Initializing SQL service');
         try {
             const sequelize = new Sequelize(`postgres://${process.env.SQL_USER}:${process.env.SQL_PWD}@${environment.SQL_SERVER}:${environment.SQL_PORT}/${environment.SQL_DATABASE}`);
             await sequelize.authenticate();
@@ -18,14 +23,15 @@ export class SqlService {
 
             await this.populateRoles(role);
 
-            console.log('Connection has been established successfully.');
+            this.Logger.info('Database connection successfully established');
         } catch (error) {
-            console.error('Error connecting to DB: ', error);
+            this.Logger.fatal('Database connection error: ', error);
             process.exit(1);
         }
     }
 
     private async syncUser(sequelize: Sequelize): Promise<ModelStatic<Model<any, any>>> {
+        this.Logger.info('Synchronizing Users table');
         const user = sequelize.define('User', {
             id: {
                 type: DataTypes.INTEGER,
@@ -90,10 +96,12 @@ export class SqlService {
         });
 
         await user.sync();
+        this.Logger.info('Users table synchronized');
         return user;
     }
 
     private async syncRole(sequelize: Sequelize): Promise<ModelStatic<Model<any, any>>> {
+        this.Logger.info('Synchronizing Roles table');
         const role = sequelize.define('Role', {
             id: {
                 type: DataTypes.INTEGER,
@@ -117,14 +125,16 @@ export class SqlService {
         });
 
         await role.sync();
+        this.Logger.info('Users table synchronized');
         return role;
     }
 
     private async populateRoles(role: ModelStatic<Model<any, any>>): Promise<void> {
+        this.Logger.info('Roles creation');
         const roleCount = await role.count();
 
         if (roleCount === 0) {
-            console.log('No roles found, creating default roles...');
+            this.Logger.info('No roles found, creating default roles...');
 
             const CUSTOMER = await role.create({
                 type: 'CUSTOMER',
@@ -162,10 +172,10 @@ export class SqlService {
             await TECHNICAL_DEPARTMENT.save();
             await COMERCIAL_DEPARTMENT.save();
 
-            console.log('Roles succesfully created');
+            this.Logger.info('Roles succesfully created');
             return;
         }
 
-        console.log('Roles already created');
+        this.Logger.info('Roles already exists, skip process');
     }
 }

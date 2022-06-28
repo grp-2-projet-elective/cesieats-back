@@ -1,6 +1,8 @@
-import { BadRequestException, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { BadRequestException, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { Router } from 'express';
 import { MenusService } from 'services/menus.service';
+
+const Logger: LoggerService = LoggerService.Instance('Menus API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/menus');
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`
@@ -16,6 +18,7 @@ const service = new MenusService();
  * Trouve tous les menus
  */
 MenusController.get('/', async (req, res) => {
+    Logger.info('Requesting all menus');
     return res
         .status(200)
         .json(await service.findAll());
@@ -25,6 +28,7 @@ MenusController.get('/', async (req, res) => {
  * Trouve un menu en particulier
  */
 MenusController.get('/:id', async (req, res) => {
+    Logger.info('Requesting single menu');
     const id = req.params.id;
 
     if (!id) {
@@ -46,6 +50,7 @@ MenusController.get('/:id', async (req, res) => {
  * Créé un menu
  */
 MenusController.post('/', async (req, res) => {
+    Logger.info('Requesting menu creation');
     const createdMenu = await service.create(req.body);
 
     return res
@@ -57,6 +62,7 @@ MenusController.post('/', async (req, res) => {
  * Mise à jour d'un menu
  */
 MenusController.patch('/:id', async (req, res) => {
+    Logger.info('Requesting menu update');
     const id = req.params.id;
 
     if (!id) {
@@ -74,6 +80,7 @@ MenusController.patch('/:id', async (req, res) => {
  * Suppression d'un menu
  */
 MenusController.delete('/:id', async (req, res) => {
+    Logger.info('Requesting menu deletion');
     const id = req.params.id;
 
     if (!id) {

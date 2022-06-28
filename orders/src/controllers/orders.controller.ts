@@ -1,6 +1,8 @@
-import { BadRequestException, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { BadRequestException, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { Router } from 'express';
 import { OrdersService } from 'services/orders.service';
+
+const Logger: LoggerService = LoggerService.Instance('Orders API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/orders');
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`
@@ -16,6 +18,7 @@ const service = new OrdersService();
  * Trouve tous les orders
  */
 OrdersController.get('/', async (req, res) => {
+    Logger.info('Requesting all orders');
     return res
         .status(200)
         .json(await service.findAll());
@@ -25,6 +28,7 @@ OrdersController.get('/', async (req, res) => {
  * Trouve un order en particulier
  */
 OrdersController.get('/:id', async (req, res) => {
+    Logger.info('Requesting single user');
     const id = req.params.id;
 
     if (!id) {
@@ -46,6 +50,7 @@ OrdersController.get('/:id', async (req, res) => {
  * Créé un order
  */
 OrdersController.post('/', async (req, res) => {
+    Logger.info('Requesting order creation');
     const createdOrder = await service.create(req.body);
 
     return res
@@ -57,6 +62,7 @@ OrdersController.post('/', async (req, res) => {
  * Mise à jour d'un order
  */
 OrdersController.patch('/:id', async (req, res) => {
+    Logger.info('Requesting order update');
     const id = req.params.id;
 
     if (!id) {
@@ -74,6 +80,7 @@ OrdersController.patch('/:id', async (req, res) => {
  * Suppression d'un order
  */
 OrdersController.delete('/:id', async (req, res) => {
+    Logger.info('Requesting order deletion');
     const id = req.params.id;
 
     if (!id) {

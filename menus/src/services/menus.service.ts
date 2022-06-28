@@ -1,7 +1,9 @@
-import { NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { IMenu, Menu } from 'models/menus.model';
 
 export class MenusService {
+    private readonly Logger: LoggerService = LoggerService.Instance('Menus API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/menus');
+
     constructor() { }
 
     /**
@@ -40,6 +42,7 @@ export class MenusService {
 
         const updatedMenu = await Menu.findByIdAndUpdate(id, menuData, { new: true });
 
+        this.Logger.info('Menu updated');
         return updatedMenu;
     }
 
@@ -53,6 +56,7 @@ export class MenusService {
     async create(menuData: IMenu): Promise<IMenu> {
         const newMenu: IMenu = await Menu.create(menuData);
 
+        this.Logger.info('Menu created');
         return newMenu;
     }
 
@@ -67,5 +71,6 @@ export class MenusService {
         }
 
         await Menu.findByIdAndRemove(id);
+        this.Logger.info('Menu deleted');
     }
 }

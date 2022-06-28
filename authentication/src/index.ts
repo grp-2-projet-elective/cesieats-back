@@ -1,9 +1,11 @@
-import { ExceptionsHandler, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
+import { ExceptionsHandler, LoggerService, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
 import { AuthController } from 'controllers/auth.controller';
 import cors from 'cors';
 import 'dotenv/config';
 import { environment } from 'environment/environment';
 import express from 'express';
+
+const Logger = LoggerService.Instance('Auth API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/auth');
 
 /**
  * On crée une nouvelle "application" express
@@ -47,4 +49,4 @@ app.use(ExceptionsHandler);
 /**
  * On demande à Express d'écouter les requêtes sur le port défini dans la config
  */
-app.listen(environment.API_PORT, () => console.log(`Auth server listening at: http://localhost:${environment.API_PORT}`));
+app.listen(environment.API_PORT, () => Logger.info(`Auth server listening at: http://localhost:${environment.API_PORT}`));
