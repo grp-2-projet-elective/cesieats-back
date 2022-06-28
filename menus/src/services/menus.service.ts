@@ -37,12 +37,10 @@ export class MenusService {
     }
 
     /**
-     * Met à jour un menu en particulier
-     *
-     * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
-     *
-     * @param menuData - Un objet correspondant à un menu, il ne contient pas forcément tout un menu. Attention, on ne prend pas l'id avec.
-     * @param id - ID unique de l'menu
+     * 
+     * @param id 
+     * @param menuData 
+     * @returns 
      */
     async update(id: string, menuData: Partial<IMenu>): Promise<IMenu | null | undefined> {
         try {
@@ -63,11 +61,9 @@ export class MenusService {
     }
 
     /**
-     * Créé un menu
-     *
-     * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
-     *
-     * @param menuData - Un objet correspondant à un menu. Attention, on ne prend pas l'id avec.
+     * 
+     * @param menuData 
+     * @returns 
      */
     async create(menuData: IMenu): Promise<IMenu> {
         try {
@@ -82,7 +78,8 @@ export class MenusService {
     }
 
     /**
-     * Suppression d'un menu
+     * 
+     * @param id 
      */
     async delete(id: string) {
         try {
@@ -100,6 +97,10 @@ export class MenusService {
         }
     }
     
+    /**
+     * 
+     * @returns 
+     */
     public async getStats(): Promise<MenusStats | void> {
         try {
             const menusCount = await Menu.count();

@@ -15,6 +15,9 @@ const OrdersController = Router();
  */
 const service = new OrdersService();
 
+/**
+ * Recupération des données statistiques des commandes
+ */
 OrdersController.get('/stats', async (req, res) => {
     Logger.info('Requesting orders stats');
     try {
@@ -30,7 +33,7 @@ OrdersController.get('/stats', async (req, res) => {
 });
 
 /**
- * Trouve tous les orders
+ * Trouver toutes les commandes
  */
 OrdersController.get('/', async (req, res) => {
     Logger.info('Requesting all orders');
@@ -45,7 +48,7 @@ OrdersController.get('/', async (req, res) => {
 });
 
 /**
- * Trouve un order en particulier
+ * Trouver une commande en particulier
  */
 OrdersController.get('/:id', async (req, res) => {
     Logger.info('Requesting single user');
@@ -72,7 +75,7 @@ OrdersController.get('/:id', async (req, res) => {
 });
 
 /**
- * Créé un order
+ * Créer une commande
  */
 OrdersController.post('/', async (req, res) => {
     Logger.info('Requesting order creation');
@@ -89,7 +92,7 @@ OrdersController.post('/', async (req, res) => {
 });
 
 /**
- * Mise à jour d'un order
+ * Mise à jour d'une commande
  */
 OrdersController.patch('/:id', async (req, res) => {
     Logger.info('Requesting order update');
@@ -112,7 +115,7 @@ OrdersController.patch('/:id', async (req, res) => {
 });
 
 /**
- * Suppression d'un order
+ * Suppression d'une commande
  */
 OrdersController.delete('/:id', async (req, res) => {
     Logger.info('Requesting order deletion');

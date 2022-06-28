@@ -9,6 +9,9 @@ export class SqlService {
 
     constructor(private readonly usersService: UsersService) { }
 
+    /**
+     * 
+     */
     public async initService(): Promise<void> {
         this.Logger.info('Initializing SQL service');
         try {
@@ -31,6 +34,11 @@ export class SqlService {
         }
     }
 
+    /**
+     * 
+     * @param sequelize 
+     * @returns 
+     */
     private async syncUser(sequelize: Sequelize): Promise<ModelStatic<Model<any, any>>> {
         try {
             this.Logger.info('Synchronizing Users table');
@@ -106,6 +114,11 @@ export class SqlService {
         }
     }
 
+    /**
+     * 
+     * @param sequelize 
+     * @returns 
+     */
     private async syncRole(sequelize: Sequelize): Promise<ModelStatic<Model<any, any>>> {
         this.Logger.info('Synchronizing Roles table');
         try {
@@ -140,6 +153,11 @@ export class SqlService {
         }
     }
 
+    /**
+     * 
+     * @param role 
+     * @returns 
+     */
     private async populateRoles(role: ModelStatic<Model<any, any>>): Promise<void> {
         this.Logger.info('Roles creation');
         try {

@@ -28,7 +28,7 @@ export class RestaurantsService {
 
     /**
      * Trouve un restaurant en particulier
-     * @param id - ID unique de l'restaurant
+     * @param id - ID unique du restaurant
      */
     async findOne(id: string): Promise<IRestaurant | null | undefined> {
         try {
@@ -41,6 +41,11 @@ export class RestaurantsService {
         }
     }
 
+    /**
+     * 
+     * @param restaurantName 
+     * @returns 
+     */
     async findOneByName(restaurantName: string): Promise<IRestaurant | null | undefined> {
         try {
             const restaurant = await Restaurant.findOne({ where: { name: restaurantName } });
@@ -53,12 +58,10 @@ export class RestaurantsService {
     }
 
     /**
-     * Met à jour un restaurant en particulier
-     *
-     * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
-     *
-     * @param restaurantData - Un objet correspondant à un restaurant, il ne contient pas forcément tout un restaurant. Attention, on ne prend pas l'id avec.
-     * @param id - ID unique de l'restaurant
+     * 
+     * @param id 
+     * @param restaurantData 
+     * @returns 
      */
     async update(id: string, restaurantData: Partial<IRestaurant>): Promise<IRestaurant | null | undefined> {
         try {
@@ -79,11 +82,9 @@ export class RestaurantsService {
     }
 
     /**
-     * Créé un restaurant
-     *
-     * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
-     *
-     * @param restaurantData - Un objet correspondant à un restaurant. Attention, on ne prend pas l'id avec.
+     * 
+     * @param restaurantData 
+     * @returns 
      */
     async create(restaurantData: IRestaurant): Promise<IRestaurant> {
         try {
@@ -98,7 +99,8 @@ export class RestaurantsService {
     }
 
     /**
-     * Suppression d'un restaurant
+     * 
+     * @param id 
      */
     async delete(id: string) {
         try {
@@ -116,6 +118,10 @@ export class RestaurantsService {
         }
     }
 
+    /**
+     * 
+     * @returns 
+     */
     public async getStats(): Promise<RestaurantsStats | void> {
         try {
             const restaurantsCount = await Restaurant.count();
@@ -129,6 +135,11 @@ export class RestaurantsService {
         }
     }
 
+    /**
+     * 
+     * @param restaurantName 
+     * @returns 
+     */
     public static async isRestaurantDuplicated(restaurantName: string): Promise<boolean> {
         try {
             const user = await this.instance.findOneByName(restaurantName);

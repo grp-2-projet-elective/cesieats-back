@@ -11,6 +11,11 @@ export class AuthService {
 
     constructor() { }
 
+    /**
+     * 
+     * @param userInformationData 
+     * @returns 
+     */
     public async register(userInformationData: Partial<IUser>): Promise<IUser | void> {
         try {
             const user = await this.createUser(userInformationData);
@@ -23,6 +28,12 @@ export class AuthService {
         }
     }
 
+    /**
+     * 
+     * @param mail 
+     * @param password 
+     * @returns 
+     */
     public async login(mail: string, password: string): Promise<Tokens | { status: number, message: string, [key: string]: any }> {
         try {
             const user = await this.getUserByMail(mail);
@@ -60,6 +71,11 @@ export class AuthService {
         }
     }
 
+    /**
+     * 
+     * @param mail 
+     * @returns 
+     */
     public async logout(mail: string): Promise<any> {
         try {
             const user = await this.getUserByMail(mail);
@@ -75,6 +91,12 @@ export class AuthService {
         }
     }
 
+    /**
+     * 
+     * @param mail 
+     * @param refreshToken 
+     * @returns 
+     */
     public async refreshToken(mail: string, refreshToken: string): Promise<Tokens | void> {
         try {
             const user = await this.getUserByMail(mail);
@@ -111,6 +133,7 @@ export class AuthService {
 
     /**
      * Génération d'un refresh token
+     * 
      * @param tokenData 
      * @returns 
      */
@@ -131,6 +154,11 @@ export class AuthService {
         }
     }
 
+    /**
+     * 
+     * @param userInformationData 
+     * @returns 
+     */
     public async createUser(userInformationData: Partial<IUser>): Promise<IUser> {
         this.Logger.info('Users api request: requesting user creation');
         try {
@@ -148,10 +176,15 @@ export class AuthService {
         }
     }
 
+    /**
+     * 
+     * @param userInformationData 
+     * @returns 
+     */
     public async updateUser(userInformationData: Partial<IUser>): Promise<IUser> {
         this.Logger.info('Users api request: requesting user update');
         try {
-            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${userInformationData.mail}`;
+            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${userInformationData.id}`;
             const body = {
                 ...userInformationData
             }

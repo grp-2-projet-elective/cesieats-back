@@ -9,7 +9,7 @@ export class DeliveriesService {
     constructor() { }
 
     /**
-     * Trouve tous les deliveries
+     * Trouve toutes les livraisons
      */
     async findAll(): Promise<Array<IDelivery>> {
         try {
@@ -23,8 +23,9 @@ export class DeliveriesService {
     }
 
     /**
-     * Trouve un delivery en particulier
-     * @param id - ID unique de l'delivery
+     * 
+     * @param id 
+     * @returns 
      */
     async findOne(id: string): Promise<IDelivery | null | undefined> {
         try {
@@ -38,12 +39,10 @@ export class DeliveriesService {
     }
 
     /**
-     * Met à jour un delivery en particulier
-     *
-     * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
-     *
-     * @param deliveryData - Un objet correspondant à un delivery, il ne contient pas forcément tout un delivery. Attention, on ne prend pas l'id avec.
-     * @param id - ID unique de l'delivery
+     * 
+     * @param id 
+     * @param deliveryData 
+     * @returns 
      */
     async update(id: string, deliveryData: Partial<IDelivery>): Promise<IDelivery | null | undefined> {
         try {
@@ -64,11 +63,9 @@ export class DeliveriesService {
     }
 
     /**
-     * Créé un delivery
-     *
-     * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
-     *
-     * @param deliveryData - Un objet correspondant à un delivery. Attention, on ne prend pas l'id avec.
+     * 
+     * @param deliveryData 
+     * @returns 
      */
     async create(deliveryData: IDelivery): Promise<IDelivery> {
         try {
@@ -83,7 +80,8 @@ export class DeliveriesService {
     }
 
     /**
-     * Suppression d'un delivery
+     * 
+     * @param id 
      */
     async delete(id: string) {
         try {
@@ -101,7 +99,10 @@ export class DeliveriesService {
         }
     }
 
-    
+    /**
+     * 
+     * @returns 
+     */
     public async getStats(): Promise<DeliveriesStats | void> {
         try {
             const deliveriesCount = await Delivery.count();

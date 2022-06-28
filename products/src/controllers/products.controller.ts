@@ -15,6 +15,9 @@ const ProductsController = Router();
  */
 const service = new ProductsService();
 
+/**
+ * Recupération des données statistiques des produits
+ */
 ProductsController.get('/stats', async (req, res) => {
     Logger.info('Requesting products stats');
     try {
@@ -30,7 +33,7 @@ ProductsController.get('/stats', async (req, res) => {
 });
 
 /**
- * Trouve tous les products
+ * Trouve tous les produits
  */
 ProductsController.get('/', async (req, res) => {
     Logger.info('Requesting all products');
@@ -45,7 +48,7 @@ ProductsController.get('/', async (req, res) => {
 });
 
 /**
- * Trouve un product en particulier
+ * Trouve un produit en particulier
  */
 ProductsController.get('/:id', async (req, res) => {
     Logger.info('Requesting single product');
@@ -72,7 +75,7 @@ ProductsController.get('/:id', async (req, res) => {
 });
 
 /**
- * Créé un product
+ * Créé un produit
  */
 ProductsController.post('/', async (req, res) => {
     Logger.info('Requesting product creation');
@@ -89,7 +92,7 @@ ProductsController.post('/', async (req, res) => {
 });
 
 /**
- * Mise à jour d'un product
+ * Mise à jour d'un produit
  */
 ProductsController.patch('/:id', async (req, res) => {
     Logger.info('Requesting product update');
@@ -112,7 +115,7 @@ ProductsController.patch('/:id', async (req, res) => {
 });
 
 /**
- * Suppression d'un product
+ * Suppression d'un produit
  */
 ProductsController.delete('/:id', async (req, res) => {
     Logger.info('Requesting product deletion');

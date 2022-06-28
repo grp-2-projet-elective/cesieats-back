@@ -17,7 +17,7 @@ const AuthController = Router();
 const authService = new AuthService();
 
 /**
- * Enregistrer un nouvel user
+ * Enregistrer un nouvel utilisateur
  */
 AuthController.post('/register', async (req, res, next) => {
     Logger.info('Requesting account registration');
@@ -42,7 +42,7 @@ AuthController.post('/register', async (req, res, next) => {
 
 
 /**
- * Connecter un user
+ * Connecter un utilisateur
  */
 AuthController.post('/login', async (req, res, next) => {
     Logger.info('Requesting account login');
@@ -55,6 +55,9 @@ AuthController.post('/login', async (req, res, next) => {
     }
 });
 
+/**
+ * Rafraichir le token d'accès d'un utilisateur
+ */
 AuthController.post("/refreshToken", async (req, res, next) => {
     Logger.info('Requesting account token refresh');
     try {
@@ -67,7 +70,9 @@ AuthController.post("/refreshToken", async (req, res, next) => {
     }
 });
 
-
+/**
+ * Déconnecter un utilisateur
+ */
 AuthController.post("/logout", async (req, res, next) => {
     Logger.info('Requesting account logout');
     try {

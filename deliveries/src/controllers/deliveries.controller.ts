@@ -15,6 +15,9 @@ const DeliveriesController = Router();
  */
 const service = new DeliveriesService();
 
+/**
+ * Recupération des données statistiques des livraisons
+ */
 DeliveriesController.get('/stats', async (req, res) => {
     Logger.info('Requesting deliveries stats');
     try {
@@ -30,7 +33,7 @@ DeliveriesController.get('/stats', async (req, res) => {
 });
 
 /**
- * Trouve tous les deliveries
+ * Trouver toutes les livraisons
  */
 DeliveriesController.get('/', async (req, res) => {
     Logger.info('Requesting all deliveries');
@@ -45,7 +48,7 @@ DeliveriesController.get('/', async (req, res) => {
 });
 
 /**
- * Trouve un delivery en particulier
+ * Trouver un livraison en particulier
  */
 DeliveriesController.get('/:id', async (req, res) => {
     Logger.info('Requesting single delivery');
@@ -72,7 +75,7 @@ DeliveriesController.get('/:id', async (req, res) => {
 });
 
 /**
- * Créé un delivery
+ * Créé une livraison
  */
 DeliveriesController.post('/', async (req, res) => {
     Logger.info('Requesting delivery creation');
@@ -89,7 +92,7 @@ DeliveriesController.post('/', async (req, res) => {
 });
 
 /**
- * Mise à jour d'un delivery
+ * Mise à jour d'une livraison
  */
 DeliveriesController.patch('/:id', async (req, res) => {
     Logger.info('Requesting delivery update');
@@ -112,7 +115,7 @@ DeliveriesController.patch('/:id', async (req, res) => {
 });
 
 /**
- * Suppression d'un delivery
+ * Suppression d'une livraison
  */
 DeliveriesController.delete('/:id', async (req, res) => {
     Logger.info('Requesting delivery deletion');

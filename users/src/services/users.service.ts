@@ -19,7 +19,7 @@ export class UsersService {
     }
 
     /**
-     * Trouve tous les users
+     * Trouve tous les utilisateurs
      */
     async findAll(): Promise<Array<Model<any, any>>> {
         try {
@@ -33,8 +33,8 @@ export class UsersService {
     }
 
     /**
-     * Trouve un user en particulier
-     * @param id - ID unique de l'user
+     * Trouve un utilisateur en particulier
+     * @param id - ID unique de l'utilisateur
      */
     async findOne(id: number): Promise<Model<any, any> | null> {
         try {
@@ -48,8 +48,8 @@ export class UsersService {
     }
 
     /**
-     * Trouve un user en particulier par son email
-     * @param mail - mail unique de l'user
+     * Trouve un utilisateur en particulier par son email
+     * @param mail - mail unique de l'utilisateur
      */
     async findOneByMail(mail: string): Promise<Model<any, any> | null> {
         try {
@@ -63,12 +63,10 @@ export class UsersService {
     }
 
     /**
-     * Met à jour un user en particulier
-     *
-     * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
-     *
-     * @param userData - Un objet correspondant à un user, il ne contient pas forcément tout un user. Attention, on ne prend pas l'id avec.
-     * @param id - ID unique de l'user
+     * 
+     * @param id 
+     * @param userData 
+     * @returns 
      */
     async update(id: number, userData: Partial<User>): Promise<Model<any, any> | null> {
         try {
@@ -92,11 +90,9 @@ export class UsersService {
     }
 
     /**
-     * Créé un user
-     *
-     * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
-     *
-     * @param userData - Un objet correspondant à un user. Attention, on ne prend pas l'id avec.
+     * 
+     * @param userData 
+     * @returns 
      */
     async create(userData: IUser): Promise<Model<any, any>> {
         try {
@@ -123,7 +119,9 @@ export class UsersService {
     }
 
     /**
-     * Suppression d'un user
+     * 
+     * @param id 
+     * @returns 
      */
     async delete(id: number): Promise<any> {
         try {
@@ -139,6 +137,10 @@ export class UsersService {
         }
     }
 
+    /**
+     * 
+     * @returns 
+     */
     public async getStats(): Promise<UsersStats | void> {
         try {
             const usersCount = await this.User.count();
@@ -168,6 +170,11 @@ export class UsersService {
         }
     }
 
+    /**
+     * 
+     * @param mail 
+     * @returns 
+     */
     public static async isUserDuplicated(mail: string): Promise<boolean> {
         try {
             const user = await this.instance.findOneByMail(mail);

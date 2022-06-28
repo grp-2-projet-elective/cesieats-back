@@ -5,6 +5,13 @@ import { RestaurantsService } from 'services/restaurants.service';
 export abstract class RestaurantAuthMiddleware {
     public static authorizedHosts: Array<string> = environment.authorizedHosts;
 
+    /**
+     * 
+     * @param req 
+     * @param res 
+     * @param next 
+     * @returns 
+     */
     public static async isRestaurantDuplicated(req: Request, res: Response, next: NextFunction) {
         if ((req as any).skipMiddlewares) {
             return next();
@@ -25,6 +32,13 @@ export abstract class RestaurantAuthMiddleware {
         return next();
     }
 
+    /**
+     * 
+     * @param req 
+     * @param res 
+     * @param next 
+     * @returns 
+     */
     public static async isApiCall(req: Request, res: Response, next: NextFunction) {
         const hostname = req.hostname;
         console.log('API call from: ', hostname);

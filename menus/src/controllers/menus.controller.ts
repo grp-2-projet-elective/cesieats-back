@@ -15,6 +15,9 @@ const MenusController = Router();
  */
 const service = new MenusService();
 
+/**
+ * Recupération des données statistiques des menus
+ */
 MenusController.get('/stats', async (req, res) => {
     Logger.info('Requesting menus stats');
     try {
@@ -30,7 +33,7 @@ MenusController.get('/stats', async (req, res) => {
 });
 
 /**
- * Trouve tous les menus
+ * Trouver tous les menus
  */
 MenusController.get('/', async (req, res) => {
     Logger.info('Requesting all menus');
@@ -45,7 +48,7 @@ MenusController.get('/', async (req, res) => {
 });
 
 /**
- * Trouve un menu en particulier
+ * Trouver un menu en particulier
  */
 MenusController.get('/:id', async (req, res) => {
     Logger.info('Requesting single menu');

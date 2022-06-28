@@ -16,6 +16,9 @@ const UsersController = Router();
  */
 const usersService = new UsersService();
 
+/**
+ * Recupération des données statistiques des utilisateurs
+ */
 UsersController.get('/stats', async (req, res, next) => {
     Logger.info('Requesting users stats');
     try {
@@ -27,12 +30,11 @@ UsersController.get('/stats', async (req, res, next) => {
     } catch (error) {
         Logger.error(error);
         res.json(error);
-        // throw error;
     }
 });
 
 /**
- * Trouve tous les users
+ * Trouve tous les utilisateurs
  */
 UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req, res, next) => {
     Logger.info('Requesting all users');
@@ -43,24 +45,23 @@ UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req
     } catch (error) {
         Logger.error(error);
         res.json(error);
-        // throw error;
     }
 });
 
 /**
- * Trouve un user en particulier par son email
+ * Trouve un utilisateur en particulier par son email ou son id
  */
-UsersController.get('/:id', async (req, res, next) => {
+UsersController.get('/:key', async (req, res, next) => {
     Logger.info('Requesting single user');
     try {
         let id;
         let mail;
 
-        if(req.params.id.includes('@')) {
+        if(req.params.key.includes('@')) {
             id = null
-            mail = req.params.id;
+            mail = req.params.key;
         } else {
-            id = Number(req.params.id);
+            id = Number(req.params.key);
             mail = null
         }
 
@@ -85,13 +86,11 @@ UsersController.get('/:id', async (req, res, next) => {
     } catch (error) {
         Logger.error(error);
         res.json(error);
-        // throw error;
-        // next(error);
     }
 });
 
 /**
- * Créé un user
+ * Créer un utilisateur
  */
 UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req, res, next) => {
     Logger.info('Requesting user creation');
@@ -104,13 +103,11 @@ UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req
     } catch (error) {
         Logger.error(error);
         res.json(error);
-        // throw error;
-        // next(error);
     }
 });
 
 /**
- * Mise à jour d'un user
+ * Mise à jour d'un utilisateur
  */
 UsersController.patch('/:id', async (req, res, next) => {
     Logger.info('Requesting user update');
@@ -129,13 +126,11 @@ UsersController.patch('/:id', async (req, res, next) => {
     } catch (error) {
         Logger.error(error);
         res.json(error);
-        // throw error;
-        // next(error);
     }
 });
 
 /**
- * Suppression d'un user
+ * Suppression d'un utilisateur
  */
 UsersController.delete('/:id', async (req, res, next) => {
     Logger.info('Requesting user deletion');
@@ -153,9 +148,7 @@ UsersController.delete('/:id', async (req, res, next) => {
             .json(response);
     } catch (error) {
         Logger.error(error);
-        // throw error;
         res.json(error);
-        // next(error);
     }
 });
 

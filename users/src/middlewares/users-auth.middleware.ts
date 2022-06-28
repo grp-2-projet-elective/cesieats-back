@@ -7,6 +7,13 @@ export abstract class UsersAuthMiddleware {
     public static authorizedHosts: Array<string> = environment.authorizedHosts;
     private static Logger: LoggerService = LoggerService.Instance('Users API', environment.logDir);
 
+    /**
+     * 
+     * @param req 
+     * @param res 
+     * @param next 
+     * @returns 
+     */
     public static async verifyUserDucplication(req: Request, res: Response, next: NextFunction) {
         try {
             const mail: string = req.body.mail;
@@ -28,6 +35,13 @@ export abstract class UsersAuthMiddleware {
         }
     }
 
+    /**
+     * 
+     * @param req 
+     * @param res 
+     * @param next 
+     * @returns 
+     */
     public static async isApiCall(req: Request, res: Response, next: NextFunction) {
         const hostname = req.hostname;
         UsersAuthMiddleware.Logger.info('API call from: ', hostname);

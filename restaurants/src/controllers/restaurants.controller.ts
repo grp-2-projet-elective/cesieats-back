@@ -15,6 +15,9 @@ const RestaurantsController = Router();
  */
 const service = new RestaurantsService();
 
+/**
+ * Recupération des données statistiques des restaurants
+ */
 RestaurantsController.get('/stats', async (req, res) => {
     Logger.info('Requesting users stats');
     try {
@@ -72,7 +75,7 @@ RestaurantsController.get('/:id', async (req, res) => {
 });
 
 /**
- * Créé un restaurant
+ * Créer un restaurant
  */
 RestaurantsController.post('/', async (req, res) => {
     Logger.info('Requesting restaurant creation');

@@ -9,7 +9,7 @@ export class ProductsService {
     constructor() { }
 
     /**
-     * Trouve tous les products
+     * Trouve tous les produits
      */
     async findAll(): Promise<Array<IProduct>> {
         try {
@@ -23,8 +23,9 @@ export class ProductsService {
     }
 
     /**
-     * Trouve un product en particulier
-     * @param id - ID unique de l'product
+     * 
+     * @param id 
+     * @returns 
      */
     async findOne(id: string): Promise<IProduct | null | undefined> {
         try {
@@ -38,12 +39,10 @@ export class ProductsService {
     }
 
     /**
-     * Met à jour un product en particulier
-     *
-     * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
-     *
-     * @param productData - Un objet correspondant à un product, il ne contient pas forcément tout un product. Attention, on ne prend pas l'id avec.
-     * @param id - ID unique de l'product
+     * 
+     * @param id 
+     * @param productData 
+     * @returns 
      */
     async update(id: string, productData: Partial<IProduct>): Promise<IProduct | null | undefined> {
         try {
@@ -64,11 +63,9 @@ export class ProductsService {
     }
 
     /**
-     * Créé un product
-     *
-     * /!\ Idéalement, il faudrait vérifier le contenu de la requête avant de le sauvegarder.
-     *
-     * @param productData - Un objet correspondant à un product. Attention, on ne prend pas l'id avec.
+     * 
+     * @param productData 
+     * @returns 
      */
     async create(productData: IProduct): Promise<IProduct> {
         try {
@@ -83,7 +80,8 @@ export class ProductsService {
     }
 
     /**
-     * Suppression d'un product
+     * 
+     * @param id 
      */
     async delete(id: string) {
         try {
@@ -101,6 +99,10 @@ export class ProductsService {
         }
     }
     
+    /**
+     * 
+     * @returns 
+     */
     public async getStats(): Promise<ProductsStats | void> {
         try {
             const productsCount = await Product.count();

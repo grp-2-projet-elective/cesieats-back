@@ -4,6 +4,13 @@ import { NextFunction, Request, Response } from 'express';
 export abstract class OrdersAuthMiddleware {
     public static authorizedHosts: Array<string> = environment.authorizedHosts;
 
+    /**
+     * 
+     * @param req 
+     * @param res 
+     * @param next 
+     * @returns 
+     */
     public static async isApiCall(req: Request, res: Response, next: NextFunction) {
         const hostname = req.hostname;
         console.log('API call from: ', hostname);
