@@ -7,19 +7,24 @@ export abstract class UsersAuthMiddleware {
     private static Logger: LoggerService = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
 
     public static async verifyUserDucplication(req: Request, res: Response, next: NextFunction) {
-        const mail: string = req.body.mail;
+        try {
+            const mail: string = req.body.mail;
 
-        if (!mail) {
-            throw new BadRequestException('User mail not provided');
+            if (!mail) {
+                throw new BadRequestException('User mail not provided');
+            }
+
+            const isUserDuplicated: boolean = await UsersService.isUserDuplicated(mail);
+
+            if (isUserDuplicated) {
+                throw new BadRequestException('User already exists');
+            }
+
+            return next();
+        } catch (error) {
+            UsersAuthMiddleware.Logger.error(error);
+            throw error;
         }
-
-        const isUserDuplicated: boolean = await UsersService.isUserDuplicated(mail);
-
-        if (isUserDuplicated) {
-            throw new BadRequestException('User already exists');
-        }
-
-        return next();
     }
 
     public static async isApiCall(req: Request, res: Response, next: NextFunction) {
