@@ -1,9 +1,10 @@
-import { BadRequestException } from '@grp-2-projet-elective/cesieats-helpers';
+import { BadRequestException, LoggerService } from '@grp-2-projet-elective/cesieats-helpers';
 import { NextFunction, Request, Response } from 'express';
 import { UsersService } from 'services/users.service';
 
 export abstract class UsersAuthMiddleware {
     public static authorizedHosts: Array<string>;
+    private static Logger: LoggerService = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
 
     public static async verifyUserDucplication(req: Request, res: Response, next: NextFunction) {
         const mail: string = req.body.mail;
@@ -23,9 +24,10 @@ export abstract class UsersAuthMiddleware {
 
     public static async isApiCall(req: Request, res: Response, next: NextFunction) {
         const hostname = req.hostname;
-        console.log('API call from: ', hostname);
+        UsersAuthMiddleware.Logger.info('API call from: ', hostname);
 
         if (UsersAuthMiddleware.authorizedHosts.includes(hostname)) {
+            UsersAuthMiddleware.Logger.info('Skip default verification');
             (req as any).skipMiddlewares = true;
         }
 

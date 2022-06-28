@@ -1,7 +1,9 @@
-import { AuthMiddlewares, BadRequestException } from '@grp-2-projet-elective/cesieats-helpers';
+import { AuthMiddlewares, BadRequestException, LoggerService } from '@grp-2-projet-elective/cesieats-helpers';
 import { Router } from 'express';
 import { UsersAuthMiddleware } from 'middlewares/users-auth.middleware';
 import { UsersService } from 'services/users.service';
+
+const Logger: LoggerService = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`
@@ -17,6 +19,7 @@ const usersService = new UsersService();
  * Trouve tous les users
  */
 UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req, res) => {
+    Logger.info('Requesting all users');
     return res
         .status(200)
         .json(await usersService.findAll());
@@ -26,6 +29,7 @@ UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req
  * Trouve un user en particulier par son email
  */
 UsersController.get('/:id?/:mail?', async (req, res) => {
+    Logger.info('Requesting single user');
     const id = Number(req.params.id);
     const mail = req.params.mail;
 
@@ -52,6 +56,7 @@ UsersController.get('/:id?/:mail?', async (req, res) => {
  * Créé un user
  */
 UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req, res) => {
+    Logger.info('Requesting user creation');
     const createdUser = await usersService.create(req.body);
 
     return res
@@ -63,6 +68,7 @@ UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req
  * Mise à jour d'un user
  */
 UsersController.patch('/:id', async (req, res) => {
+    Logger.info('Requesting user update');
     const id = Number(req.params.id);
 
     if (!id) {
@@ -80,6 +86,7 @@ UsersController.patch('/:id', async (req, res) => {
  * Suppression d'un user
  */
 UsersController.delete('/:id', async (req, res) => {
+    Logger.info('Requesting user deletion');
     const id = Number(req.params.id);
 
     if (!id) {

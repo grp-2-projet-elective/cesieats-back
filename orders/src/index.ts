@@ -1,4 +1,4 @@
-import { AuthMiddlewares, ExceptionsHandler, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
+import { AuthMiddlewares, ExceptionsHandler, LoggerService, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
 import { OrdersController } from 'controllers/orders.controller';
 import cors from 'cors';
 import 'dotenv/config';
@@ -6,6 +6,8 @@ import { environment } from 'environment/environment';
 import express from 'express';
 import { OrdersAuthMiddleware } from 'middlewares/orders-auth.middleware';
 import { connect } from 'mongoose';
+
+const Logger: LoggerService = LoggerService.Instance('Orders API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/orders');
 
 /**
  * On crée une nouvelle "application" express
@@ -49,14 +51,14 @@ app.use(ExceptionsHandler);
 /**
  * On demande à Express d'écouter les requêtes sur le port défini dans la config
  */
-app.listen(environment.API_PORT, () => console.log(`Server listening at: http://localhost:${environment.API_PORT}`));
+app.listen(environment.API_PORT, () => Logger.info(`Server listening at: http://localhost:${environment.API_PORT}`));
 
 try {
     (async () => {
         await connect('mongodb://' + process.env.MONGO_USER + ':' + process.env.MONGO_PWD + environment.MONGO_URI);
-        console.log('Connected to MongoDB');
+        Logger.info('Connected to MongoDB');
     })();
 } catch (error) {
-    console.log('Error connecting to DB: ', error);
+    Logger.info('Error connecting to DB: ', error);
     process.exit(1);
 }

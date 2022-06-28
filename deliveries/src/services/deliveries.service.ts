@@ -1,7 +1,9 @@
-import { NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { Delivery, IDelivery } from 'models/deliveries.model';
 
 export class DeliveriesService {
+
+    private readonly Logger: LoggerService = LoggerService.Instance('Deliveries API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/deliveries');
 
     constructor() { }
 
@@ -41,6 +43,7 @@ export class DeliveriesService {
 
         const updatedDelivery = await Delivery.findByIdAndUpdate(id, deliveryData, { new: true });
 
+        this.Logger.info('Delivery updated');
         return updatedDelivery;
     }
 
@@ -54,6 +57,7 @@ export class DeliveriesService {
     async create(deliveryData: IDelivery): Promise<IDelivery> {
         const newDelivery: IDelivery = await Delivery.create(deliveryData);
 
+        this.Logger.info('Delivery created');
         return newDelivery;
     }
 
@@ -68,5 +72,6 @@ export class DeliveriesService {
         }
 
         await Delivery.findByIdAndRemove(id);
+        this.Logger.info('Delivery deleted');
     }
 }

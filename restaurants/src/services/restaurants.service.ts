@@ -1,7 +1,10 @@
-import { NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { IRestaurant, Restaurant } from 'models/restaurants.model';
 
 export class RestaurantsService {
+
+    private readonly Logger: LoggerService = LoggerService.Instance('Restaurants API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/restaurants');
+
     private static instance: RestaurantsService;
 
     constructor() {
@@ -49,6 +52,7 @@ export class RestaurantsService {
         }
 
         const updatedRestaurant = await Restaurant.findByIdAndUpdate(id, restaurantData, { new: true });
+        this.Logger.info('Restaurant updated');
 
         return updatedRestaurant;
     }
@@ -63,6 +67,7 @@ export class RestaurantsService {
     async create(restaurantData: IRestaurant): Promise<IRestaurant> {
         const newRestaurant: IRestaurant = await Restaurant.create(restaurantData);
 
+        this.Logger.info('Restaurant created');
         return newRestaurant;
     }
 
@@ -77,6 +82,7 @@ export class RestaurantsService {
         }
 
         await Restaurant.findByIdAndRemove(id);
+        this.Logger.info('Restaurant deleted');
     }
 
     public static async isRestaurantDuplicated(restaurantName: string): Promise<boolean> {

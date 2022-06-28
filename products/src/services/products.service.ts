@@ -1,7 +1,9 @@
-import { NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { IProduct, Product } from 'models/products.model';
 
 export class ProductsService {
+
+    private readonly Logger: LoggerService = LoggerService.Instance('Products API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/products');
 
     constructor() { }
 
@@ -41,6 +43,7 @@ export class ProductsService {
 
         const updatedProduct = await Product.findByIdAndUpdate(id, productData, { new: true });
 
+        this.Logger.info('Product updated');
         return updatedProduct;
     }
 
@@ -54,6 +57,7 @@ export class ProductsService {
     async create(productData: IProduct): Promise<IProduct> {
         const newProduct: IProduct = await Product.create(productData);
 
+        this.Logger.info('Product created');
         return newProduct;
     }
 
@@ -68,5 +72,6 @@ export class ProductsService {
         }
 
         await Product.findByIdAndRemove(id);
+        this.Logger.info('Product deleted');
     }
 }

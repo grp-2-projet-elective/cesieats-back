@@ -1,4 +1,4 @@
-import { AuthMiddlewares, ExceptionsHandler, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
+import { AuthMiddlewares, ExceptionsHandler, LoggerService, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
 import { UsersController, usersService } from 'controllers/users.controller';
 import cors from 'cors';
 import 'dotenv/config';
@@ -7,7 +7,8 @@ import express from 'express';
 import { UsersAuthMiddleware } from 'middlewares/users-auth.middleware';
 import { SqlService } from 'services/sql.service';
 
-UsersAuthMiddleware.authorizedHosts = environment.authorizedHosts;
+const Logger: LoggerService = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
+
 /**
  * On crée une nouvelle "application" express
  */
@@ -54,5 +55,5 @@ app.use(ExceptionsHandler);
     /**
      * On demande à Express d'écouter les requêtes sur le port défini dans la config
      */
-    app.listen(environment.API_PORT, () => console.log(`Server listening at: http://localhost:${environment.API_PORT}`));
+    app.listen(environment.API_PORT, () => Logger.info(`Server listening at: http://localhost:${environment.API_PORT}`));
 })();

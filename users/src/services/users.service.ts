@@ -1,9 +1,12 @@
-import { IUser, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { IUser, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { User } from 'models/users.model';
 import * as referralCodes from 'referral-codes';
-import { Model, ModelStatic } from 'sequelize/types';
+import { Model, ModelStatic } from 'sequelize';
 
 export class UsersService {
+
+    private readonly Logger: LoggerService = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
+
     public User: ModelStatic<Model<any, any>>;
     public Role: ModelStatic<Model<any, any>>;
 
@@ -61,6 +64,7 @@ export class UsersService {
         };
 
         await this.User.update(updatedUser, { where: { id } });
+        this.Logger.info('User updated');
 
         return updatedUser;
     }
@@ -87,6 +91,7 @@ export class UsersService {
         });
 
         await newUser.save();
+        this.Logger.info('User created');
         return newUser;
     }
 
@@ -96,10 +101,9 @@ export class UsersService {
     async delete(id: number): Promise<any> {
         const userCount = await this.User.destroy({ where: { id } });
 
-        if (userCount === 0) {
-            throw new NotFoundException('No user found');
-        }
+        if (userCount === 0) throw new NotFoundException('No user found');
 
+        this.Logger.info('User deleted');
         return { message: 'User deleted' };
     }
 

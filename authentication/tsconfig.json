@@ -6,6 +6,7 @@
     "lib": [
       "esnext"
     ],
+    "sourceMap": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "strict": true,
