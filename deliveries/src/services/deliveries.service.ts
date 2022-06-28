@@ -9,13 +9,9 @@ export class DeliveriesService {
      * Trouve tous les deliveries
      */
     async findAll(): Promise<Array<IDelivery>> {
-        try {
-            const deliveries = await Delivery.find();
+        const deliveries = await Delivery.find();
 
-            return deliveries;
-        } catch (e) {
-            throw new NotFoundException('No deliveries found');
-        }
+        return deliveries;
     }
 
     /**
@@ -23,13 +19,9 @@ export class DeliveriesService {
      * @param id - ID unique de l'delivery
      */
     async findOne(id: string): Promise<IDelivery | null | undefined> {
-        try {
-            const delivery = await Delivery.findById(id);
+        const delivery = await Delivery.findById(id);
 
-            return delivery;
-        } catch (e) {
-            throw new NotFoundException('No delivery found');
-        }
+        return delivery;
     }
 
     /**

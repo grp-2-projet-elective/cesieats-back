@@ -1,7 +1,4 @@
-import { Exception, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
-import axios from 'axios';
-import { environment } from 'environment/environment';
-import * as jwt from 'jsonwebtoken';
+import { NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { IRestaurant, Restaurant } from 'models/restaurants.model';
 
 export class RestaurantsService {
@@ -15,13 +12,9 @@ export class RestaurantsService {
      * Trouve tous les restaurants
      */
     async findAll(): Promise<Array<IRestaurant>> {
-        try {
-            const restaurants = await Restaurant.find();
+        const restaurants = await Restaurant.find();
 
-            return restaurants;
-        } catch (e) {
-            throw new NotFoundException('No restaurants found');
-        }
+        return restaurants;
     }
 
     /**
@@ -29,23 +22,15 @@ export class RestaurantsService {
      * @param id - ID unique de l'restaurant
      */
     async findOne(id: string): Promise<IRestaurant | null | undefined> {
-        try {
-            const restaurant = await Restaurant.findById(id);
+        const restaurant = await Restaurant.findById(id);
 
-            return restaurant;
-        } catch (e) {
-            throw new NotFoundException('No restaurant found');
-        }
+        return restaurant;
     }
 
     async findOneByName(restaurantName: string): Promise<IRestaurant | null | undefined> {
-        try {
-            const restaurant = await Restaurant.findOne({ where: { name: restaurantName } });
+        const restaurant = await Restaurant.findOne({ where: { name: restaurantName } });
 
-            return restaurant;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
+        return restaurant;
     }
 
     /**
@@ -94,24 +79,9 @@ export class RestaurantsService {
         await Restaurant.findByIdAndRemove(id);
     }
 
-    public async getUserByMail(mail: string): Promise<any> {
-        try {
-            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${mail}`;
-
-            const user = (await axios.get(apiUrl)).data;
-            return user;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
-    }
-
     public static async isRestaurantDuplicated(restaurantName: string): Promise<boolean> {
-        try {
-            const user = await this.instance.findOneByName(restaurantName);
-            if (user === null) return false;
-            return true;
-        } catch (e: any) {
-            throw new Exception(e, e.status ? e.status : 500);
-        }
+        const user = await this.instance.findOneByName(restaurantName);
+        if (user === null) return false;
+        return true;
     }
 }

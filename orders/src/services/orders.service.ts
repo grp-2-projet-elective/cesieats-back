@@ -1,26 +1,17 @@
-import { Exception, NotFoundException, Roles } from '@grp-2-projet-elective/cesieats-helpers';
-import axios from 'axios';
-import { environment } from 'environment/environment';
+import { NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { IOrder, Order } from 'models/orders.model';
 
 export class OrdersService {
-    private static instance: OrdersService;
 
-    constructor() {
-        OrdersService.instance = this;
-    }
+    constructor() { }
 
     /**
      * Trouve tous les orders
      */
     async findAll(): Promise<Array<IOrder>> {
-        try {
-            const orders = await Order.find();
+        const orders = await Order.find();
 
-            return orders;
-        } catch (e) {
-            throw new NotFoundException('No orders found');
-        }
+        return orders;
     }
 
     /**
@@ -28,13 +19,9 @@ export class OrdersService {
      * @param id - ID unique de l'order
      */
     async findOne(id: string): Promise<IOrder | null | undefined> {
-        try {
-            const order = await Order.findById(id);
+        const order = await Order.findById(id);
 
-            return order;
-        } catch (e) {
-            throw new NotFoundException('No order found');
-        }
+        return order;
     }
 
     /**
@@ -81,26 +68,5 @@ export class OrdersService {
         }
 
         await Order.findByIdAndRemove(id);
-    }
-
-    public async asRole(mail: string, role: Roles): Promise<boolean> {
-        try {
-            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/asRole/${mail}/${role}`;
-
-            const asRole = ((await axios.get(apiUrl))).data as boolean;
-            return asRole;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
-    }
-
-    public static async asRole(mail: string, role: Roles): Promise<boolean> {
-        try {
-            const user = await this.instance.asRole(mail, role);
-            if (user === null) return false;
-            return true;
-        } catch (e: any) {
-            throw new Exception(e, e.status ? e.status : 500);
-        }
     }
 }
