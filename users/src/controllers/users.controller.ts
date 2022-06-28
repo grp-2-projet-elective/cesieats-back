@@ -49,11 +49,19 @@ UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req
 /**
  * Trouve un user en particulier par son email
  */
-UsersController.get('/:id?/:mail?', async (req, res, next) => {
+UsersController.get('/:id', async (req, res, next) => {
     Logger.info('Requesting single user');
     try {
-        const id = Number(req.params.id);
-        const mail = req.params.mail;
+        let id;
+        let mail;
+
+        if(req.params.id.includes('@')) {
+            id = null
+            mail = req.params.id;
+        } else {
+            id = Number(req.params.id);
+            mail = null
+        }
 
         if (!id && !mail) {
             throw new BadRequestException('Invalid parameters');
@@ -67,7 +75,7 @@ UsersController.get('/:id?/:mail?', async (req, res, next) => {
                 .json(user);
         }
 
-        const user = await usersService.findOne(id);
+        const user = await usersService.findOne(id as number);
 
         return res
             .status(200)
