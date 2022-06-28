@@ -1,4 +1,4 @@
-import { Exception, IUser, Roles } from '@grp-2-projet-elective/cesieats-helpers';
+import { BadRequestException, IUser, NotFoundException, Roles, UnauthorizedException } from '@grp-2-projet-elective/cesieats-helpers';
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import { environment } from 'environment/environment';
@@ -6,11 +6,8 @@ import * as jwt from 'jsonwebtoken';
 import { TokenData, Tokens } from 'models/auth.model';
 
 export class AuthService {
-    private static instance: AuthService;
 
-    constructor() {
-        AuthService.instance = this;
-    }
+    constructor() { }
 
     public async register(userInformationData: Partial<IUser>): Promise<IUser | void> {
         const user = await this.createUser(userInformationData);
@@ -19,59 +16,12 @@ export class AuthService {
     }
 
     public async login(mail: string, password: string): Promise<Tokens | { status: number, message: string, [key: string]: any }> {
-        try {
-            const user = await this.getUserByMail(mail);
+        const user = await this.getUserByMail(mail);
 
-            if (!user) return { status: 404, message: 'No user found' };
-            const hashComparaison = await bcrypt.compare(password, user.password);
+        if (!user) throw new NotFoundException('No user found');
+        const hashComparaison = await bcrypt.compare(password, user.password);
 
-            if (hashComparaison) {
-                const tokenData: TokenData = {
-                    id: user.id,
-                    mail: user.mail,
-                    role: user.role,
-                    restaurantId: user.role === Roles.RESTAURANT_OWNER ? 0 : undefined
-                };
-
-                const accessToken = this.generateAccessToken(tokenData);
-                const refreshToken = this.generateRefreshToken(tokenData);
-
-                const updatedUser = {
-                    ...user,
-                    accessToken,
-                    refreshToken
-                };
-
-                await this.updateUser(updatedUser);
-
-                return { accessToken: accessToken, refreshToken: refreshToken };
-            }
-
-            return { status: 403, message: 'Unauthorized' };
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
-    }
-
-    public async logout(mail: string): Promise<any> {
-        try {
-            const user = await this.getUserByMail(mail);
-            user.refreshToken = undefined;
-
-            await this.updateUser(user);
-
-            return { status: 200, message: 'disconnected' };
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
-    }
-
-    public async refreshToken(mail: string, refreshToken: string): Promise<Tokens | void> {
-        try {
-            const user = await this.getUserByMail(mail);
-
-            if (user.refreshToken != refreshToken) throw new Exception('Refresh Token Invalid', 400);
-
+        if (hashComparaison) {
             const tokenData: TokenData = {
                 id: user.id,
                 mail: user.mail,
@@ -79,14 +29,48 @@ export class AuthService {
                 restaurantId: user.role === Roles.RESTAURANT_OWNER ? 0 : undefined
             };
 
-            const newAccessToken = this.generateAccessToken(tokenData);
-            const newRefreshToken = this.generateRefreshToken(tokenData);
+            const accessToken = this.generateAccessToken(tokenData);
+            const refreshToken = this.generateRefreshToken(tokenData);
 
-            return { accessToken: newAccessToken, refreshToken: newRefreshToken };
-        } catch (e: any) {
-            console.error(e)
-            throw new Exception(e.error, e.status);
+            const updatedUser = {
+                ...user,
+                accessToken,
+                refreshToken
+            };
+
+            await this.updateUser(updatedUser);
+
+            return { accessToken: accessToken, refreshToken: refreshToken };
         }
+
+        throw new UnauthorizedException('Unauthorized');
+    }
+
+    public async logout(mail: string): Promise<any> {
+        const user = await this.getUserByMail(mail);
+        user.refreshToken = undefined;
+
+        await this.updateUser(user);
+
+        return { status: 204, message: 'Disconnected' };
+    }
+
+    public async refreshToken(mail: string, refreshToken: string): Promise<Tokens | void> {
+        const user = await this.getUserByMail(mail);
+
+        if (user.refreshToken != refreshToken) throw new BadRequestException('Refresh Token Invalid');
+
+        const tokenData: TokenData = {
+            id: user.id,
+            mail: user.mail,
+            role: user.role,
+            restaurantId: user.role === Roles.RESTAURANT_OWNER ? 0 : undefined
+        };
+
+        const newAccessToken = this.generateAccessToken(tokenData);
+        const newRefreshToken = this.generateRefreshToken(tokenData);
+
+        return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     }
 
     /**
@@ -109,14 +93,10 @@ export class AuthService {
     }
 
     public async getUserByMail(mail: string): Promise<any> {
-        try {
-            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${mail}`;
+        const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${mail}`;
 
-            const user = (await axios.get(apiUrl)).data;
-            return user;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
+        const user = (await axios.get(apiUrl)).data;
+        return user;
     }
 
     public async createUser(userInformationData: Partial<IUser>): Promise<IUser> {
@@ -131,17 +111,13 @@ export class AuthService {
     }
 
     public async updateUser(userInformationData: Partial<IUser>): Promise<IUser> {
-        try {
-            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${userInformationData.mail}`;
-            const body = {
-                ...userInformationData
-            }
-
-            const user = (await axios.patch(apiUrl, body)).data;
-
-            return user as any;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
+        const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${userInformationData.mail}`;
+        const body = {
+            ...userInformationData
         }
+
+        const user = (await axios.patch(apiUrl, body)).data;
+
+        return user as any;
     }
 }

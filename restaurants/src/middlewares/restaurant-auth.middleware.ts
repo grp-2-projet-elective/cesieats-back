@@ -10,26 +10,19 @@ export abstract class RestaurantAuthMiddleware {
             return next();
         }
 
-        try {
-            const restaurantName: string = req.body.name;
+        const restaurantName: string = req.body.name;
 
-            if (!restaurantName) {
-                return res.status(400).send({ message: 'Restaurant name not provided' });
-            }
-
-            const isUserDuplicated: boolean = await RestaurantsService.isRestaurantDuplicated(restaurantName);
-
-            if (isUserDuplicated) {
-                return res.status(400).send({ message: 'User already exists' });
-            }
-
-            return next();
-        } catch (e: any) {
-            console.error(e);
-            return res
-                .status(e.status ? e.status : 500)
-                .json(e);
+        if (!restaurantName) {
+            return res.status(400).send({ message: 'Restaurant name not provided' });
         }
+
+        const isUserDuplicated: boolean = await RestaurantsService.isRestaurantDuplicated(restaurantName);
+
+        if (isUserDuplicated) {
+            return res.status(400).send({ message: 'User already exists' });
+        }
+
+        return next();
     }
 
     public static async isApiCall(req: Request, res: Response, next: NextFunction) {

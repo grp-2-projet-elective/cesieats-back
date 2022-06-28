@@ -1,26 +1,17 @@
-import axios from 'axios';
-import { environment } from 'environment/environment';
-import { Product, IProduct } from 'models/products.model';
-import { NotFoundException, Exception, Roles } from '@grp-2-projet-elective/cesieats-helpers';
+import { NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { IProduct, Product } from 'models/products.model';
 
 export class ProductsService {
-    private static instance: ProductsService;
 
-    constructor() {
-        ProductsService.instance = this;
-    }
+    constructor() { }
 
     /**
      * Trouve tous les products
      */
     async findAll(): Promise<Array<IProduct>> {
-        try {
-            const products = await Product.find();
+        const products = await Product.find();
 
-            return products;
-        } catch (e) {
-            throw new NotFoundException('No products found');
-        }
+        return products;
     }
 
     /**
@@ -28,13 +19,9 @@ export class ProductsService {
      * @param id - ID unique de l'product
      */
     async findOne(id: string): Promise<IProduct | null | undefined> {
-        try {
-            const product = await Product.findById(id);
+        const product = await Product.findById(id);
 
-            return product;
-        } catch (e) {
-            throw new NotFoundException('No product found');
-        }
+        return product;
     }
 
     /**
@@ -81,26 +68,5 @@ export class ProductsService {
         }
 
         await Product.findByIdAndRemove(id);
-    }
-
-    public async asRole(mail: string, role: Roles): Promise<boolean> {
-        try {
-            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/asRole/${mail}/${role}`;
-
-            const asRole = ((await axios.get(apiUrl))).data as boolean;
-            return asRole;
-        } catch (e: any) {
-            throw new Exception(e.error, e.status);
-        }
-    }
-
-    public static async asRole(mail: string, role: Roles): Promise<boolean> {
-        try {
-            const user = await this.instance.asRole(mail, role);
-            if (user === null) return false;
-            return true;
-        } catch (e: any) {
-            throw new Exception(e, e.status ? e.status : 500);
-        }
     }
 }

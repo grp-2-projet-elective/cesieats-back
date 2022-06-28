@@ -8,13 +8,9 @@ export class MenusService {
      * Trouve tous les menus
      */
     async findAll(): Promise<Array<IMenu>> {
-        try {
-            const menus = await Menu.find();
+        const menus = await Menu.find();
 
-            return menus;
-        } catch (e) {
-            throw new NotFoundException('No menus found');
-        }
+        return menus;
     }
 
     /**
@@ -22,13 +18,9 @@ export class MenusService {
      * @param id - ID unique de l'menu
      */
     async findOne(id: string): Promise<IMenu | null | undefined> {
-        try {
-            const menu = await Menu.findById(id);
+        const menu = await Menu.findById(id);
 
-            return menu;
-        } catch (e) {
-            throw new NotFoundException('No menu found');
-        }
+        return menu;
     }
 
     /**

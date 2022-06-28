@@ -1,3 +1,4 @@
+import { BadRequestException } from '@grp-2-projet-elective/cesieats-helpers';
 import { NextFunction, Request, Response } from 'express';
 import { UsersService } from 'services/users.service';
 
@@ -5,50 +6,19 @@ export abstract class UsersAuthMiddleware {
     public static authorizedHosts: Array<string>;
 
     public static async verifyUserDucplication(req: Request, res: Response, next: NextFunction) {
-        try {
-            const mail: string = req.body.mail;
+        const mail: string = req.body.mail;
 
-            if (!mail) {
-                return res.status(400).send({ message: 'User mail not provided' });
-            }
-
-            const isUserDuplicated: boolean = await UsersService.isUserDuplicated(mail);
-
-            if (isUserDuplicated) {
-                return res.status(400).send({ message: 'User already exists' });
-            }
-
-            return next();
-        } catch (e: any) {
-            console.error(e);
-            return res
-                .status(e.status ? e.status : 500)
-                .json(e);
-        }
-    }
-
-    public static async verifyProfileOwnership(req: Request, res: Response, next: NextFunction) {
-        if ((req as any).skipMiddlewares) {
-            return next();
+        if (!mail) {
+            throw new BadRequestException('User mail not provided');
         }
 
-        try {
-            const accessToken: string = req.headers['x-access-token'] as string;
-            const id = req.body.id;
+        const isUserDuplicated: boolean = await UsersService.isUserDuplicated(mail);
 
-            const isProfileOwner: boolean = await UsersService.isProfileOwner(id, accessToken);
-
-            if (!isProfileOwner) {
-                return res.status(400).send({ message: 'Unauthorized' });
-            }
-
-            return next();
-        } catch (e: any) {
-            console.error(e);
-            return res
-                .status(e.status ? e.status : 500)
-                .json(e);
+        if (isUserDuplicated) {
+            throw new BadRequestException('User already exists');
         }
+
+        return next();
     }
 
     public static async isApiCall(req: Request, res: Response, next: NextFunction) {
