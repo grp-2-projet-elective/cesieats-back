@@ -5,11 +5,11 @@ export interface IRestaurant extends Document {
     description?: string,
     image: string,
     categories?: Array<string>,
-    restaurantOwnerId: number,
+    restaurantOwnerId: string,
     openingHours: string,
     location: {
         city: string,
-        zipCode: number,
+        zipCode: string,
         address: string,
         latitude: number,
         longitude: number,
@@ -21,7 +21,7 @@ export const RestaurantSchema: Schema = new Schema({
     description: { type: String, required: false },
     image: { type: String, required: true },
     categories: { type: Array, required: true },
-    restaurantOwnerId: { type: Number, required: true },
+    restaurantOwnerId: { type: String, required: true },
     location: {
         city: { type: String, required: true },
         zipCode: { type: String, required: true },
