@@ -23,7 +23,7 @@ export abstract class UsersAuthMiddleware {
             return next();
         } catch (error) {
             UsersAuthMiddleware.Logger.error(error);
-            throw error;
+            res.status((error as any).status).json(error);
         }
     }
 

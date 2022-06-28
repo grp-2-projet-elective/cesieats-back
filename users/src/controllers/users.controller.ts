@@ -15,7 +15,7 @@ const UsersController = Router();
  */
 const usersService = new UsersService();
 
-UsersController.get('/stats', async (req, res) => {
+UsersController.get('/stats', async (req, res, next) => {
     Logger.info('Requesting users stats');
     try {
         const response = await usersService.getStats();
@@ -25,14 +25,15 @@ UsersController.get('/stats', async (req, res) => {
             .json(response);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
+        // throw error;
     }
 });
 
 /**
  * Trouve tous les users
  */
-UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req, res) => {
+UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req, res, next) => {
     Logger.info('Requesting all users');
     try {
         return res
@@ -40,14 +41,15 @@ UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req
             .json(await usersService.findAll());
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
+        // throw error;
     }
 });
 
 /**
  * Trouve un user en particulier par son email
  */
-UsersController.get('/:id?/:mail?', async (req, res) => {
+UsersController.get('/:id?/:mail?', async (req, res, next) => {
     Logger.info('Requesting single user');
     try {
         const id = Number(req.params.id);
@@ -73,14 +75,16 @@ UsersController.get('/:id?/:mail?', async (req, res) => {
 
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
+        // throw error;
+        // next(error);
     }
 });
 
 /**
  * Créé un user
  */
-UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req, res) => {
+UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req, res, next) => {
     Logger.info('Requesting user creation');
     try {
         const createdUser = await usersService.create(req.body);
@@ -90,14 +94,16 @@ UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req
             .json(createdUser);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
+        // throw error;
+        // next(error);
     }
 });
 
 /**
  * Mise à jour d'un user
  */
-UsersController.patch('/:id', async (req, res) => {
+UsersController.patch('/:id', async (req, res, next) => {
     Logger.info('Requesting user update');
     try {
         const id = Number(req.params.id);
@@ -113,14 +119,16 @@ UsersController.patch('/:id', async (req, res) => {
             .json(updatedUser);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
+        // throw error;
+        // next(error);
     }
 });
 
 /**
  * Suppression d'un user
  */
-UsersController.delete('/:id', async (req, res) => {
+UsersController.delete('/:id', async (req, res, next) => {
     Logger.info('Requesting user deletion');
     try {
         const id = Number(req.params.id);
@@ -136,7 +144,9 @@ UsersController.delete('/:id', async (req, res) => {
             .json(response);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        // throw error;
+        res.json(error);
+        // next(error);
     }
 });
 

@@ -18,7 +18,7 @@ const authService = new AuthService();
 /**
  * Enregistrer un nouvel user
  */
-AuthController.post('/register', async (req, res) => {
+AuthController.post('/register', async (req, res, next) => {
     Logger.info('Requesting account registration');
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -33,9 +33,9 @@ AuthController.post('/register', async (req, res) => {
         return res
             .status(201)
             .json(createdUser);
-    } catch (error) {
+    } catch (error: any) {
         Logger.error(error);
-        throw error;
+        res.status(error.status).json(error);
     }
 });
 
@@ -43,39 +43,39 @@ AuthController.post('/register', async (req, res) => {
 /**
  * Connecter un user
  */
-AuthController.post('/login', async (req, res) => {
+AuthController.post('/login', async (req, res, next) => {
     Logger.info('Requesting account login');
     try {
         const loginInformations = await authService.login(req.body.mail, req.body.password);
         return res.status(201).json(loginInformations);
-    } catch (error) {
+    } catch (error: any) {
         Logger.error(error);
-        throw error;
+        res.status(error.status).json(error);
     }
 });
 
-AuthController.post("/refreshToken", async (req, res) => {
+AuthController.post("/refreshToken", async (req, res, next) => {
     Logger.info('Requesting account token refresh');
     try {
         const tokens = await authService.refreshToken(req.body.mail, req.body.refreshToken);
 
         return res.status(200).send(tokens);
-    } catch (error) {
+    } catch (error: any) {
         Logger.error(error);
-        throw error;
+        res.status(error.status).json(error);
     }
 });
 
 
-AuthController.post("/logout", async (req, res) => {
+AuthController.post("/logout", async (req, res, next) => {
     Logger.info('Requesting account logout');
     try {
         const logoutResponse = await authService.logout(req.body.id);
 
         return res.status(logoutResponse.status).send(logoutResponse.message);
-    } catch (error) {
+    } catch (error: any) {
         Logger.error(error);
-        throw error;
+        res.status(error.status).json(error);
     }
 });
 

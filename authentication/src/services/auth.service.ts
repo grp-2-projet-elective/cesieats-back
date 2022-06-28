@@ -125,9 +125,9 @@ export class AuthService {
 
             const user = (await axios.get(apiUrl)).data;
             return user;
-        } catch (error) {
+        } catch (error: any) {
             this.Logger.error(error);
-            throw error;
+            throw error?.response?.data ? error?.response?.data : error;
         }
     }
 
@@ -142,9 +142,9 @@ export class AuthService {
             const user = (await axios.post(apiUrl, body)).data;
 
             return user as any;
-        } catch (error) {
+        } catch (error: any) {
             this.Logger.error(error);
-            throw error;
+            throw error?.response?.data ? error?.response?.data : error;
         }
     }
 
@@ -159,9 +159,9 @@ export class AuthService {
             const user = (await axios.patch(apiUrl, body)).data;
 
             return user as any;
-        } catch (error) {
+        } catch (error: any) {
             this.Logger.error(error);
-            throw error;
+            throw error?.response?.data ? error?.response?.data : error;
         }
     }
 }
