@@ -3,7 +3,7 @@ import { model, Schema, Model, Document } from 'mongoose';
 export interface IMenu extends Document {
     name: string,
     description?: string,
-    products: Array<number>,
+    products: Array<string>,
     restaurant: object,
     price: number,
     image: string,
@@ -14,7 +14,7 @@ export const MenuSchema: Schema = new Schema({
     description: { type: String, required: false },
     products: { type: Array, required: true },
     restaurant: { type: Object, required: true },
-    price: { type: String, required: true },
+    price: { type: Number, required: true },
     image: { type: String, required: true },
 });
 

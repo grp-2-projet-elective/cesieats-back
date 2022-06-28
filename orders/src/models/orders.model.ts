@@ -11,10 +11,10 @@ export interface IOrder extends Document {
     },
     date: Date,
     orderState: string,
-    customerId: number,
+    customerId: string,
     location: {
         city: string,
-        zipCode: number,
+        zipCode: string,
         address: string,
         latitude: number,
         longitude: number,
@@ -31,7 +31,8 @@ export const OrderSchema: Schema = new Schema({
         totalPrice: { type: Number, required: true },
     },
     date: { type: Date, required: true },
-    customerId: { type: Number, required: true },
+    orderState: { type: String, required: true },
+    customerId: { type: String, required: true },
     location: {
         city: { type: String, required: true },
         zipCode: { type: String, required: true },

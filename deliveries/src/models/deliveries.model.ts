@@ -1,15 +1,15 @@
 import { Document, model, Model, Schema } from 'mongoose';
 
 export interface IDelivery extends Document {
-    orderId: number,
+    order: object,
     restaurant: object,
     date: Date,
     deliveryState: string,
-    deliveryManId: number,
-    customerId: number,
+    deliveryManId: string,
+    customerId: string,
     location: {
         city: string,
-        zipCode: number,
+        zipCode: string,
         address: string,
         latitude: number,
         longitude: number,
@@ -17,12 +17,12 @@ export interface IDelivery extends Document {
 }
 
 export const DeliverySchema: Schema = new Schema({
-    orderId: { type: Number, required: true },
+    order: { type: Object, required: true },
     restaurant: { type: Object, required: true },
     date: { type: Date, required: true },
     deliveryState: { type: String, required: true },
-    deliveryManId: { type: Number, required: true },
-    customerId: { type: Number, required: true },
+    deliveryManId: { type: String, required: true },
+    customerId: { type: String, required: true },
     location: {
         city: { type: String, required: true },
         zipCode: { type: String, required: true },
