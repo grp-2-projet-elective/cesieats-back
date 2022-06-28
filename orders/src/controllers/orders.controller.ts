@@ -19,9 +19,14 @@ const service = new OrdersService();
  */
 OrdersController.get('/', async (req, res) => {
     Logger.info('Requesting all orders');
-    return res
-        .status(200)
-        .json(await service.findAll());
+    try {
+        return res
+            .status(200)
+            .json(await service.findAll());
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 /**
@@ -29,21 +34,26 @@ OrdersController.get('/', async (req, res) => {
  */
 OrdersController.get('/:id', async (req, res) => {
     Logger.info('Requesting single user');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const order = await service.findOne(id);
+
+        if (!order) {
+            throw new NotFoundException('No order found');
+        }
+
+        return res
+            .status(200)
+            .json(order);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const order = await service.findOne(id);
-
-    if (!order) {
-        throw new NotFoundException('No order found');
-    }
-
-    return res
-        .status(200)
-        .json(order);
 });
 
 /**
@@ -51,11 +61,16 @@ OrdersController.get('/:id', async (req, res) => {
  */
 OrdersController.post('/', async (req, res) => {
     Logger.info('Requesting order creation');
-    const createdOrder = await service.create(req.body);
+    try {
+        const createdOrder = await service.create(req.body);
 
-    return res
-        .status(201)
-        .json(createdOrder);
+        return res
+            .status(201)
+            .json(createdOrder);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 /**
@@ -63,17 +78,22 @@ OrdersController.post('/', async (req, res) => {
  */
 OrdersController.patch('/:id', async (req, res) => {
     Logger.info('Requesting order update');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const updatedOrder = await service.update(id, req.body);
+
+        return res
+            .status(200)
+            .json(updatedOrder);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const updatedOrder = await service.update(id, req.body);
-
-    return res
-        .status(200)
-        .json(updatedOrder);
 });
 
 /**
@@ -81,15 +101,20 @@ OrdersController.patch('/:id', async (req, res) => {
  */
 OrdersController.delete('/:id', async (req, res) => {
     Logger.info('Requesting order deletion');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        return res
+            .status(200)
+            .json(await service.delete(id));
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    return res
-        .status(200)
-        .json(await service.delete(id));
 });
 
 /**

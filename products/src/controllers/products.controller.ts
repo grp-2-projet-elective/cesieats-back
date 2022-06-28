@@ -19,9 +19,14 @@ const service = new ProductsService();
  */
 ProductsController.get('/', async (req, res) => {
     Logger.info('Requesting all products');
-    return res
-        .status(200)
-        .json(await service.findAll());
+    try {
+        return res
+            .status(200)
+            .json(await service.findAll());
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 /**
@@ -29,21 +34,26 @@ ProductsController.get('/', async (req, res) => {
  */
 ProductsController.get('/:id', async (req, res) => {
     Logger.info('Requesting single product');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const product = await service.findOne(id);
+
+        if (!product) {
+            throw new NotFoundException('No product found');
+        }
+
+        return res
+            .status(200)
+            .json(product);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const product = await service.findOne(id);
-
-    if (!product) {
-        throw new NotFoundException('No product found');
-    }
-
-    return res
-        .status(200)
-        .json(product);
 });
 
 /**
@@ -51,11 +61,16 @@ ProductsController.get('/:id', async (req, res) => {
  */
 ProductsController.post('/', async (req, res) => {
     Logger.info('Requesting product creation');
-    const createdProduct = await service.create(req.body);
+    try {
+        const createdProduct = await service.create(req.body);
 
-    return res
-        .status(201)
-        .json(createdProduct);
+        return res
+            .status(201)
+            .json(createdProduct);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 /**
@@ -63,17 +78,22 @@ ProductsController.post('/', async (req, res) => {
  */
 ProductsController.patch('/:id', async (req, res) => {
     Logger.info('Requesting product update');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const updatedProduct = await service.update(id, req.body);
+
+        return res
+            .status(200)
+            .json(updatedProduct);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const updatedProduct = await service.update(id, req.body);
-
-    return res
-        .status(200)
-        .json(updatedProduct);
 });
 
 /**
@@ -81,15 +101,20 @@ ProductsController.patch('/:id', async (req, res) => {
  */
 ProductsController.delete('/:id', async (req, res) => {
     Logger.info('Requesting product deletion');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        return res
+            .status(200)
+            .json(await service.delete(id));
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    return res
-        .status(200)
-        .json(await service.delete(id));
 });
 
 /**

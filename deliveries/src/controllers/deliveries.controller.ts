@@ -19,9 +19,14 @@ const service = new DeliveriesService();
  */
 DeliveriesController.get('/', async (req, res) => {
     Logger.info('Requesting all deliveries');
-    return res
-        .status(200)
-        .json(await service.findAll());
+    try {
+        return res
+            .status(200)
+            .json(await service.findAll());
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 /**
@@ -29,21 +34,26 @@ DeliveriesController.get('/', async (req, res) => {
  */
 DeliveriesController.get('/:id', async (req, res) => {
     Logger.info('Requesting single delivery');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const delivery = await service.findOne(id);
+
+        if (!delivery) {
+            throw new NotFoundException('No delivery found');
+        }
+
+        return res
+            .status(200)
+            .json(delivery);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const delivery = await service.findOne(id);
-
-    if (!delivery) {
-        throw new NotFoundException('No delivery found');
-    }
-
-    return res
-        .status(200)
-        .json(delivery);
 });
 
 /**
@@ -51,11 +61,16 @@ DeliveriesController.get('/:id', async (req, res) => {
  */
 DeliveriesController.post('/', async (req, res) => {
     Logger.info('Requesting delivery creation');
-    const createdDelivery = await service.create(req.body);
+    try {
+        const createdDelivery = await service.create(req.body);
 
-    return res
-        .status(201)
-        .json(createdDelivery);
+        return res
+            .status(201)
+            .json(createdDelivery);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 /**
@@ -63,17 +78,22 @@ DeliveriesController.post('/', async (req, res) => {
  */
 DeliveriesController.patch('/:id', async (req, res) => {
     Logger.info('Requesting delivery update');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const updatedDelivery = await service.update(id, req.body);
+
+        return res
+            .status(200)
+            .json(updatedDelivery);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const updatedDelivery = await service.update(id, req.body);
-
-    return res
-        .status(200)
-        .json(updatedDelivery);
 });
 
 /**
@@ -81,15 +101,20 @@ DeliveriesController.patch('/:id', async (req, res) => {
  */
 DeliveriesController.delete('/:id', async (req, res) => {
     Logger.info('Requesting delivery deletion');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        return res
+            .status(200)
+            .json(await service.delete(id));
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    return res
-        .status(200)
-        .json(await service.delete(id));
 });
 
 /**

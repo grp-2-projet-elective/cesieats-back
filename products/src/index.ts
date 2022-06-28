@@ -4,6 +4,7 @@ import cors from 'cors';
 import 'dotenv/config';
 import { environment } from 'environment/environment';
 import express from 'express';
+import { ProductsAuthMiddleware } from 'middlewares/products-auth.middleware';
 import { connect } from 'mongoose';
 
 const Logger: LoggerService = LoggerService.Instance('Products API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/products');
@@ -29,7 +30,7 @@ app.use(cors());
 /**
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
-app.use('/api/v1/products', AuthMiddlewares.verifyAccessToken, ProductsController);
+app.use('/api/v1/products', ProductsAuthMiddleware.isApiCall, AuthMiddlewares.verifyAccessToken, ProductsController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)

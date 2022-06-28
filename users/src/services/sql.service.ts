@@ -20,6 +20,7 @@ export class SqlService {
 
             this.usersService.User = user;
             this.usersService.Role = role;
+            this.usersService.sequelize = sequelize;
 
             await this.populateRoles(role);
 

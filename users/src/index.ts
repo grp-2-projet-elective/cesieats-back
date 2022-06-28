@@ -1,10 +1,9 @@
-import { AuthMiddlewares, ExceptionsHandler, LoggerService, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
+import { ExceptionsHandler, LoggerService, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
 import { UsersController, usersService } from 'controllers/users.controller';
 import cors from 'cors';
 import 'dotenv/config';
 import { environment } from 'environment/environment';
 import express from 'express';
-import { UsersAuthMiddleware } from 'middlewares/users-auth.middleware';
 import { SqlService } from 'services/sql.service';
 
 const Logger: LoggerService = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
@@ -30,7 +29,8 @@ app.use(cors());
 /**
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
-app.use('/api/v1/users', UsersAuthMiddleware.isApiCall, AuthMiddlewares.verifyAccessToken, UsersController);
+// app.use('/api/v1/users', UsersAuthMiddleware.isApiCall, AuthMiddlewares.verifyAccessToken, UsersController);
+app.use('/api/v1/users', UsersController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)
@@ -44,7 +44,6 @@ app.all('*', UnknownRoutesHandler);
 
 /**
  * Gestion des erreurs
- * /!\ Cela doit être le dernier `app.use`
  */
 app.use(ExceptionsHandler);
 

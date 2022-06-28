@@ -2,7 +2,7 @@ import { Document, model, Model, Schema } from 'mongoose';
 
 export interface IDelivery extends Document {
     orderId: number,
-    restaurantId: string,
+    restaurant: object,
     date: Date,
     deliveryState: string,
     deliveryManId: number,
@@ -18,7 +18,7 @@ export interface IDelivery extends Document {
 
 export const DeliverySchema: Schema = new Schema({
     orderId: { type: Number, required: true },
-    restaurantId: { type: String, required: true },
+    restaurant: { type: Object, required: true },
     date: { type: Date, required: true },
     deliveryState: { type: String, required: true },
     deliveryManId: { type: Number, required: true },

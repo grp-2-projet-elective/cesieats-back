@@ -11,9 +11,14 @@ export class DeliveriesService {
      * Trouve tous les deliveries
      */
     async findAll(): Promise<Array<IDelivery>> {
-        const deliveries = await Delivery.find();
+        try {
+            const deliveries = await Delivery.find();
 
-        return deliveries;
+            return deliveries;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
@@ -21,9 +26,14 @@ export class DeliveriesService {
      * @param id - ID unique de l'delivery
      */
     async findOne(id: string): Promise<IDelivery | null | undefined> {
-        const delivery = await Delivery.findById(id);
+        try {
+            const delivery = await Delivery.findById(id);
 
-        return delivery;
+            return delivery;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
@@ -35,16 +45,21 @@ export class DeliveriesService {
      * @param id - ID unique de l'delivery
      */
     async update(id: string, deliveryData: Partial<IDelivery>): Promise<IDelivery | null | undefined> {
-        const delivery = await this.findOne(id);
+        try {
+            const delivery = await this.findOne(id);
 
-        if (!delivery) {
-            throw new NotFoundException('No delivery found');
+            if (!delivery) {
+                throw new NotFoundException('No delivery found');
+            }
+
+            const updatedDelivery = await Delivery.findByIdAndUpdate(id, deliveryData, { new: true });
+
+            this.Logger.info('Delivery updated');
+            return updatedDelivery;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
         }
-
-        const updatedDelivery = await Delivery.findByIdAndUpdate(id, deliveryData, { new: true });
-
-        this.Logger.info('Delivery updated');
-        return updatedDelivery;
     }
 
     /**
@@ -55,23 +70,33 @@ export class DeliveriesService {
      * @param deliveryData - Un objet correspondant à un delivery. Attention, on ne prend pas l'id avec.
      */
     async create(deliveryData: IDelivery): Promise<IDelivery> {
-        const newDelivery: IDelivery = await Delivery.create(deliveryData);
+        try {
+            const newDelivery: IDelivery = await Delivery.create(deliveryData);
 
-        this.Logger.info('Delivery created');
-        return newDelivery;
+            this.Logger.info('Delivery created');
+            return newDelivery;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
      * Suppression d'un delivery
      */
     async delete(id: string) {
-        const delivery = await this.findOne(id);
+        try {
+            const delivery = await this.findOne(id);
 
-        if (!delivery) {
-            throw new NotFoundException('No delivery found');
+            if (!delivery) {
+                throw new NotFoundException('No delivery found');
+            }
+
+            await Delivery.findByIdAndRemove(id);
+            this.Logger.info('Delivery deleted');
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
         }
-
-        await Delivery.findByIdAndRemove(id);
-        this.Logger.info('Delivery deleted');
     }
 }

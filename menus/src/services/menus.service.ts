@@ -10,9 +10,14 @@ export class MenusService {
      * Trouve tous les menus
      */
     async findAll(): Promise<Array<IMenu>> {
-        const menus = await Menu.find();
+        try {
+            const menus = await Menu.find();
 
-        return menus;
+            return menus;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
@@ -20,9 +25,14 @@ export class MenusService {
      * @param id - ID unique de l'menu
      */
     async findOne(id: string): Promise<IMenu | null | undefined> {
-        const menu = await Menu.findById(id);
+        try {
+            const menu = await Menu.findById(id);
 
-        return menu;
+            return menu;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
@@ -34,16 +44,21 @@ export class MenusService {
      * @param id - ID unique de l'menu
      */
     async update(id: string, menuData: Partial<IMenu>): Promise<IMenu | null | undefined> {
-        const menu = await this.findOne(id);
+        try {
+            const menu = await this.findOne(id);
 
-        if (!menu) {
-            throw new NotFoundException('No menu found');
+            if (!menu) {
+                throw new NotFoundException('No menu found');
+            }
+
+            const updatedMenu = await Menu.findByIdAndUpdate(id, menuData, { new: true });
+
+            this.Logger.info('Menu updated');
+            return updatedMenu;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
         }
-
-        const updatedMenu = await Menu.findByIdAndUpdate(id, menuData, { new: true });
-
-        this.Logger.info('Menu updated');
-        return updatedMenu;
     }
 
     /**
@@ -54,23 +69,33 @@ export class MenusService {
      * @param menuData - Un objet correspondant à un menu. Attention, on ne prend pas l'id avec.
      */
     async create(menuData: IMenu): Promise<IMenu> {
-        const newMenu: IMenu = await Menu.create(menuData);
+        try {
+            const newMenu: IMenu = await Menu.create(menuData);
 
-        this.Logger.info('Menu created');
-        return newMenu;
+            this.Logger.info('Menu created');
+            return newMenu;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
      * Suppression d'un menu
      */
     async delete(id: string) {
-        const menu = await this.findOne(id);
+        try {
+            const menu = await this.findOne(id);
 
-        if (!menu) {
-            throw new NotFoundException('No menu found');
+            if (!menu) {
+                throw new NotFoundException('No menu found');
+            }
+
+            await Menu.findByIdAndRemove(id);
+            this.Logger.info('Menu deleted');
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
         }
-
-        await Menu.findByIdAndRemove(id);
-        this.Logger.info('Menu deleted');
     }
 }

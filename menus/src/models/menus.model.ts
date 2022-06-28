@@ -4,7 +4,7 @@ export interface IMenu extends Document {
     name: string,
     description?: string,
     products: Array<number>,
-    restaurantId: string,
+    restaurant: object,
     price: number,
     image: string,
 }
@@ -13,7 +13,7 @@ export const MenuSchema: Schema = new Schema({
     name: { type: String, required: true },
     description: { type: String, required: false },
     products: { type: Array, required: true },
-    restaurantId: { type: String, required: true },
+    restaurant: { type: Object, required: true },
     price: { type: String, required: true },
     image: { type: String, required: true },
 });

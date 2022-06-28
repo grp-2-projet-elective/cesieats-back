@@ -15,14 +15,33 @@ const UsersController = Router();
  */
 const usersService = new UsersService();
 
+UsersController.get('/stats', async (req, res) => {
+    Logger.info('Requesting users stats');
+    try {
+        const response = await usersService.getStats();
+
+        return res
+            .status(200)
+            .json(response);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
+});
+
 /**
  * Trouve tous les users
  */
 UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req, res) => {
     Logger.info('Requesting all users');
-    return res
-        .status(200)
-        .json(await usersService.findAll());
+    try {
+        return res
+            .status(200)
+            .json(await usersService.findAll());
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 /**
@@ -30,26 +49,32 @@ UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req
  */
 UsersController.get('/:id?/:mail?', async (req, res) => {
     Logger.info('Requesting single user');
-    const id = Number(req.params.id);
-    const mail = req.params.mail;
+    try {
+        const id = Number(req.params.id);
+        const mail = req.params.mail;
 
-    if (!id && !mail) {
-        throw new BadRequestException('Invalid parameters');
-    }
+        if (!id && !mail) {
+            throw new BadRequestException('Invalid parameters');
+        }
 
-    if (mail) {
-        const user = await usersService.findOneByMail(mail);
+        if (mail) {
+            const user = await usersService.findOneByMail(mail);
+
+            return res
+                .status(200)
+                .json(user);
+        }
+
+        const user = await usersService.findOne(id);
 
         return res
             .status(200)
             .json(user);
+
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const user = await usersService.findOne(id);
-
-    return res
-        .status(200)
-        .json(user);
 });
 
 /**
@@ -57,11 +82,16 @@ UsersController.get('/:id?/:mail?', async (req, res) => {
  */
 UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req, res) => {
     Logger.info('Requesting user creation');
-    const createdUser = await usersService.create(req.body);
+    try {
+        const createdUser = await usersService.create(req.body);
 
-    return res
-        .status(201)
-        .json(createdUser);
+        return res
+            .status(201)
+            .json(createdUser);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 /**
@@ -69,17 +99,22 @@ UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req
  */
 UsersController.patch('/:id', async (req, res) => {
     Logger.info('Requesting user update');
-    const id = Number(req.params.id);
+    try {
+        const id = Number(req.params.id);
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const updatedUser = await usersService.update(id, req.body);
+
+        return res
+            .status(200)
+            .json(updatedUser);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const updatedUser = await usersService.update(id, req.body);
-
-    return res
-        .status(200)
-        .json(updatedUser);
 });
 
 /**
@@ -87,17 +122,22 @@ UsersController.patch('/:id', async (req, res) => {
  */
 UsersController.delete('/:id', async (req, res) => {
     Logger.info('Requesting user deletion');
-    const id = Number(req.params.id);
+    try {
+        const id = Number(req.params.id);
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const response = await usersService.delete(id);
+
+        return res
+            .status(200)
+            .json(response);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const response = await usersService.delete(id);
-
-    return res
-        .status(200)
-        .json(response);
 });
 
 /**

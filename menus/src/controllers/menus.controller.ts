@@ -19,9 +19,14 @@ const service = new MenusService();
  */
 MenusController.get('/', async (req, res) => {
     Logger.info('Requesting all menus');
-    return res
-        .status(200)
-        .json(await service.findAll());
+    try {
+        return res
+            .status(200)
+            .json(await service.findAll());
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 /**
@@ -29,21 +34,26 @@ MenusController.get('/', async (req, res) => {
  */
 MenusController.get('/:id', async (req, res) => {
     Logger.info('Requesting single menu');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const menu = await service.findOne(id);
+
+        if (!menu) {
+            throw new NotFoundException('No menu found');
+        }
+
+        return res
+            .status(200)
+            .json(menu);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const menu = await service.findOne(id);
-
-    if (!menu) {
-        throw new NotFoundException('No menu found');
-    }
-
-    return res
-        .status(200)
-        .json(menu);
 });
 
 /**
@@ -51,11 +61,16 @@ MenusController.get('/:id', async (req, res) => {
  */
 MenusController.post('/', async (req, res) => {
     Logger.info('Requesting menu creation');
-    const createdMenu = await service.create(req.body);
+    try {
+        const createdMenu = await service.create(req.body);
 
-    return res
-        .status(201)
-        .json(createdMenu);
+        return res
+            .status(201)
+            .json(createdMenu);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 /**
@@ -63,17 +78,22 @@ MenusController.post('/', async (req, res) => {
  */
 MenusController.patch('/:id', async (req, res) => {
     Logger.info('Requesting menu update');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const updatedMenu = await service.update(id, req.body);
+
+        return res
+            .status(200)
+            .json(updatedMenu);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const updatedMenu = await service.update(id, req.body);
-
-    return res
-        .status(200)
-        .json(updatedMenu);
 });
 
 /**
@@ -81,15 +101,20 @@ MenusController.patch('/:id', async (req, res) => {
  */
 MenusController.delete('/:id', async (req, res) => {
     Logger.info('Requesting menu deletion');
-    const id = req.params.id;
+    try {
+        const id = req.params.id;
 
-    if (!id) {
-        throw new BadRequestException('Invalid id');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        return res
+            .status(200)
+            .json(await service.delete(id));
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    return res
-        .status(200)
-        .json(await service.delete(id));
 });
 
 /**
