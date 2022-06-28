@@ -1,4 +1,4 @@
-import { model, Schema, Model, Document } from 'mongoose';
+import { Document, model, Model, Schema } from 'mongoose';
 
 export interface IRestaurant extends Document {
     name: string,
@@ -32,3 +32,8 @@ export const RestaurantSchema: Schema = new Schema({
 });
 
 export const Restaurant: Model<IRestaurant> = model('Restaurant', RestaurantSchema) as Model<IRestaurant>;
+
+
+export interface RestaurantsStats {
+    restaurantsCount: number;
+}

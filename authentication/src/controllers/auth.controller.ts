@@ -20,18 +20,23 @@ const authService = new AuthService();
  */
 AuthController.post('/register', async (req, res) => {
     Logger.info('Requesting account registration');
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    try {
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-    const userInformationData: any = {
-        ...req.body,
-        password: hashedPassword
+        const userInformationData: any = {
+            ...req.body,
+            password: hashedPassword
+        }
+
+        const createdUser = await authService.register(userInformationData);
+
+        return res
+            .status(201)
+            .json(createdUser);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
     }
-
-    const createdUser = await authService.register(userInformationData);
-
-    return res
-        .status(201)
-        .json(createdUser);
 });
 
 
@@ -40,23 +45,38 @@ AuthController.post('/register', async (req, res) => {
  */
 AuthController.post('/login', async (req, res) => {
     Logger.info('Requesting account login');
-    const loginInformations = await authService.login(req.body.mail, req.body.password);
-    return res.status(201).json(loginInformations);
+    try {
+        const loginInformations = await authService.login(req.body.mail, req.body.password);
+        return res.status(201).json(loginInformations);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 AuthController.post("/refreshToken", async (req, res) => {
     Logger.info('Requesting account token refresh');
-    const tokens = await authService.refreshToken(req.body.mail, req.body.refreshToken);
+    try {
+        const tokens = await authService.refreshToken(req.body.mail, req.body.refreshToken);
 
-    return res.status(200).send(tokens);
+        return res.status(200).send(tokens);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 
 AuthController.post("/logout", async (req, res) => {
     Logger.info('Requesting account logout');
-    const logoutResponse = await authService.logout(req.body.id);
+    try {
+        const logoutResponse = await authService.logout(req.body.id);
 
-    return res.status(logoutResponse.status).send(logoutResponse.message);
+        return res.status(logoutResponse.status).send(logoutResponse.message);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
 });
 
 /**

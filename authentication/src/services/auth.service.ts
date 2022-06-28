@@ -12,19 +12,75 @@ export class AuthService {
     constructor() { }
 
     public async register(userInformationData: Partial<IUser>): Promise<IUser | void> {
-        const user = await this.createUser(userInformationData);
-        
-        this.Logger.info('New account registered');
-        return user;
+        try {
+            const user = await this.createUser(userInformationData);
+
+            this.Logger.info('New account registered');
+            return user;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     public async login(mail: string, password: string): Promise<Tokens | { status: number, message: string, [key: string]: any }> {
-        const user = await this.getUserByMail(mail);
+        try {
+            const user = await this.getUserByMail(mail);
 
-        if (!user) throw new NotFoundException('No user found');
-        const hashComparaison = await bcrypt.compare(password, user.password);
+            if (!user) throw new NotFoundException('No user found');
+            const hashComparaison = await bcrypt.compare(password, user.password);
 
-        if (hashComparaison) {
+            if (hashComparaison) {
+                const tokenData: TokenData = {
+                    id: user.id,
+                    mail: user.mail,
+                    role: user.role,
+                    restaurantId: user.role === Roles.RESTAURANT_OWNER ? 0 : undefined
+                };
+
+                const accessToken = this.generateAccessToken(tokenData);
+                const refreshToken = this.generateRefreshToken(tokenData);
+
+                const updatedUser = {
+                    ...user,
+                    accessToken,
+                    refreshToken
+                };
+
+                await this.updateUser(updatedUser);
+
+                this.Logger.info('Account logged in');
+                return { accessToken: accessToken, refreshToken: refreshToken };
+            }
+
+            throw new UnauthorizedException('Unauthorized');
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
+    }
+
+    public async logout(mail: string): Promise<any> {
+        try {
+            const user = await this.getUserByMail(mail);
+            user.refreshToken = undefined;
+
+            await this.updateUser(user);
+
+            this.Logger.info('Account logged out');
+            return { status: 204, message: 'Disconnected' };
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
+    }
+
+    public async refreshToken(mail: string, refreshToken: string): Promise<Tokens | void> {
+        try {
+            const user = await this.getUserByMail(mail);
+
+            if (user.refreshToken != refreshToken) throw new BadRequestException('Refresh Token Invalid');
+
             const tokenData: TokenData = {
                 id: user.id,
                 mail: user.mail,
@@ -32,51 +88,15 @@ export class AuthService {
                 restaurantId: user.role === Roles.RESTAURANT_OWNER ? 0 : undefined
             };
 
-            const accessToken = this.generateAccessToken(tokenData);
-            const refreshToken = this.generateRefreshToken(tokenData);
+            const newAccessToken = this.generateAccessToken(tokenData);
+            const newRefreshToken = this.generateRefreshToken(tokenData);
 
-            const updatedUser = {
-                ...user,
-                accessToken,
-                refreshToken
-            };
-
-            await this.updateUser(updatedUser);
-
-            this.Logger.info('Account logged in');
-            return { accessToken: accessToken, refreshToken: refreshToken };
+            this.Logger.info('Account token refreshed');
+            return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
         }
-
-        throw new UnauthorizedException('Unauthorized');
-    }
-
-    public async logout(mail: string): Promise<any> {
-        const user = await this.getUserByMail(mail);
-        user.refreshToken = undefined;
-
-        await this.updateUser(user);
-
-        this.Logger.info('Account logged out');
-        return { status: 204, message: 'Disconnected' };
-    }
-
-    public async refreshToken(mail: string, refreshToken: string): Promise<Tokens | void> {
-        const user = await this.getUserByMail(mail);
-
-        if (user.refreshToken != refreshToken) throw new BadRequestException('Refresh Token Invalid');
-
-        const tokenData: TokenData = {
-            id: user.id,
-            mail: user.mail,
-            role: user.role,
-            restaurantId: user.role === Roles.RESTAURANT_OWNER ? 0 : undefined
-        };
-
-        const newAccessToken = this.generateAccessToken(tokenData);
-        const newRefreshToken = this.generateRefreshToken(tokenData);
-
-        this.Logger.info('Account token refreshed');
-        return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     }
 
     /**
@@ -100,33 +120,48 @@ export class AuthService {
 
     public async getUserByMail(mail: string): Promise<any> {
         this.Logger.info('Users api request: requesting user by mail');
-        const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${mail}`;
+        try {
+            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${mail}`;
 
-        const user = (await axios.get(apiUrl)).data;
-        return user;
+            const user = (await axios.get(apiUrl)).data;
+            return user;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     public async createUser(userInformationData: Partial<IUser>): Promise<IUser> {
         this.Logger.info('Users api request: requesting user creation');
-        const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users`;
-        const body = {
-            ...userInformationData
+        try {
+            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users`;
+            const body = {
+                ...userInformationData
+            }
+
+            const user = (await axios.post(apiUrl, body)).data;
+
+            return user as any;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
         }
-
-        const user = (await axios.post(apiUrl, body)).data;
-
-        return user as any;
     }
 
     public async updateUser(userInformationData: Partial<IUser>): Promise<IUser> {
         this.Logger.info('Users api request: requesting user update');
-        const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${userInformationData.mail}`;
-        const body = {
-            ...userInformationData
+        try {
+            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${userInformationData.mail}`;
+            const body = {
+                ...userInformationData
+            }
+
+            const user = (await axios.patch(apiUrl, body)).data;
+
+            return user as any;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
         }
-
-        const user = (await axios.patch(apiUrl, body)).data;
-
-        return user as any;
     }
 }

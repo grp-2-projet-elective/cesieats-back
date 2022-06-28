@@ -1,5 +1,5 @@
 import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
-import { IOrder, Order } from 'models/orders.model';
+import { IOrder, Order, OrdersStats } from 'models/orders.model';
 
 export class OrdersService {
     private readonly Logger: LoggerService = LoggerService.Instance('Orders API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/orders');
@@ -10,9 +10,14 @@ export class OrdersService {
      * Trouve tous les orders
      */
     async findAll(): Promise<Array<IOrder>> {
-        const orders = await Order.find();
+        try {
+            const orders = await Order.find();
 
-        return orders;
+            return orders;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
@@ -20,9 +25,14 @@ export class OrdersService {
      * @param id - ID unique de l'order
      */
     async findOne(id: string): Promise<IOrder | null | undefined> {
-        const order = await Order.findById(id);
+        try {
+            const order = await Order.findById(id);
 
-        return order;
+            return order;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
@@ -34,16 +44,21 @@ export class OrdersService {
      * @param id - ID unique de l'order
      */
     async update(id: string, orderData: Partial<IOrder>): Promise<IOrder | null | undefined> {
-        const order = await this.findOne(id);
+        try {
+            const order = await this.findOne(id);
 
-        if (!order) {
-            throw new NotFoundException('No order found');
+            if (!order) {
+                throw new NotFoundException('No order found');
+            }
+
+            const updatedOrder = await Order.findByIdAndUpdate(id, orderData, { new: true });
+
+            this.Logger.info('Order updated');
+            return updatedOrder;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
         }
-
-        const updatedOrder = await Order.findByIdAndUpdate(id, orderData, { new: true });
-
-        this.Logger.info('Order updated');
-        return updatedOrder;
     }
 
     /**
@@ -54,23 +69,46 @@ export class OrdersService {
      * @param orderData - Un objet correspondant à un order. Attention, on ne prend pas l'id avec.
      */
     async create(orderData: IOrder): Promise<IOrder> {
-        const newOrder: IOrder = await Order.create(orderData);
+        try {
+            const newOrder: IOrder = await Order.create(orderData);
 
-        this.Logger.info('Order created');
-        return newOrder;
+            this.Logger.info('Order created');
+            return newOrder;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
      * Suppression d'un order
      */
     async delete(id: string) {
-        const order = await this.findOne(id);
+        try {
+            const order = await this.findOne(id);
 
-        if (!order) {
-            throw new NotFoundException('No order found');
+            if (!order) {
+                throw new NotFoundException('No order found');
+            }
+
+            await Order.findByIdAndRemove(id);
+            this.Logger.info('Order deleted');
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
         }
+    }
 
-        await Order.findByIdAndRemove(id);
-        this.Logger.info('Order deleted');
+    public async getStats(): Promise<OrdersStats | void> {
+        try {
+            const ordersCount = await Order.count();
+
+            return {
+                ordersCount
+            }
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 }

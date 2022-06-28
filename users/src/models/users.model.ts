@@ -43,3 +43,16 @@ export class Role extends Model<InferAttributes<Role>, InferCreationAttributes<R
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
+
+export interface UsersStats {
+  usersCount: number;
+
+  customersCount: number;
+  restaurantOwnersCount: number;
+  deliveryMansCount: number;
+  technicalDepartmentCount: number;
+  comercialDepartmentsCount: number;
+  externalsCount: number;
+
+  citiesCount: number;
+}

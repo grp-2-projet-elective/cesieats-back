@@ -1,5 +1,5 @@
 import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
-import { IProduct, Product } from 'models/products.model';
+import { IProduct, Product, ProductsStats } from 'models/products.model';
 
 export class ProductsService {
 
@@ -11,9 +11,14 @@ export class ProductsService {
      * Trouve tous les products
      */
     async findAll(): Promise<Array<IProduct>> {
-        const products = await Product.find();
+        try {
+            const products = await Product.find();
 
-        return products;
+            return products;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
@@ -21,9 +26,14 @@ export class ProductsService {
      * @param id - ID unique de l'product
      */
     async findOne(id: string): Promise<IProduct | null | undefined> {
-        const product = await Product.findById(id);
+        try {
+            const product = await Product.findById(id);
 
-        return product;
+            return product;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
@@ -35,16 +45,21 @@ export class ProductsService {
      * @param id - ID unique de l'product
      */
     async update(id: string, productData: Partial<IProduct>): Promise<IProduct | null | undefined> {
-        const product = await this.findOne(id);
+        try {
+            const product = await this.findOne(id);
 
-        if (!product) {
-            throw new NotFoundException('No product found');
+            if (!product) {
+                throw new NotFoundException('No product found');
+            }
+
+            const updatedProduct = await Product.findByIdAndUpdate(id, productData, { new: true });
+
+            this.Logger.info('Product updated');
+            return updatedProduct;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
         }
-
-        const updatedProduct = await Product.findByIdAndUpdate(id, productData, { new: true });
-
-        this.Logger.info('Product updated');
-        return updatedProduct;
     }
 
     /**
@@ -55,23 +70,46 @@ export class ProductsService {
      * @param productData - Un objet correspondant à un product. Attention, on ne prend pas l'id avec.
      */
     async create(productData: IProduct): Promise<IProduct> {
-        const newProduct: IProduct = await Product.create(productData);
+        try {
+            const newProduct: IProduct = await Product.create(productData);
 
-        this.Logger.info('Product created');
-        return newProduct;
+            this.Logger.info('Product created');
+            return newProduct;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 
     /**
      * Suppression d'un product
      */
     async delete(id: string) {
-        const product = await this.findOne(id);
+        try {
+            const product = await this.findOne(id);
 
-        if (!product) {
-            throw new NotFoundException('No product found');
+            if (!product) {
+                throw new NotFoundException('No product found');
+            }
+
+            await Product.findByIdAndRemove(id);
+            this.Logger.info('Product deleted');
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
         }
+    }
+    
+    public async getStats(): Promise<ProductsStats | void> {
+        try {
+            const productsCount = await Product.count();
 
-        await Product.findByIdAndRemove(id);
-        this.Logger.info('Product deleted');
+            return {
+                productsCount
+            }
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
     }
 }
