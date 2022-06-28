@@ -14,6 +14,20 @@ const MenusController = Router();
  */
 const service = new MenusService();
 
+MenusController.get('/stats', async (req, res) => {
+    Logger.info('Requesting menus stats');
+    try {
+        const response = await service.getStats();
+
+        return res
+            .status(200)
+            .json(response);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
+});
+
 /**
  * Trouve tous les menus
  */

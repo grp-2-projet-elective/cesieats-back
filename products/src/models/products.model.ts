@@ -1,4 +1,4 @@
-import { model, Schema, Model, Document } from 'mongoose';
+import { Document, model, Model, Schema } from 'mongoose';
 
 export interface IProduct extends Document {
     name: string,
@@ -21,3 +21,7 @@ export const ProductSchema: Schema = new Schema({
 });
 
 export const Product: Model<IProduct> = model('Product', ProductSchema);
+
+export interface ProductsStats {
+    productsCount: number;
+}

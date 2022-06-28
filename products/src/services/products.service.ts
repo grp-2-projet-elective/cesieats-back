@@ -1,5 +1,5 @@
 import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
-import { IProduct, Product } from 'models/products.model';
+import { IProduct, Product, ProductsStats } from 'models/products.model';
 
 export class ProductsService {
 
@@ -94,6 +94,19 @@ export class ProductsService {
 
             await Product.findByIdAndRemove(id);
             this.Logger.info('Product deleted');
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
+    }
+    
+    public async getStats(): Promise<ProductsStats | void> {
+        try {
+            const productsCount = await Product.count();
+
+            return {
+                productsCount
+            }
         } catch (error) {
             this.Logger.error(error);
             throw error;

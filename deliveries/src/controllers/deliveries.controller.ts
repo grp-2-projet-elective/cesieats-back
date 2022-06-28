@@ -14,6 +14,20 @@ const DeliveriesController = Router();
  */
 const service = new DeliveriesService();
 
+DeliveriesController.get('/stats', async (req, res) => {
+    Logger.info('Requesting deliveries stats');
+    try {
+        const response = await service.getStats();
+
+        return res
+            .status(200)
+            .json(response);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
+});
+
 /**
  * Trouve tous les deliveries
  */

@@ -42,3 +42,7 @@ export const OrderSchema: Schema = new Schema({
 });
 
 export const Order: Model<IOrder> = model('Order', OrderSchema);
+
+export interface OrdersStats {
+    ordersCount: number;
+}

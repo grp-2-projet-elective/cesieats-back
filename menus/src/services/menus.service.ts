@@ -1,5 +1,5 @@
 import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
-import { IMenu, Menu } from 'models/menus.model';
+import { IMenu, Menu, MenusStats } from 'models/menus.model';
 
 export class MenusService {
     private readonly Logger: LoggerService = LoggerService.Instance('Menus API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/menus');
@@ -93,6 +93,19 @@ export class MenusService {
 
             await Menu.findByIdAndRemove(id);
             this.Logger.info('Menu deleted');
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
+    }
+    
+    public async getStats(): Promise<MenusStats | void> {
+        try {
+            const menusCount = await Menu.count();
+
+            return {
+                menusCount
+            }
         } catch (error) {
             this.Logger.error(error);
             throw error;

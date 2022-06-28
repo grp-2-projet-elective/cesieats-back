@@ -19,3 +19,7 @@ export const MenuSchema: Schema = new Schema({
 });
 
 export const Menu: Model<IMenu> = model('Menu', MenuSchema);
+
+export interface MenusStats {
+    menusCount: number;
+}

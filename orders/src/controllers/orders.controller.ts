@@ -14,6 +14,20 @@ const OrdersController = Router();
  */
 const service = new OrdersService();
 
+OrdersController.get('/stats', async (req, res) => {
+    Logger.info('Requesting orders stats');
+    try {
+        const response = await service.getStats();
+
+        return res
+            .status(200)
+            .json(response);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
+});
+
 /**
  * Trouve tous les orders
  */

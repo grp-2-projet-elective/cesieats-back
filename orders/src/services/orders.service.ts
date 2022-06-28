@@ -1,5 +1,5 @@
 import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
-import { IOrder, Order } from 'models/orders.model';
+import { IOrder, Order, OrdersStats } from 'models/orders.model';
 
 export class OrdersService {
     private readonly Logger: LoggerService = LoggerService.Instance('Orders API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/orders');
@@ -93,6 +93,19 @@ export class OrdersService {
 
             await Order.findByIdAndRemove(id);
             this.Logger.info('Order deleted');
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
+    }
+
+    public async getStats(): Promise<OrdersStats | void> {
+        try {
+            const ordersCount = await Order.count();
+
+            return {
+                ordersCount
+            }
         } catch (error) {
             this.Logger.error(error);
             throw error;

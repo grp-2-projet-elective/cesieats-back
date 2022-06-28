@@ -1,5 +1,5 @@
 import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
-import { Delivery, IDelivery } from 'models/deliveries.model';
+import { DeliveriesStats, Delivery, IDelivery } from 'models/deliveries.model';
 
 export class DeliveriesService {
 
@@ -94,6 +94,20 @@ export class DeliveriesService {
 
             await Delivery.findByIdAndRemove(id);
             this.Logger.info('Delivery deleted');
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
+    }
+
+    
+    public async getStats(): Promise<DeliveriesStats | void> {
+        try {
+            const deliveriesCount = await Delivery.count();
+
+            return {
+                deliveriesCount
+            }
         } catch (error) {
             this.Logger.error(error);
             throw error;

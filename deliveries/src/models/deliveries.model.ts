@@ -33,3 +33,7 @@ export const DeliverySchema: Schema = new Schema({
 });
 
 export const Delivery: Model<IDelivery> = model('Delivery', DeliverySchema);
+
+export interface DeliveriesStats {
+    deliveriesCount: number;
+}
