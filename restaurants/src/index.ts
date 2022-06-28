@@ -7,7 +7,7 @@ import { RestaurantsController } from 'controllers/restaurants.controller';
 import { RestaurantAuthMiddleware } from 'middlewares/restaurant-auth.middleware';
 import { AuthMiddlewares, ExceptionsHandler, LoggerService, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
 
-const Logger: LoggerService = LoggerService.Instance('Restaurants API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/restaurants');
+const Logger: LoggerService = LoggerService.Instance('Restaurants API', environment.logDir);
 
 /**middlewares/restaurant-auth.middleware
  * On crée une nouvelle "application" express

@@ -7,7 +7,7 @@ import { TokenData, Tokens } from 'models/auth.model';
 
 export class AuthService {
 
-    private readonly Logger: LoggerService = LoggerService.Instance('Auth API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/auth');
+    private readonly Logger: LoggerService = LoggerService.Instance('Auth API', environment.logDir);
 
     constructor() { }
 

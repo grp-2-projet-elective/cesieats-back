@@ -1,9 +1,10 @@
 import { LoggerService } from '@grp-2-projet-elective/cesieats-helpers';
 import * as bcrypt from 'bcrypt';
+import { environment } from 'environment/environment';
 import { Router } from 'express';
 import { AuthService } from 'services/auth.service';
 
-const Logger: LoggerService = LoggerService.Instance('Auth API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/auth');
+const Logger: LoggerService = LoggerService.Instance('Auth API', environment.logDir);
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`

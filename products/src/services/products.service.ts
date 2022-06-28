@@ -1,9 +1,10 @@
 import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { environment } from 'environment/environment';
 import { IProduct, Product, ProductsStats } from 'models/products.model';
 
 export class ProductsService {
 
-    private readonly Logger: LoggerService = LoggerService.Instance('Products API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/products');
+    private readonly Logger: LoggerService = LoggerService.Instance('Products API', environment.logDir);
 
     constructor() { }
 

@@ -1,8 +1,9 @@
 import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { environment } from 'environment/environment';
 import { IMenu, Menu, MenusStats } from 'models/menus.model';
 
 export class MenusService {
-    private readonly Logger: LoggerService = LoggerService.Instance('Menus API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/menus');
+    private readonly Logger: LoggerService = LoggerService.Instance('Menus API', environment.logDir);
 
     constructor() { }
 

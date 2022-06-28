@@ -1,11 +1,12 @@
 import { IUser, LoggerService, NotFoundException, Roles } from '@grp-2-projet-elective/cesieats-helpers';
+import { environment } from 'environment/environment';
 import { User, UsersStats } from 'models/users.model';
 import * as referralCodes from 'referral-codes';
 import { Model, ModelStatic, Sequelize } from 'sequelize';
 
 export class UsersService {
 
-    private readonly Logger: LoggerService = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
+    private readonly Logger: LoggerService = LoggerService.Instance('Users API', environment.logDir);
 
     public User: ModelStatic<Model<any, any>>;
     public Role: ModelStatic<Model<any, any>>;

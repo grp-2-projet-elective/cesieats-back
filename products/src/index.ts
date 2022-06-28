@@ -7,7 +7,7 @@ import express from 'express';
 import { ProductsAuthMiddleware } from 'middlewares/products-auth.middleware';
 import { connect } from 'mongoose';
 
-const Logger: LoggerService = LoggerService.Instance('Products API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/products');
+const Logger: LoggerService = LoggerService.Instance('Products API', environment.logDir);
 
 /**
  * On crée une nouvelle "application" express

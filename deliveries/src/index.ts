@@ -7,7 +7,7 @@ import express from 'express';
 import { DeliveriesAuthMiddleware } from 'middlewares/deliveries-auth.middleware';
 import { connect } from 'mongoose';
 
-const Logger: LoggerService = LoggerService.Instance('Deliveries API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/deliveries');
+const Logger: LoggerService = LoggerService.Instance('Deliveries API', environment.logDir);
 
 /**
  * On crée une nouvelle "application" express

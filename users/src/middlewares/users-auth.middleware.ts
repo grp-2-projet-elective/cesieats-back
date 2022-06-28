@@ -1,10 +1,11 @@
 import { BadRequestException, LoggerService } from '@grp-2-projet-elective/cesieats-helpers';
+import { environment } from 'environment/environment';
 import { NextFunction, Request, Response } from 'express';
 import { UsersService } from 'services/users.service';
 
 export abstract class UsersAuthMiddleware {
     public static authorizedHosts: Array<string>;
-    private static Logger: LoggerService = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
+    private static Logger: LoggerService = LoggerService.Instance('Users API', environment.logDir);
 
     public static async verifyUserDucplication(req: Request, res: Response, next: NextFunction) {
         try {

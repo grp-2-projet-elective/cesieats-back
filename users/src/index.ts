@@ -6,7 +6,7 @@ import { environment } from 'environment/environment';
 import express from 'express';
 import { SqlService } from 'services/sql.service';
 
-const Logger: LoggerService = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
+const Logger: LoggerService = LoggerService.Instance('Users API', environment.logDir);
 
 /**
  * On crée une nouvelle "application" express

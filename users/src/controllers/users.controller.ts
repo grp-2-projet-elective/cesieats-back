@@ -1,9 +1,10 @@
 import { AuthMiddlewares, BadRequestException, LoggerService } from '@grp-2-projet-elective/cesieats-helpers';
+import { environment } from 'environment/environment';
 import { Router } from 'express';
 import { UsersAuthMiddleware } from 'middlewares/users-auth.middleware';
 import { UsersService } from 'services/users.service';
 
-const Logger: LoggerService = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
+const Logger: LoggerService = LoggerService.Instance('Users API', environment.logDir);
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`

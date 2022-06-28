@@ -1,9 +1,10 @@
 import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { environment } from 'environment/environment';
 import { IRestaurant, Restaurant, RestaurantsStats } from 'models/restaurants.model';
 
 export class RestaurantsService {
 
-    private readonly Logger: LoggerService = LoggerService.Instance('Restaurants API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/restaurants');
+    private readonly Logger: LoggerService = LoggerService.Instance('Restaurants API', environment.logDir);
 
     private static instance: RestaurantsService;
 

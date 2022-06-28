@@ -7,7 +7,7 @@ import express from 'express';
 import { MenusAuthMiddleware } from 'middlewares/menus-auth.middleware';
 import { connect } from 'mongoose';
 
-const Logger: LoggerService = LoggerService.Instance('Menus API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/menus');
+const Logger: LoggerService = LoggerService.Instance('Menus API', environment.logDir);
 
 /**
  * On crée une nouvelle "application" express

@@ -5,7 +5,7 @@ import 'dotenv/config';
 import { environment } from 'environment/environment';
 import express from 'express';
 
-const Logger = LoggerService.Instance('Auth API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/auth');
+const Logger = LoggerService.Instance('Auth API', environment.logDir);
 
 /**
  * On crée une nouvelle "application" express

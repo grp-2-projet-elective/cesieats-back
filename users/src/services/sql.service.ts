@@ -5,7 +5,7 @@ import { UsersService } from "./users.service";
 
 export class SqlService {
 
-    private readonly Logger = LoggerService.Instance('Users API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users');
+    private readonly Logger = LoggerService.Instance('Users API', environment.logDir);
 
     constructor(private readonly usersService: UsersService) { }
 

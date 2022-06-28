@@ -7,7 +7,7 @@ import express from 'express';
 import { OrdersAuthMiddleware } from 'middlewares/orders-auth.middleware';
 import { connect } from 'mongoose';
 
-const Logger: LoggerService = LoggerService.Instance('Orders API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/orders');
+const Logger: LoggerService = LoggerService.Instance('Orders API', environment.logDir);
 
 /**
  * On crée une nouvelle "application" express

@@ -1,8 +1,9 @@
 import { BadRequestException, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { environment } from 'environment/environment';
 import { Router } from 'express';
 import { ProductsService } from 'services/products.service';
 
-const Logger: LoggerService = LoggerService.Instance('Products API', 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/products');
+const Logger: LoggerService = LoggerService.Instance('Products API', environment.logDir);
 
 /**
  * Nous créons un `Router` Express, il nous permet de créer des routes en dehors du fichier `src/index.ts`
