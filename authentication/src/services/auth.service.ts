@@ -50,7 +50,7 @@ export class AuthService {
                 await this.updateUser(updatedUser);
 
                 this.Logger.info('Account logged in');
-                return { accessToken: accessToken, refreshToken: refreshToken };
+                return { user: user, accessToken: accessToken, refreshToken: refreshToken };
             }
 
             throw new UnauthorizedException('Unauthorized');

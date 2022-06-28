@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import { UsersService } from 'services/users.service';
 
 export abstract class UsersAuthMiddleware {
-    public static authorizedHosts: Array<string>;
+    public static authorizedHosts: Array<string> = environment.authorizedHosts;
     private static Logger: LoggerService = LoggerService.Instance('Users API', environment.logDir);
 
     public static async verifyUserDucplication(req: Request, res: Response, next: NextFunction) {
