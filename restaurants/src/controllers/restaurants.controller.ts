@@ -48,18 +48,18 @@ RestaurantsController.get('/', async (req, res) => {
 });
 
 /**
- * Trouve un restaurant en particulier
+ * Trouve un restaurant par son propriétaire
  */
-RestaurantsController.get('/:id', async (req, res) => {
-    Logger.info('Requesting single restaurant');
+ RestaurantsController.get('/byowner/:ownerId', async (req, res) => {
+    Logger.info('Requesting single restaurant by owner');
     try {
-        const id = req.params.id;
+        const ownerId = req.params.ownerId;
 
-        if (!id) {
-            throw new BadRequestException('Invalid id');
+        if (!ownerId) {
+            throw new BadRequestException('Invalid ownerId');
         }
 
-        const restaurant = await service.findOne(id);
+        const restaurant = await service.findOneByOwner(ownerId);
 
         if (!restaurant) {
             throw new NotFoundException('No restaurant found');
@@ -75,18 +75,18 @@ RestaurantsController.get('/:id', async (req, res) => {
 });
 
 /**
- * Trouve un restaurant par son propriétaire
+ * Trouve un restaurant en particulier
  */
-RestaurantsController.get('/byowner/:ownerId', async (req, res) => {
-    Logger.info('Requesting single restaurant by owner');
+RestaurantsController.get('/:id', async (req, res) => {
+    Logger.info('Requesting single restaurant');
     try {
-        const ownerId = req.params.ownerId;
+        const id = req.params.id;
 
-        if (!ownerId) {
-            throw new BadRequestException('Invalid ownerId');
+        if (!id) {
+            throw new BadRequestException('Invalid id');
         }
 
-        const restaurant = await service.findOneByOwner(ownerId);
+        const restaurant = await service.findOne(id);
 
         if (!restaurant) {
             throw new NotFoundException('No restaurant found');

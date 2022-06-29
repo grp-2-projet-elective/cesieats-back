@@ -38,6 +38,21 @@ export class DeliveriesService {
         }
     }
 
+    async findAvailableDeliveryMan(): Promise<Array<number> | null | undefined> {
+        try {
+            const deliveries = await Delivery.find({ where: { deliveryState: 'En cours de livraison' } });
+
+            console.log(deliveries);
+            const availableDeliveryMan = deliveries.map(delivery => delivery.deliveryManId);
+            console.log(availableDeliveryMan);
+
+            return availableDeliveryMan;
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
+    }
+
     /**
      * 
      * @param id 

@@ -50,6 +50,23 @@ DeliveriesController.get('/', async (req, res) => {
 /**
  * Trouver un livraison en particulier
  */
+ DeliveriesController.get('/deliveryman', async (req, res) => {
+    Logger.info('Requesting available delivery man');
+    try {
+        const delivery = await service.findAvailableDeliveryMan();
+
+        return res
+            .status(200)
+            .json(delivery);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
+});
+
+/**
+ * Trouver un livraison en particulier
+ */
 DeliveriesController.get('/:id', async (req, res) => {
     Logger.info('Requesting single delivery');
     try {
