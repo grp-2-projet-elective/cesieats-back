@@ -53,7 +53,7 @@ RestaurantsController.get('/', async (req, res) => {
  RestaurantsController.get('/byowner/:ownerId', async (req, res) => {
     Logger.info('Requesting single restaurant by owner');
     try {
-        const ownerId = req.params.ownerId;
+        const ownerId = Number(req.params.ownerId);
 
         if (!ownerId) {
             throw new BadRequestException('Invalid ownerId');

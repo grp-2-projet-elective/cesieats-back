@@ -45,7 +45,7 @@ export class RestaurantsService {
      * Trouve un restaurant en particulier
      * @param id - ID unique du restaurant
      */
-      async findOneByOwner(ownerId: string): Promise<IRestaurant | null | undefined> {
+      async findOneByOwner(ownerId: number): Promise<IRestaurant | null | undefined> {
         try {
             const restaurant = await Restaurant.findOne({ where: { restaurantOwnerId: ownerId }});
 

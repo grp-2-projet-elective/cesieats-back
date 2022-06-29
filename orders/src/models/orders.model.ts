@@ -11,7 +11,7 @@ export interface IOrder extends Document {
     },
     date: Date,
     orderState: string,
-    customerId: string,
+    customerId: number,
     location: {
         city: string,
         zipCode: string,
@@ -32,7 +32,7 @@ export const OrderSchema: Schema = new Schema({
     },
     date: { type: Date, required: true },
     orderState: { type: String, required: true },
-    customerId: { type: String, required: true },
+    customerId: { type: Number, required: true },
     location: {
         city: { type: String, required: true },
         zipCode: { type: String, required: true },

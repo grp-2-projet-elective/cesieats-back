@@ -40,10 +40,24 @@ export class DeliveriesService {
 
     async findAvailableDeliveryMan(): Promise<Array<number> | null | undefined> {
         try {
-            const deliveries = await Delivery.find({ where: { deliveryState: 'En cours de livraison' } });
-
-            console.log(deliveries);
-            const availableDeliveryMan = deliveries.map(delivery => delivery.deliveryManId);
+            // const deliveries = await Delivery.find({ where: { deliveryState: 'En cours de livraison' } });
+            const deliverByState = await Delivery.aggregate(
+                [
+                    {
+                        $group: {
+                            _id: {
+                                deliveryState: '$deliveryState',
+                                deliveryManId: '$deliveryManId',
+                            },
+                        },
+                        $match: {
+                            deliveryState: 'En cours de livraison' || '',
+                        }
+                    },
+                ],
+            );
+            console.log(deliverByState);
+            const availableDeliveryMan = deliverByState.map(delivery => delivery.deliveryManId);
             console.log(availableDeliveryMan);
 
             return availableDeliveryMan;
