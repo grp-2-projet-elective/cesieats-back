@@ -45,10 +45,11 @@ export class RestaurantsService {
      * Trouve un restaurant en particulier
      * @param id - ID unique du restaurant
      */
-      async findOneByOwner(ownerId: number): Promise<IRestaurant | null | undefined> {
+      async findOneByOwner(restaurantOwnerId: number): Promise<IRestaurant | null | undefined> {
         try {
-            const restaurant = await Restaurant.findOne({ where: { restaurantOwnerId: ownerId }});
+            const restaurant = await Restaurant.findOne({ restaurantOwnerId });
 
+            console.log(restaurant)
             return restaurant;
         } catch (error) {
             this.Logger.error(error);
@@ -61,9 +62,9 @@ export class RestaurantsService {
      * @param restaurantName 
      * @returns 
      */
-    async findOneByName(restaurantName: string): Promise<IRestaurant | null | undefined> {
+    async findOneByName(name: string): Promise<IRestaurant | null | undefined> {
         try {
-            const restaurant = await Restaurant.findOne({ where: { name: restaurantName } });
+            const restaurant = await Restaurant.findOne({ name });
 
             return restaurant;
         } catch (error) {
