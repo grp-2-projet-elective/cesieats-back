@@ -120,6 +120,7 @@ export class UsersService {
                     count: 1,
                     charset: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
                 })[0],
+                isSuspend: false,
                 createdAt: new Date(Date.now()),
                 updatedAt: new Date(Date.now()),
             });

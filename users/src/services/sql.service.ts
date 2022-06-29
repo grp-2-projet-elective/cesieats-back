@@ -101,6 +101,10 @@ export class SqlService {
                     type: DataTypes.STRING,
                     allowNull: true
                 },
+                isSuspend: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: false
+                },
                 createdAt: DataTypes.DATE,
                 updatedAt: DataTypes.DATE,
             });

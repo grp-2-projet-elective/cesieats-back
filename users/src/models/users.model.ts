@@ -21,6 +21,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare referalCode: CreationOptional<string>;
 
   declare refreshToken: CreationOptional<string>;
+  declare isSuspend: boolean;
 
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
