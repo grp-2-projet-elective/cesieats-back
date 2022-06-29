@@ -41,15 +41,14 @@ export class RestaurantsService {
         }
     }
 
-     /**
-     * Trouve un restaurant en particulier
-     * @param id - ID unique du restaurant
-     */
-      async findOneByOwner(restaurantOwnerId: number): Promise<IRestaurant | null | undefined> {
+    /**
+    * Trouve un restaurant en particulier
+    * @param id - ID unique du restaurant
+    */
+    async findOneByOwner(restaurantOwnerId: number): Promise<IRestaurant | null | undefined> {
         try {
             const restaurant = await Restaurant.findOne({ restaurantOwnerId });
 
-            console.log(restaurant)
             return restaurant;
         } catch (error) {
             this.Logger.error(error);

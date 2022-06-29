@@ -1,9 +1,8 @@
-import { BadRequestException, IUser, LoggerService, NotFoundException, Roles, UnauthorizedException } from '@grp-2-projet-elective/cesieats-helpers';
+import { BadRequestException, IUser, LoggerService, NotFoundException, Roles, TokenData, Tokens, UnauthorizedException } from '@grp-2-projet-elective/cesieats-helpers';
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import { environment } from 'environment/environment';
 import * as jwt from 'jsonwebtoken';
-import { TokenData, Tokens } from 'models/auth.model';
 
 export class AuthService {
 
@@ -45,8 +44,9 @@ export class AuthService {
                 const tokenData: TokenData = {
                     id: user.id,
                     mail: user.mail,
-                    role: user.role,
-                    restaurantId: user.role === Roles.RESTAURANT_OWNER ? 0 : undefined
+                    roleId: user.roleId,
+                    isSuspended: user.isSuspended,
+                    restaurantId: user.roleId === Roles.RESTAURANT_OWNER ? '0' : undefined
                 };
 
                 const accessToken = this.generateAccessToken(tokenData);
@@ -79,7 +79,7 @@ export class AuthService {
     public async logout(mail: string): Promise<any> {
         try {
             const user = await this.getUserByMail(mail);
-            user.refreshToken = undefined;
+            user.refreshToken = '';
 
             await this.updateUser(user);
 
@@ -106,8 +106,9 @@ export class AuthService {
             const tokenData: TokenData = {
                 id: user.id,
                 mail: user.mail,
-                role: user.role,
-                restaurantId: user.role === Roles.RESTAURANT_OWNER ? 0 : undefined
+                roleId: user.roleId,
+                isSuspended: user.isSuspended,
+                restaurantId: user.roleId === Roles.RESTAURANT_OWNER ? '0' : undefined
             };
 
             const newAccessToken = this.generateAccessToken(tokenData);
@@ -141,7 +142,7 @@ export class AuthService {
         return jwt.sign(tokenData, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: '20m' });
     }
 
-    public async getUserByMail(mail: string): Promise<any> {
+    public async getUserByMail(mail: string): Promise<IUser> {
         this.Logger.info('Users api request: requesting user by mail');
         try {
             const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/${mail}`;

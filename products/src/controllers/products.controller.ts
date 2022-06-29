@@ -28,7 +28,7 @@ ProductsController.get('/stats', async (req, res) => {
             .json(response);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -43,7 +43,7 @@ ProductsController.get('/', async (req, res) => {
             .json(await service.findAll());
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -70,7 +70,7 @@ ProductsController.get('/:id', async (req, res) => {
             .json(product);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -87,7 +87,7 @@ ProductsController.post('/', async (req, res) => {
             .json(createdProduct);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -110,7 +110,7 @@ ProductsController.patch('/:id', async (req, res) => {
             .json(updatedProduct);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -131,7 +131,7 @@ ProductsController.delete('/:id', async (req, res) => {
             .json(await service.delete(id));
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 

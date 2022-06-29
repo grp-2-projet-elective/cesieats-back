@@ -28,7 +28,7 @@ MenusController.get('/stats', async (req, res) => {
             .json(response);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -43,7 +43,7 @@ MenusController.get('/', async (req, res) => {
             .json(await service.findAll());
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -70,7 +70,7 @@ MenusController.get('/:id', async (req, res) => {
             .json(menu);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -87,7 +87,7 @@ MenusController.post('/', async (req, res) => {
             .json(createdMenu);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -110,7 +110,7 @@ MenusController.patch('/:id', async (req, res) => {
             .json(updatedMenu);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -131,7 +131,7 @@ MenusController.delete('/:id', async (req, res) => {
             .json(await service.delete(id));
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 

@@ -28,7 +28,7 @@ RestaurantsController.get('/stats', async (req, res) => {
             .json(response);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -43,14 +43,14 @@ RestaurantsController.get('/', async (req, res) => {
             .json(await service.findAll());
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
 /**
  * Trouve un restaurant par son propriétaire
  */
- RestaurantsController.get('/byowner/:ownerId', async (req, res) => {
+RestaurantsController.get('/byowner/:ownerId', async (req, res) => {
     Logger.info('Requesting single restaurant by owner');
     try {
         const ownerId = Number(req.params.ownerId);
@@ -71,7 +71,7 @@ RestaurantsController.get('/', async (req, res) => {
             .json(restaurant);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -81,7 +81,7 @@ RestaurantsController.get('/', async (req, res) => {
 RestaurantsController.get('/:id', async (req, res) => {
     Logger.info('Requesting single restaurant');
     try {
-        const id = req.params.id;
+        const id: string = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -98,7 +98,7 @@ RestaurantsController.get('/:id', async (req, res) => {
             .json(restaurant);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -115,7 +115,7 @@ RestaurantsController.post('/', async (req, res) => {
             .json(createdRestaurant);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -125,7 +125,7 @@ RestaurantsController.post('/', async (req, res) => {
 RestaurantsController.patch('/:id', async (req, res) => {
     Logger.info('Requesting restaurant update');
     try {
-        const id = req.params.id;
+        const id: string = req.params.id;
 
         if (!id) {
             throw new BadRequestException('Invalid id');
@@ -138,7 +138,7 @@ RestaurantsController.patch('/:id', async (req, res) => {
             .json(updatedRestaurant);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -159,7 +159,7 @@ RestaurantsController.delete('/:id', async (req, res) => {
             .json(await service.delete(id));
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 

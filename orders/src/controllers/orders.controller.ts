@@ -28,7 +28,7 @@ OrdersController.get('/stats', async (req, res) => {
             .json(response);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -43,7 +43,7 @@ OrdersController.get('/', async (req, res) => {
             .json(await service.findAll());
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -70,7 +70,7 @@ OrdersController.get('/:id', async (req, res) => {
             .json(order);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -87,7 +87,7 @@ OrdersController.post('/', async (req, res) => {
             .json(createdOrder);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -110,7 +110,7 @@ OrdersController.patch('/:id', async (req, res) => {
             .json(updatedOrder);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -131,7 +131,7 @@ OrdersController.delete('/:id', async (req, res) => {
             .json(await service.delete(id));
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 

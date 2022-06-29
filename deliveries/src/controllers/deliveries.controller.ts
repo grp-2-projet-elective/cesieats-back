@@ -28,7 +28,7 @@ DeliveriesController.get('/stats', async (req, res) => {
             .json(response);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -43,14 +43,14 @@ DeliveriesController.get('/', async (req, res) => {
             .json(await service.findAll());
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
 /**
  * Trouver un livraison en particulier
  */
- DeliveriesController.get('/deliveryman/:not?', async (req, res) => {
+DeliveriesController.get('/deliveryman/:not?', async (req, res) => {
     Logger.info('Requesting available delivery man');
     try {
         const delivery = await service.findAvailableDeliveryMan(Number(req.params.not));
@@ -60,7 +60,7 @@ DeliveriesController.get('/', async (req, res) => {
             .json(delivery);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -87,7 +87,7 @@ DeliveriesController.get('/:id', async (req, res) => {
             .json(delivery);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -104,7 +104,7 @@ DeliveriesController.post('/', async (req, res) => {
             .json(createdDelivery);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -127,7 +127,7 @@ DeliveriesController.patch('/:id', async (req, res) => {
             .json(updatedDelivery);
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 
@@ -148,7 +148,7 @@ DeliveriesController.delete('/:id', async (req, res) => {
             .json(await service.delete(id));
     } catch (error) {
         Logger.error(error);
-        throw error;
+        res.json(error);
     }
 });
 

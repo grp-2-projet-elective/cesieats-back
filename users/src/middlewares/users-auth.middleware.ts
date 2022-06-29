@@ -48,7 +48,7 @@ export abstract class UsersAuthMiddleware {
 
         if (UsersAuthMiddleware.authorizedHosts.includes(hostname)) {
             UsersAuthMiddleware.Logger.info('Skip default verification');
-            (req as any).skipMiddlewares = true;
+            (req as any).isApiCall = true;
         }
 
         return next();
