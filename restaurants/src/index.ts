@@ -1,11 +1,10 @@
+import { ExceptionsHandler, LoggerService, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
+import { RestaurantsController } from 'controllers/restaurants.controller';
 import cors from 'cors';
 import 'dotenv/config';
-import express from 'express';
 import { environment } from 'environment/environment';
+import express from 'express';
 import { connect } from 'mongoose';
-import { RestaurantsController } from 'controllers/restaurants.controller';
-import { RestaurantAuthMiddleware } from 'middlewares/restaurant-auth.middleware';
-import { AuthMiddlewares, ExceptionsHandler, LoggerService, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
 
 const Logger: LoggerService = LoggerService.Instance('Restaurants API', environment.logDir);
 

@@ -3,7 +3,7 @@ import { Document, model, Model, Schema } from 'mongoose';
 export interface IProduct extends Document {
     name: string,
     description?: string,
-    restaurant: object,
+    restaurantId: string,
     price: number,
     image: string,
     categories?: Array<string>,
@@ -13,7 +13,7 @@ export interface IProduct extends Document {
 export const ProductSchema: Schema = new Schema({
     name: { type: String, required: true },
     description: { type: String, required: false },
-    restaurant: { type: Object, required: true },
+    restaurantId: { type: String, required: true },
     price: { type: Number, required: true },
     image: { type: String, required: true },
     categories: { type: Array, required: true },
