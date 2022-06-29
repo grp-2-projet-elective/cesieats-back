@@ -90,6 +90,22 @@ UsersController.get('/:key', async (req, res, next) => {
 });
 
 /**
+ * Trouve tous les utilisateurs
+ */
+ UsersController.post('/availableDeliveryMan', async (req, res, next) => {
+    Logger.info('Requesting delivery man');
+    try {
+        const unavailableDeliveryMans = req.body.unavailableDeliveryMans;
+        return res
+            .status(200)
+            .json(await usersService.findAvailableDelivery(unavailableDeliveryMans));
+    } catch (error) {
+        Logger.error(error);
+        res.json(error);
+    }
+});
+
+/**
  * Créer un utilisateur
  */
 UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req, res, next) => {

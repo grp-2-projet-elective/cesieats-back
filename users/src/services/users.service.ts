@@ -62,6 +62,21 @@ export class UsersService {
         }
     }
 
+    
+    /**
+     * Trouve un utilisateur en particulier par son email
+     * @param mail - mail unique de l'utilisateur
+     */
+     async findAvailableDelivery(unavailableDeliveryMan: Array<number>): Promise<Model<any, any> | null> {
+        try {
+            const availableDeliveryMans = (await this.User.findAll({ where: { roleId: 3 } })).filter(deliveryMan => !unavailableDeliveryMan.includes((deliveryMan as any).id));
+            return availableDeliveryMans[0];
+        } catch (error) {
+            this.Logger.error(error);
+            throw error;
+        }
+    }
+
     /**
      * 
      * @param id 

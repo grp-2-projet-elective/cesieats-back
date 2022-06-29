@@ -50,10 +50,10 @@ DeliveriesController.get('/', async (req, res) => {
 /**
  * Trouver un livraison en particulier
  */
- DeliveriesController.get('/deliveryman', async (req, res) => {
+ DeliveriesController.get('/deliveryman/:not?', async (req, res) => {
     Logger.info('Requesting available delivery man');
     try {
-        const delivery = await service.findAvailableDeliveryMan();
+        const delivery = await service.findAvailableDeliveryMan(Number(req.params.not));
 
         return res
             .status(200)

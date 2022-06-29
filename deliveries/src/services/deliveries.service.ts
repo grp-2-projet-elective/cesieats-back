@@ -1,4 +1,5 @@
 import { LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import axios from 'axios';
 import { environment } from 'environment/environment';
 import { DeliveriesStats, Delivery, IDelivery } from 'models/deliveries.model';
 
@@ -38,29 +39,33 @@ export class DeliveriesService {
         }
     }
 
-    async findAvailableDeliveryMan(): Promise<Array<number> | null | undefined> {
+    async findAvailableDeliveryMan(not?: number): Promise<Array<number> | null | undefined> {
         try {
             // const deliveries = await Delivery.find({ where: { deliveryState: 'En cours de livraison' } });
-            const deliverByState = await Delivery.aggregate(
+            const deliverByState = (await Delivery.aggregate(
                 [
                     {
                         $group: {
                             _id: {
                                 deliveryState: '$deliveryState',
-                                deliveryManId: '$deliveryManId',
+                                deliveryManId: '$deliveryManId'
                             },
-                        },
-                        $match: {
-                            deliveryState: 'En cours de livraison' || '',
                         }
-                    },
+                    }
                 ],
-            );
-            console.log(deliverByState);
-            const availableDeliveryMan = deliverByState.map(delivery => delivery.deliveryManId);
-            console.log(availableDeliveryMan);
+            )).map(delivery => delivery._id);
 
-            return availableDeliveryMan;
+            const unavailableDeliveryMans = deliverByState.map(delivery => {
+                if (delivery.deliveryState === 'En cours de livraison') {
+                    return delivery.deliveryManId
+                }
+            }).filter(deliveryManId => deliveryManId !== undefined);
+            if (not) unavailableDeliveryMans.push(not)
+
+            const apiUrl: string = `http://${environment.USERS_API_HOSTNAME}:${environment.USERS_API_PORT}/api/v1/users/availableDeliveryMan`;
+
+            const deliveryMan = (await axios.post(apiUrl, { unavailableDeliveryMans: unavailableDeliveryMans })).data;
+            return deliveryMan;
         } catch (error) {
             this.Logger.error(error);
             throw error;
