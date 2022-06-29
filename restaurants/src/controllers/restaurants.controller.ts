@@ -75,6 +75,33 @@ RestaurantsController.get('/:id', async (req, res) => {
 });
 
 /**
+ * Trouve un restaurant par son propriétaire
+ */
+RestaurantsController.get('/byowner/:ownerId', async (req, res) => {
+    Logger.info('Requesting single restaurant by owner');
+    try {
+        const ownerId = req.params.ownerId;
+
+        if (!ownerId) {
+            throw new BadRequestException('Invalid ownerId');
+        }
+
+        const restaurant = await service.findOneByOwner(ownerId);
+
+        if (!restaurant) {
+            throw new NotFoundException('No restaurant found');
+        }
+
+        return res
+            .status(200)
+            .json(restaurant);
+    } catch (error) {
+        Logger.error(error);
+        throw error;
+    }
+});
+
+/**
  * Créer un restaurant
  */
 RestaurantsController.post('/', async (req, res) => {
