@@ -22,6 +22,7 @@ export const RestaurantSchema: Schema = new Schema({
     image: { type: String, required: true },
     categories: { type: Array, required: true },
     restaurantOwnerId: { type: Number, required: true },
+    openingHours: { type: String, required: true },
     location: {
         city: { type: String, required: true },
         zipCode: { type: String, required: true },
