@@ -19,7 +19,7 @@ const usersService = new UsersService();
 /**
  * Recupération des données statistiques des utilisateurs
  */
-UsersController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, async (req, res, next) => {
+UsersController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res, next) => {
     Logger.info('Requesting users stats');
     try {
         const response = await usersService.getStats();
@@ -36,7 +36,7 @@ UsersController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, async
 /**
  * Trouve tous les utilisateurs
  */
-UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req, res, next) => {
+UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res, next) => {
     Logger.info('Requesting all users');
     try {
         return res
@@ -148,7 +148,7 @@ UsersController.patch('/:id', AuthMiddlewares.verifyProfileOwnership, async (req
 /**
  * Suppression d'un utilisateur
  */
-UsersController.delete('/:id', async (req, res, next) => {
+UsersController.delete('/:id', AuthMiddlewares.verifyProfileOwnership, async (req, res, next) => {
     Logger.info('Requesting user deletion');
     try {
         const id = Number(req.params.id);

@@ -30,7 +30,7 @@ app.use(cors());
 /**
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
-app.use('/api/v1/restaurants', RestaurantAuthMiddleware.isApiCall, AuthMiddlewares.verifyAccessToken, RestaurantsController);
+app.use('/api/v1/restaurants', RestaurantAuthMiddleware.isApiCall, AuthMiddlewares.isCommercialDepartmentCall, AuthMiddlewares.isTechnicalDepartmentCall, AuthMiddlewares.verifyAccessToken, RestaurantsController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)

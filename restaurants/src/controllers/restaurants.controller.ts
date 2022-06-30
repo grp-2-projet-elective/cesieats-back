@@ -1,6 +1,7 @@
-import { BadRequestException, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { AuthMiddlewares, BadRequestException, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { environment } from 'environment/environment';
 import { Router } from 'express';
+import { IRestaurant } from 'models/restaurants.model';
 import { RestaurantsService } from 'services/restaurants.service';
 
 const Logger: LoggerService = LoggerService.Instance('Restaurants API', environment.logDir);
@@ -18,7 +19,7 @@ const service = new RestaurantsService();
 /**
  * Recupération des données statistiques des restaurants
  */
-RestaurantsController.get('/stats', async (req, res) => {
+RestaurantsController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
     Logger.info('Requesting users stats');
     try {
         const response = await service.getStats();
@@ -35,7 +36,7 @@ RestaurantsController.get('/stats', async (req, res) => {
 /**
  * Trouve tous les restaurants
  */
-RestaurantsController.get('/', async (req, res) => {
+RestaurantsController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
     Logger.info('Requesting all restaurants');
     try {
         return res
@@ -78,7 +79,7 @@ RestaurantsController.get('/byowner/:ownerId', async (req, res) => {
 /**
  * Trouve un restaurant en particulier
  */
-RestaurantsController.get('/:id', async (req, res) => {
+RestaurantsController.get('/:id', AuthMiddlewares.verifyRestaurantOwnership, async (req, res) => {
     Logger.info('Requesting single restaurant');
     try {
         const id: string = req.params.id;
@@ -108,7 +109,7 @@ RestaurantsController.get('/:id', async (req, res) => {
 RestaurantsController.post('/', async (req, res) => {
     Logger.info('Requesting restaurant creation');
     try {
-        const createdRestaurant = await service.create(req.body);
+        const createdRestaurant: IRestaurant = await service.create(req.body);
 
         return res
             .status(201)
@@ -122,7 +123,7 @@ RestaurantsController.post('/', async (req, res) => {
 /**
  * Mise à jour d'un restaurant
  */
-RestaurantsController.patch('/:id', async (req, res) => {
+RestaurantsController.patch('/:id', AuthMiddlewares.verifyRestaurantOwnership, async (req, res) => {
     Logger.info('Requesting restaurant update');
     try {
         const id: string = req.params.id;
@@ -145,7 +146,7 @@ RestaurantsController.patch('/:id', async (req, res) => {
 /**
  * Suppression d'un restaurant
  */
-RestaurantsController.delete('/:id', async (req, res) => {
+RestaurantsController.delete('/:id', AuthMiddlewares.verifyRestaurantOwnership, async (req, res) => {
     Logger.info('Requesting restaurant deletion');
     try {
         const id = req.params.id;

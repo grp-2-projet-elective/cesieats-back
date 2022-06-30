@@ -1,4 +1,4 @@
-import { BadRequestException, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { AuthMiddlewares, BadRequestException, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { environment } from 'environment/environment';
 import { Router } from 'express';
 import { MenusService } from 'services/menus.service';
@@ -18,7 +18,7 @@ const service = new MenusService();
 /**
  * Recupération des données statistiques des menus
  */
-MenusController.get('/stats', async (req, res) => {
+MenusController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
     Logger.info('Requesting menus stats');
     try {
         const response = await service.getStats();
@@ -35,7 +35,7 @@ MenusController.get('/stats', async (req, res) => {
 /**
  * Trouver tous les menus
  */
-MenusController.get('/', async (req, res) => {
+MenusController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
     Logger.info('Requesting all menus');
     try {
         return res

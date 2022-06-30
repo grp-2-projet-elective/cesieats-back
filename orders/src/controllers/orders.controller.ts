@@ -1,4 +1,4 @@
-import { BadRequestException, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { AuthMiddlewares, BadRequestException, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { environment } from 'environment/environment';
 import { Router } from 'express';
 import { OrdersService } from 'services/orders.service';
@@ -18,7 +18,7 @@ const service = new OrdersService();
 /**
  * Recupération des données statistiques des commandes
  */
-OrdersController.get('/stats', async (req, res) => {
+OrdersController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
     Logger.info('Requesting orders stats');
     try {
         const response = await service.getStats();
@@ -35,7 +35,7 @@ OrdersController.get('/stats', async (req, res) => {
 /**
  * Trouver toutes les commandes
  */
-OrdersController.get('/', async (req, res) => {
+OrdersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
     Logger.info('Requesting all orders');
     try {
         return res

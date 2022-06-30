@@ -1,4 +1,4 @@
-import { BadRequestException, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
+import { AuthMiddlewares, BadRequestException, LoggerService, NotFoundException } from '@grp-2-projet-elective/cesieats-helpers';
 import { environment } from 'environment/environment';
 import { Router } from 'express';
 import { ProductsService } from 'services/products.service';
@@ -18,7 +18,7 @@ const service = new ProductsService();
 /**
  * Recupération des données statistiques des produits
  */
-ProductsController.get('/stats', async (req, res) => {
+ProductsController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
     Logger.info('Requesting products stats');
     try {
         const response = await service.getStats();
@@ -35,7 +35,7 @@ ProductsController.get('/stats', async (req, res) => {
 /**
  * Trouve tous les produits
  */
-ProductsController.get('/', async (req, res) => {
+ProductsController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
     Logger.info('Requesting all products');
     try {
         return res
