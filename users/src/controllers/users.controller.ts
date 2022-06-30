@@ -3,6 +3,7 @@ import { environment } from 'environment/environment';
 import { Router } from 'express';
 import { UsersAuthMiddleware } from 'middlewares/users-auth.middleware';
 import { UsersService } from 'services/users.service';
+import * as bcrypt from 'bcrypt';
 
 const Logger: LoggerService = LoggerService.Instance('Users API', environment.logDir);
 
@@ -121,6 +122,35 @@ UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req
     } catch (error) {
         Logger.error(error);
         res.json(error);
+    }
+});
+
+
+/**
+ * Mettre à jour le mot de passe d'un utilisateur
+ */
+ UsersController.patch("/updatePassword/:id", async (req, res, next) => {
+    Logger.info('Requesting account password update');
+    try {
+        const id = Number(req.params.id);
+
+        if (!id) {
+            throw new BadRequestException('Invalid id');
+        }
+
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        console.log(hashedPassword);
+
+        const userInformationData: any = {
+            password: hashedPassword
+        }
+
+        const updatedUser = await usersService.update(id, userInformationData);
+
+        return res.status(200).send(updatedUser);
+    } catch (error: any) {
+        Logger.error(error);
+        res.status(error.status ? error.status : 500).json(error);
     }
 });
 

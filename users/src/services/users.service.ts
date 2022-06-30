@@ -93,6 +93,8 @@ export class UsersService {
                 ...user.toJSON(),
                 ...userData
             };
+            
+            console.log(updatedUser.password);
 
             await this.User.update(updatedUser, { where: { id } });
             this.Logger.info('User updated');

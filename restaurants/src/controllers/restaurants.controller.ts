@@ -81,7 +81,7 @@ RestaurantsController.get('/byowner/:ownerId', async (req, res) => {
 /**
  * Trouve un restaurant en particulier
  */
-RestaurantsController.get('/:id', AuthMiddlewares.verifyRestaurantOwnership, async (req, res) => {
+RestaurantsController.get('/:id', async (req, res) => {
     Logger.info('Requesting single restaurant');
     try {
         const id: string = req.params.id;
