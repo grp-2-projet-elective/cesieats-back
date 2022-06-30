@@ -1,9 +1,10 @@
-import { ExceptionsHandler, LoggerService, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
+import { AuthMiddlewares, ExceptionsHandler, LoggerService, UnknownRoutesHandler } from '@grp-2-projet-elective/cesieats-helpers';
 import { RestaurantsController } from 'controllers/restaurants.controller';
 import cors from 'cors';
 import 'dotenv/config';
 import { environment } from 'environment/environment';
 import express from 'express';
+import { RestaurantAuthMiddleware } from 'middlewares/restaurant-auth.middleware';
 import { connect } from 'mongoose';
 
 const Logger: LoggerService = LoggerService.Instance('Restaurants API', environment.logDir);
@@ -29,8 +30,7 @@ app.use(cors());
 /**
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
-// app.use('/api/v1/restaurants', RestaurantAuthMiddleware.isApiCall, AuthMiddlewares.verifyAccessToken, RestaurantsController);
-app.use('/api/v1/restaurants', RestaurantsController);
+app.use('/api/v1/restaurants', RestaurantAuthMiddleware.isApiCall, AuthMiddlewares.verifyAccessToken, RestaurantsController);
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)

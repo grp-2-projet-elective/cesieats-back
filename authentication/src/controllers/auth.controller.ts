@@ -1,4 +1,4 @@
-import { LoggerService } from '@grp-2-projet-elective/cesieats-helpers';
+import { AuthMiddlewares, LoggerService } from '@grp-2-projet-elective/cesieats-helpers';
 import * as bcrypt from 'bcrypt';
 import { environment } from 'environment/environment';
 import { Router } from 'express';
@@ -58,7 +58,7 @@ AuthController.post('/login', async (req, res, next) => {
 /**
  * Rafraichir le token d'accès d'un utilisateur
  */
-AuthController.post("/refreshToken", async (req, res, next) => {
+AuthController.post("/refreshToken", AuthMiddlewares.verifyAccessToken, async (req, res, next) => {
     Logger.info('Requesting account token refresh');
     try {
         const tokens = await authService.refreshToken(req.body.mail, req.body.refreshToken);
@@ -73,7 +73,7 @@ AuthController.post("/refreshToken", async (req, res, next) => {
 /**
  * Déconnecter un utilisateur
  */
-AuthController.post("/logout", async (req, res, next) => {
+AuthController.post("/logout", AuthMiddlewares.verifyAccessToken, async (req, res, next) => {
     Logger.info('Requesting account logout');
     try {
         const logoutResponse = await authService.logout(req.body.id);
