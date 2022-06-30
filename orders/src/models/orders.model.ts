@@ -9,7 +9,7 @@ export interface IOrder extends Document {
         deliveryPrice: number,
         totalPrice: number,
     },
-    date: Date,
+    date: number,
     orderState: string,
     customerId: number,
     location: {
@@ -30,7 +30,7 @@ export const OrderSchema: Schema = new Schema({
         deliveryPrice: { type: Number, required: true },
         totalPrice: { type: Number, required: true },
     },
-    date: { type: Date, required: true },
+    date: { type: Number, required: true },
     orderState: { type: String, required: true },
     customerId: { type: Number, required: true },
     location: {

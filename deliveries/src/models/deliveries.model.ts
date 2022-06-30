@@ -3,7 +3,7 @@ import { Document, model, Model, Schema } from 'mongoose';
 export interface IDelivery extends Document {
     order: object,
     restaurant: object,
-    date: Date,
+    date: number,
     deliveryState: string,
     deliveryManId: number,
     customerId: number,
@@ -19,7 +19,7 @@ export interface IDelivery extends Document {
 export const DeliverySchema: Schema = new Schema({
     order: { type: Object, required: true },
     restaurant: { type: Object, required: true },
-    date: { type: Date, required: true },
+    date: { type: Number, required: true },
     deliveryState: { type: String, required: true },
     deliveryManId: { type: Number, required: true },
     customerId: { type: Number, required: true },
