@@ -19,7 +19,7 @@ const usersService = new UsersService();
 /**
  * Recupération des données statistiques des utilisateurs
  */
-UsersController.get('/stats', async (req, res, next) => {
+UsersController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, async (req, res, next) => {
     Logger.info('Requesting users stats');
     try {
         const response = await usersService.getStats();
@@ -51,7 +51,7 @@ UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, async (req
 /**
  * Trouve un utilisateur en particulier par son email ou son id
  */
-UsersController.get('/:key', async (req, res, next) => {
+UsersController.get('/:key', AuthMiddlewares.verifyProfileOwnership, async (req, res, next) => {
     Logger.info('Requesting single user');
     try {
         let id;
@@ -125,7 +125,7 @@ UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req
 /**
  * Mise à jour d'un utilisateur
  */
-UsersController.patch('/:id', async (req, res, next) => {
+UsersController.patch('/:id', AuthMiddlewares.verifyProfileOwnership, async (req, res, next) => {
     Logger.info('Requesting user update');
     try {
         const id = Number(req.params.id);

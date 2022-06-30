@@ -101,7 +101,7 @@ export class SqlService {
                     type: DataTypes.STRING,
                     allowNull: true
                 },
-                isSuspend: {
+                isSuspended: {
                     type: DataTypes.BOOLEAN,
                     allowNull: false
                 },
