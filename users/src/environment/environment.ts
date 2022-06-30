@@ -3,6 +3,7 @@ export const environment = {
     SQL_PORT: 5432,
     SQL_SERVER: 'elective-db.felicien-fouillet.fr',
     SQL_DATABASE: 'users',
-    authorizedHosts: ['localhost'],
+    // 'localhost'
+    authorizedHosts: [''],
     logDir: 'C:/Users/felic/Documents/CESI/Elective/Projet/dev/logs/users'
 }

@@ -19,7 +19,8 @@ const service = new RestaurantsService();
 /**
  * Recupération des données statistiques des restaurants
  */
-RestaurantsController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
+//  , AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole
+RestaurantsController.get('/stats', async (req, res) => {
     Logger.info('Requesting users stats');
     try {
         const response = await service.getStats();
@@ -36,7 +37,8 @@ RestaurantsController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole,
 /**
  * Trouve tous les restaurants
  */
-RestaurantsController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
+// , AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole
+RestaurantsController.get('/', async (req, res) => {
     Logger.info('Requesting all restaurants');
     try {
         return res

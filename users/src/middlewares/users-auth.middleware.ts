@@ -42,7 +42,7 @@ export abstract class UsersAuthMiddleware {
      * @param next 
      * @returns 
      */
-    public static async isApiCall(req: Request, res: Response, next: NextFunction) {
+    public static isApiCall(req: Request, res: Response, next: NextFunction) {
         const hostname = req.hostname;
         UsersAuthMiddleware.Logger.info('API call from: ', hostname);
 

@@ -18,7 +18,8 @@ const service = new DeliveriesService();
 /**
  * Recupération des données statistiques des livraisons
  */
-DeliveriesController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
+//  , AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole
+DeliveriesController.get('/stats', async (req, res) => {
     Logger.info('Requesting deliveries stats');
     try {
         const response = await service.getStats();
@@ -35,7 +36,8 @@ DeliveriesController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, 
 /**
  * Trouver toutes les livraisons
  */
-DeliveriesController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
+// , AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole
+DeliveriesController.get('/', async (req, res) => {
     Logger.info('Requesting all deliveries');
     try {
         return res

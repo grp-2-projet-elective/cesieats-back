@@ -129,7 +129,7 @@ export class AuthService {
      * @returns 
      */
     generateAccessToken(tokenData: TokenData): string {
-        return jwt.sign(tokenData, process.env.ACCESS_TOKEN_SECRET as jwt.Secret, { expiresIn: '15m' });
+        return jwt.sign(tokenData, process.env.ACCESS_TOKEN_SECRET as jwt.Secret, { expiresIn: '60m' });
     }
 
     /**
@@ -139,7 +139,7 @@ export class AuthService {
      * @returns 
      */
     generateRefreshToken(tokenData: TokenData): string {
-        return jwt.sign(tokenData, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: '20m' });
+        return jwt.sign(tokenData, process.env.REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: '90m' });
     }
 
     public async getUserByMail(mail: string): Promise<IUser> {

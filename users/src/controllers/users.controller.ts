@@ -19,7 +19,8 @@ const usersService = new UsersService();
 /**
  * Recupération des données statistiques des utilisateurs
  */
-UsersController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res, next) => {
+//  AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole,
+UsersController.get('/stats', async (req, res, next) => {
     Logger.info('Requesting users stats');
     try {
         const response = await usersService.getStats();
@@ -36,7 +37,8 @@ UsersController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthM
 /**
  * Trouve tous les utilisateurs
  */
-UsersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res, next) => {
+// , AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole
+UsersController.get('/', async (req, res, next) => {
     Logger.info('Requesting all users');
     try {
         return res
@@ -125,6 +127,7 @@ UsersController.post('/', UsersAuthMiddleware.verifyUserDucplication, async (req
 /**
  * Mise à jour d'un utilisateur
  */
+// 
 UsersController.patch('/:id', AuthMiddlewares.verifyProfileOwnership, async (req, res, next) => {
     Logger.info('Requesting user update');
     try {

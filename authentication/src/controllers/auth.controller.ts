@@ -36,7 +36,7 @@ AuthController.post('/register', async (req, res, next) => {
             .json(createdUser);
     } catch (error: any) {
         Logger.error(error);
-        res.status(error.status).json(error);
+        res.status(error.status ? error.status : 500).json(error);
     }
 });
 
@@ -51,14 +51,14 @@ AuthController.post('/login', async (req, res, next) => {
         return res.status(201).json(loginInformations);
     } catch (error: any) {
         Logger.error(error);
-        res.status(error.status).json(error);
+        res.status(error.status ? error.status : 500).json(error);
     }
 });
 
 /**
  * Rafraichir le token d'accès d'un utilisateur
  */
-AuthController.post("/refreshToken", AuthMiddlewares.verifyAccessToken, async (req, res, next) => {
+AuthController.post("/refreshToken", async (req, res, next) => {
     Logger.info('Requesting account token refresh');
     try {
         const tokens = await authService.refreshToken(req.body.mail, req.body.refreshToken);
@@ -66,14 +66,14 @@ AuthController.post("/refreshToken", AuthMiddlewares.verifyAccessToken, async (r
         return res.status(200).send(tokens);
     } catch (error: any) {
         Logger.error(error);
-        res.status(error.status).json(error);
+        res.status(error.status ? error.status : 500).json(error);
     }
 });
 
 /**
  * Déconnecter un utilisateur
  */
-AuthController.post("/logout", AuthMiddlewares.verifyAccessToken, async (req, res, next) => {
+AuthController.post("/logout", async (req, res, next) => {
     Logger.info('Requesting account logout');
     try {
         const logoutResponse = await authService.logout(req.body.id);
@@ -81,7 +81,7 @@ AuthController.post("/logout", AuthMiddlewares.verifyAccessToken, async (req, re
         return res.status(logoutResponse.status).send(logoutResponse.message);
     } catch (error: any) {
         Logger.error(error);
-        res.status(error.status).json(error);
+        res.status(error.status ? error.status : 500).json(error);
     }
 });
 

@@ -18,7 +18,8 @@ const service = new OrdersService();
 /**
  * Recupération des données statistiques des commandes
  */
-OrdersController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
+//  , AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole
+OrdersController.get('/stats', async (req, res) => {
     Logger.info('Requesting orders stats');
     try {
         const response = await service.getStats();
@@ -35,7 +36,8 @@ OrdersController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, Auth
 /**
  * Trouver toutes les commandes
  */
-OrdersController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
+//  , AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole
+OrdersController.get('/', async (req, res) => {
     Logger.info('Requesting all orders');
     try {
         return res

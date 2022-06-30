@@ -18,7 +18,8 @@ const service = new ProductsService();
 /**
  * Recupération des données statistiques des produits
  */
-ProductsController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
+//  , AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole
+ProductsController.get('/stats', async (req, res) => {
     Logger.info('Requesting products stats');
     try {
         const response = await service.getStats();
@@ -35,7 +36,8 @@ ProductsController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, Au
 /**
  * Trouve tous les produits
  */
-ProductsController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
+//  , AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole
+ProductsController.get('/', async (req, res) => {
     Logger.info('Requesting all products');
     try {
         return res

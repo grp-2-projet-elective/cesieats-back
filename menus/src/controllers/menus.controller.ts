@@ -18,7 +18,8 @@ const service = new MenusService();
 /**
  * Recupération des données statistiques des menus
  */
-MenusController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
+//  , AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole
+MenusController.get('/stats', async (req, res) => {
     Logger.info('Requesting menus stats');
     try {
         const response = await service.getStats();
@@ -35,7 +36,8 @@ MenusController.get('/stats', AuthMiddlewares.hasCommercialDepartmentRole, AuthM
 /**
  * Trouver tous les menus
  */
-MenusController.get('/', AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole, async (req, res) => {
+//  , AuthMiddlewares.hasCommercialDepartmentRole, AuthMiddlewares.hasTechnicalDepartmentRole
+MenusController.get('/', async (req, res) => {
     Logger.info('Requesting all menus');
     try {
         return res
