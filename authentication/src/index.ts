@@ -4,6 +4,9 @@ import cors from 'cors';
 import 'dotenv/config';
 import { environment } from 'environment/environment';
 import express from 'express';
+import { serve, setup } from "swagger-ui-express";
+
+const outputFile = './swagger-output.json'
 
 const Logger = LoggerService.Instance('Auth API', environment.logDir);
 
@@ -11,6 +14,7 @@ const Logger = LoggerService.Instance('Auth API', environment.logDir);
  * On crée une nouvelle "application" express
  */
 const app = express();
+// const swaggerService = new SwaggerService(app, Logger, 'api/v1/auth/doc', outputFile);
 
 /**
  * On dit à Express que l'on souhaite parser le body des requêtes en JSON
@@ -29,6 +33,7 @@ app.use(cors());
  * Toutes les routes CRUD pour les animaux seront préfixées par `/pets`
  */
 app.use('/api/v1/auth', AuthController);
+app.use('/api/v1/auth/doc', serve, setup(outputFile as any));
 
 /**
  * Homepage (uniquement nécessaire pour cette demo)

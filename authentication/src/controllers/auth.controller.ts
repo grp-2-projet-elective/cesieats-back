@@ -20,6 +20,9 @@ const authService = new AuthService();
  * Enregistrer un nouvel utilisateur
  */
 AuthController.post('/register', async (req, res, next) => {
+    // #swagger.summary = "register"
+    // #swagger.description = "Enregistrer un nouvel utilisateur"
+    // #swagger.tags = ['Authentication', 'register']
     Logger.info('Requesting account registration');
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -45,6 +48,9 @@ AuthController.post('/register', async (req, res, next) => {
  * Connecter un utilisateur
  */
 AuthController.post('/login', async (req, res, next) => {
+    // #swagger.summary = "login"
+    // #swagger.description = "Connecter un utilisateur"
+    // #swagger.tags = ['Authentication', 'login']
     Logger.info('Requesting account login');
     try {
         const loginInformations = await authService.login(req.body.mail, req.body.password);
@@ -59,6 +65,9 @@ AuthController.post('/login', async (req, res, next) => {
  * Rafraichir le token d'accès d'un utilisateur
  */
 AuthController.post("/refreshToken", async (req, res, next) => {
+    // #swagger.summary = "refreshToken"
+    // #swagger.description = "Rafraichir le token d'accès d'un utilisateur"
+    // #swagger.tags = ['Authentication', 'refreshToken']
     Logger.info('Requesting account token refresh');
     try {
         const tokens = await authService.refreshToken(req.body.mail, req.body.refreshToken);
@@ -74,6 +83,9 @@ AuthController.post("/refreshToken", async (req, res, next) => {
  * Déconnecter un utilisateur
  */
 AuthController.post("/logout", async (req, res, next) => {
+    // #swagger.summary = "logout"
+    // #swagger.description = "Déconnecter un utilisateur"
+    // #swagger.tags = ['Authentication', 'logout']
     Logger.info('Requesting account logout');
     try {
         const logoutResponse = await authService.logout(req.body.id);
@@ -84,6 +96,20 @@ AuthController.post("/logout", async (req, res, next) => {
         res.status(error.status ? error.status : 500).json(error);
     }
 });
+
+AuthController.get("/logs", async (req, res, next) => {
+    // #swagger.summary = "logs"
+    // #swagger.description = "Logs de connexions"
+    // #swagger.tags = ['Authentication', 'logs']
+    Logger.info('Requesting account connection logs');
+    try {
+        return res.send(environment.logDir + '/logs.txt');
+    } catch (error: any) {
+        Logger.error(error);
+        res.status(error.status ? error.status : 500).json(error);
+    }
+});
+
 
 /**
  * On expose notre controller pour l'utiliser dans `src/index.ts`

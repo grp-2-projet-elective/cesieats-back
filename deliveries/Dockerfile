@@ -1,4 +1,4 @@
-FROM node:16.9.1
+FROM node:16.10.0
 
 # Set working dir
 RUN mkdir /app
@@ -12,7 +12,6 @@ RUN rm -rf ./node_modules
 RUN npm install
 
 # Expose ports
-EXPOSE 3030
+EXPOSE 4300
 
-RUN npm run build
-ENTRYPOINT npm start
+ENTRYPOINT npm run dev
